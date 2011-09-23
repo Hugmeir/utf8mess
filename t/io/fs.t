@@ -46,7 +46,7 @@ $needs_fh_reopen = 1 if (defined &Win32::IsWin95 && Win32::IsWin95());
 my $skip_mode_checks =
     $^O eq 'cygwin' && $ENV{CYGWIN} !~ /ntsec/;
 
-plan tests => 61;
+plan tests => 64;
 
 my $tmpdir = tempfile();
 my $tmpdir1 = tempfile();
@@ -87,6 +87,23 @@ my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
 
 SKIP: {
     skip("no link", 4) unless $has_link;
+
+    {
+        local $@;
+        eval { link("\x{30cb}", "a") };
+        like( $@, qr/\QWide character in link\E/,
+                        "link() croaks on non-downgradeable UTF-8, first argument");
+    
+        local $@;
+        eval { link("a", "\x{30cb}") };
+        like( $@, qr/\QWide character in link\E/,
+                        "link() croaks on non-downgradeable UTF-8, second argument");
+    
+        local $@;
+        eval { link("\x{30cb}", "\x{30cc}") };
+        like( $@, qr/\QWide character in link\E/,
+                        "link() croaks on non-downgradeable UTF-8, both arguments");
+    }
 
     ok(link('a','b'), "link a b");
     ok(link('b','c'), "link b c");

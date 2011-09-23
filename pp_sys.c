@@ -3559,8 +3559,8 @@ PP(pp_link)
 #  endif
 
     {
-	const char * const tmps2 = POPpconstx;
-	const char * const tmps = SvPV_nolen_const(TOPs);
+	const char * const tmps2 = POPpbytex;
+	const char * const tmps = SvPVbyte_nolen(TOPs);
 	TAINT_PROPER(PL_op_desc[op_type]);
 	result =
 #  if defined(HAS_LINK)

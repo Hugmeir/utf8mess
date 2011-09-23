@@ -20,7 +20,7 @@ if(eval {require File::Spec; 1}) {
 }
 
 
-plan tests => 112;
+plan tests => 115;
 
 my $Perl = which_perl();
 
@@ -222,6 +222,23 @@ SKIP: {
     is( $@, '',     'symlink() implemented' );
     ok( $symlink_rslt,      'symlink() ok' );
     ok(-l $tmpfile_link,    '-l');
+
+    {
+        local $@;
+        eval { symlink("\x{30cb}", "a") };
+        like( $@, qr/\QWide character in symlink\E/,
+                        "symlink() croaks on non-downgradeable UTF-8, first argument");
+    
+        local $@;
+        eval { symlink("a", "\x{30cb}") };
+        like( $@, qr/\QWide character in symlink\E/,
+                        "symlink() croaks on non-downgradeable UTF-8, second argument");
+    
+        local $@;
+        eval { symlink("\x{30cb}", "\x{30cc}") };
+        like( $@, qr/\QWide character in symlink\E/,
+                        "symlink() croaks on non-downgradeable UTF-8, both arguments");
+    }
 }
 
 ok(-o $tmpfile,     '-o');
