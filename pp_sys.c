@@ -3604,7 +3604,7 @@ PP(pp_readlink)
 #ifndef INCOMPLETE_TAINTS
     TAINT;
 #endif
-    tmps = POPpconstx;
+    tmps = POPpbytex;
     len = readlink(tmps, buf, sizeof(buf) - 1);
     if (len < 0)
 	RETPUSHUNDEF;

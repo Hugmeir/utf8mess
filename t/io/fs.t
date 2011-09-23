@@ -46,7 +46,7 @@ $needs_fh_reopen = 1 if (defined &Win32::IsWin95 && Win32::IsWin95());
 my $skip_mode_checks =
     $^O eq 'cygwin' && $ENV{CYGWIN} !~ /ntsec/;
 
-plan tests => 64;
+plan tests => 65;
 
 my $tmpdir = tempfile();
 my $tmpdir1 = tempfile();
@@ -534,6 +534,15 @@ ok(-d $tmpdir1, "rename on directories working");
 
     map chown(+()), ('')x68;
     ok(1, "extend sp in pp_chown");
+}
+
+SKIP: {
+    skip "readlink not implemeneted" unless $Config{d_readlink};
+
+    local $@;
+    eval { readlink "\x{30cb}" };
+    like( $@, qr/\QWide character in readlink\E/,
+                "readlink() croaks on non-downgradeable UTF-8");
 }
 
 # need to remove $tmpdir if rename() in test 28 failed!
