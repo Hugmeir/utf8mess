@@ -10,8 +10,9 @@ BEGIN {
 }
 
 use strict;
+use Fcntl ();
 
-plan tests => 9;
+plan tests => 4;
 
 {
     #pp_backtick
@@ -48,4 +49,34 @@ plan tests => 9;
     unlike($@, $re, "qx() treats latin-1 the same as UTF-8");
     
 =cut
+}
+
+{
+    #pp_sysopen
+
+    local $@;  
+    eval {
+        sysopen my $fh, "\x{30cb}", 0
+    };
+    like($@, qr/\QWide character in sysopen\E/, "sysopen croaks on non-downgradeable UTF-8");
+
+    my $down = "\x{e0}";
+    my $up   = "\x{e0}";
+    utf8::upgrade($up);
+
+    open my $latin_file, "+>", $down or die $!;
+
+    sysopen(my $fh1, $up, Fcntl::O_WRONLY|Fcntl::O_APPEND) or die $!;
+    print { $fh1 } "1\n";
+    close $fh1;
+    sysopen(my $fh2, $down, Fcntl::O_WRONLY|Fcntl::O_APPEND) or die $!;
+    print { $fh2 } "2\n";
+    close $fh2;
+
+    my $file_contents = do { local $/; <$latin_file> };
+    close $latin_file;
+
+    is $file_contents, "1\n2\n", "sysopen treats latin-1 the same regardless of UTF-8ness";
+
+    unlink($down);
 }

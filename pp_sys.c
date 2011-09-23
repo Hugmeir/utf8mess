@@ -1555,12 +1555,11 @@ PP(pp_sysopen)
     dSP;
     const int perm = (MAXARG > 3 && (TOPs || POPs)) ? POPi : 0666;
     const int mode = POPi;
-    SV * const sv = POPs;
-    GV * const gv = MUTABLE_GV(POPs);
     STRLEN len;
+    const char * const tmps = SvPVbytex(POPs, len);
+    GV * const gv = MUTABLE_GV(POPs);
 
     /* Need TIEHANDLE method ? */
-    const char * const tmps = SvPV_const(sv, len);
     /* FIXME? do_open should do const  */
     if (do_open(gv, tmps, len, TRUE, mode, perm, NULL)) {
 	IoLINES(GvIOp(gv)) = 0;
