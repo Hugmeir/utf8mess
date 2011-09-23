@@ -3521,8 +3521,8 @@ PP(pp_rename)
 {
     dVAR; dSP; dTARGET;
     int anum;
-    const char * const tmps2 = POPpconstx;
-    const char * const tmps = SvPV_nolen_const(TOPs);
+    const char * const tmps2 = POPpbytex;
+    const char * const tmps = SvPVbyte_nolen(TOPs);
     TAINT_PROPER("rename");
 #ifdef HAS_RENAME
     anum = PerlLIO_rename(tmps, tmps2);

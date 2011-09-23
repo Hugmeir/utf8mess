@@ -46,7 +46,7 @@ $needs_fh_reopen = 1 if (defined &Win32::IsWin95 && Win32::IsWin95());
 my $skip_mode_checks =
     $^O eq 'cygwin' && $ENV{CYGWIN} !~ /ntsec/;
 
-plan tests => 58;
+plan tests => 61;
 
 my $tmpdir = tempfile();
 my $tmpdir1 = tempfile();
@@ -217,6 +217,24 @@ SKIP: {
     eval { chown(0, 0, $fh); };
     like($@, qr/^The f?chown function is unimplemented at/, "fchown is unimplemented");
 }
+
+{
+    local $@;
+    eval { rename("\x{30cb}", "a") };
+    like( $@, qr/\QWide character in rename\E/,
+                    "rename() croaks on non-downgradeable UTF-8, first argument");
+
+    local $@;
+    eval { rename("a", "\x{30cb}") };
+    like( $@, qr/\QWide character in rename\E/,
+                    "rename() croaks on non-downgradeable UTF-8, second argument");
+
+    local $@;
+    eval { rename("\x{30cb}", "\x{30cc}") };
+    like( $@, qr/\QWide character in rename\E/,
+                    "rename() croaks on non-downgradeable UTF-8, both arguments");
+}
+
 
 is(rename('a','b'), 1, "rename a b");
 
