@@ -3434,7 +3434,7 @@ PP(pp_chdir)
 	    gv = gv_fetchsv(sv, 0, SVt_PVIO);
 	}
         else if (!(gv = MAYBE_DEREF_GV(sv)))
-		tmps = SvPV_nomg_const_nolen(sv);
+		tmps = SvPVbyte_nomg_nolen(sv);
     }
 
     if( !gv && (!tmps || !*tmps) ) {

@@ -11,7 +11,7 @@ BEGIN {
     if (is_miniperl() && !eval {require File::Spec::Functions; 1}) {
 	push @INC, qw(dist/Cwd/lib dist/Cwd ../dist/Cwd/lib ../dist/Cwd);
     }
-    plan(tests => 48);
+    plan(tests => 49);
 }
 
 use Config;
@@ -226,4 +226,10 @@ foreach my $key (@magic_envs) {
         ok( !chdir(),                   'chdir() w/o any ENV set' );
     }
     is( abs_path, $Cwd,             '  abs_path() agrees' );
+}
+
+{
+    local $@;
+    eval { chdir "\x{30cb}" };
+    like($@, qr/\QWide character in chdir\E/, "chdir() croaks on non-downgradeable UTF-8");
 }
