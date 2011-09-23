@@ -2787,7 +2787,7 @@ PP(pp_stat)
             goto do_fstat_have_io; 
         }
         
-	sv_setpv(PL_statname, SvPV_nomg_const_nolen(sv));
+	sv_setpv(PL_statname, SvPVbyte_nomg_nolen(sv));
 	PL_statgv = NULL;
 	PL_laststype = PL_op->op_type;
 	if (PL_op->op_type == OP_LSTAT)

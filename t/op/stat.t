@@ -20,7 +20,7 @@ if(eval {require File::Spec; 1}) {
 }
 
 
-plan tests => 109;
+plan tests => 112;
 
 my $Perl = which_perl();
 
@@ -562,6 +562,28 @@ SKIP: {
 	close DIR or die $!;
     }
 }
+
+{
+    local $@;  
+    eval {
+        stat "\x{30cb}"
+    };
+    like($@, qr/\QWide character in stat\E/, "stat croaks on non-downgradeable UTF-8");
+
+    my $file_d = "stat.\x{e0}.tmp";
+
+    my $file_u = $file_d;
+    utf8::upgrade($file_u);
+
+    open my $fh, ">", $file_d;
+    close $fh;
+    
+    ok(stat($file_d), "stat on latin-1 works");
+    is( join("", stat($file_d)), join("", stat($file_u)), "stats the same file regardless of UTF-8ness" );
+
+    1 while unlink $file_d;
+}
+
 
 END {
     chmod 0666, $tmpfile;
