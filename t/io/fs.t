@@ -46,7 +46,7 @@ $needs_fh_reopen = 1 if (defined &Win32::IsWin95 && Win32::IsWin95());
 my $skip_mode_checks =
     $^O eq 'cygwin' && $ENV{CYGWIN} !~ /ntsec/;
 
-plan tests => 51;
+plan tests => 54;
 
 my $tmpdir = tempfile();
 my $tmpdir1 = tempfile();
@@ -345,6 +345,30 @@ SKIP: {
     truncate $tmpfile, 0;
 
     ok(-z $tmpfile,    "truncation to zero bytes");
+
+    {
+        local $@;
+        eval { truncate "\x{30cb}", 0 };
+        like($@, qr/\QWide character in truncate\E/,
+                "truncate croaks on non-downgradeable UTF-8");
+
+        my $latin_file = "\x{e0}.tmp";
+        my $utf8_file  = "\x{e0}.tmp";
+        utf8::upgrade($utf8_file);
+    
+        open IOFSCOM, ">$latin_file" or die "Could not write $latin_file: $!";
+        print IOFSCOM 'helloworld';
+        close(IOFSCOM);
+        
+        truncate $latin_file, 5;
+        is(-s $latin_file, 5, "truncation works on latin-1 filenames");
+        truncate $utf8_file, 0;
+        ok(-z $latin_file,    "..and downgrades UTF-8 filenames when possible");
+            # Can't use $utf8_file here, as
+            # -X downgradeableUTF8 may not
+            # be working yet
+        unlink($latin_file);
+    }
 
 #these steps are necessary to check if file is really truncated
 #On Win95, FH is updated, but file properties aren't

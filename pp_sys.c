@@ -2217,7 +2217,7 @@ PP(pp_truncate)
 		goto do_ftruncate_io;
 	}
 	else {
-	    const char * const name = SvPV_nomg_const_nolen(sv);
+	    const char * const name = SvPVbyte_nomg_nolen(sv);
 	    TAINT_PROPER("truncate");
 #ifdef HAS_TRUNCATE
 	    if (truncate(name, len) < 0)
