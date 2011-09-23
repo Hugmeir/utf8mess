@@ -46,7 +46,7 @@ $needs_fh_reopen = 1 if (defined &Win32::IsWin95 && Win32::IsWin95());
 my $skip_mode_checks =
     $^O eq 'cygwin' && $ENV{CYGWIN} !~ /ntsec/;
 
-plan tests => 54;
+plan tests => 58;
 
 my $tmpdir = tempfile();
 my $tmpdir1 = tempfile();
@@ -120,6 +120,12 @@ $newmode = (($^O eq 'MSWin32') || ($^O eq 'NetWare')) ? 0444 : 0777;
 
 is(chmod($newmode,'a'), 1, "chmod succeeding");
 
+{
+    local $@;
+    eval { chmod($newmod, "\x{30cb}") };
+    like( $@, qr/\QWide character in chmod\E/, "chmod() croaks on non-downgradeable UTF-8");
+}
+
 SKIP: {
     skip("no link", 7) unless $has_link;
 
@@ -190,6 +196,12 @@ SKIP: {
     skip "no fchown", 1 unless ($Config{d_fchown} || "") eq "define";
     open(my $fh, "<", "a");
     is(chown(-1, -1, $fh), 1, "fchown");
+    {
+        local $@;
+        eval { chown(-1, -1, "\x{30cb}") };
+        like( $@, qr/Wide character in f?chown/,
+                    "chown() croaks on non-downgradeable UTF-8");
+    }
 }
 
 SKIP: {
@@ -225,6 +237,13 @@ utime undef, undef, 'b';
 print "# utime undef, undef --> $atime, $mtime\n";
 isnt($atime, 500000000, 'atime');
 isnt($mtime, 500000000 + $delta, 'mtime');
+
+{
+    local $@;
+    eval { utime(500000000,500000000 + 1, "\x{30cb}") };
+    like( $@, qr/\QWide character in utime\E/,
+                "utime() croaks on non-downgradeable UTF-8");
+}
 
 SKIP: {
     skip "no futimes", 4 unless ($Config{d_futimes} || "") eq "define";
@@ -302,6 +321,13 @@ is(unlink('b'), 1, "unlink b");
     $blksize,$blocks) = stat('b');
 is($ino, undef, "ino of unlinked file b should be undef");
 unlink 'c';
+
+{
+    local $@;
+    eval { unlink("\x{30cb}") };
+    like( $@, qr/\QWide character in unlink\E/,
+                "unlink croaks on non-downgradeable UTF-8");
+}
 
 chdir $wd || die "Can't cd back to $wd";
 

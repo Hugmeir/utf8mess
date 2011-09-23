@@ -1631,7 +1631,7 @@ Perl_apply(pTHX_ I32 type, register SV **mark, register SV **sp)
 		    }
 		}
 		else {
-		    const char *name = SvPV_nomg_const_nolen(*mark);
+		    const char *name = SvPVbyte_nomg_nolen(*mark);
 		    APPLY_TAINT_PROPER();
 		    if (PerlLIO_chmod(name, val))
 			tot--;
@@ -1665,7 +1665,7 @@ Perl_apply(pTHX_ I32 type, register SV **mark, register SV **sp)
 		    }
 		}
 		else {
-		    const char *name = SvPV_nomg_const_nolen(*mark);
+		    const char *name = SvPVbyte_nomg_nolen(*mark);
 		    APPLY_TAINT_PROPER();
 		    if (PerlLIO_chown(name, val, val2))
 			tot--;
@@ -1768,7 +1768,7 @@ nothing in the core.
 	APPLY_TAINT_PROPER();
 	tot = sp - mark;
 	while (++mark <= sp) {
-	    s = SvPV_nolen_const(*mark);
+	    s = SvPVbyte_nolen(*mark);
 	    APPLY_TAINT_PROPER();
 	    if (PL_euid || PL_unsafe) {
 		if (UNLINK(s))
@@ -1846,7 +1846,7 @@ nothing in the core.
 		    }
 		}
 		else {
-		    const char * const name = SvPV_nomg_const_nolen(*mark);
+		    const char * const name = SvPVbyte_nomg_nolen(*mark);
 		    APPLY_TAINT_PROPER();
 #ifdef HAS_FUTIMES
 		    if (utimes(name, (struct timeval *)utbufp))
