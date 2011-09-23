@@ -10,13 +10,33 @@ BEGIN {
 }
 
 use Config;
-plan(tests => 34 + 27*14);
+plan(tests => 34 + 27*14 + 3);
 
 ok( -d 'op' );
 ok( -f 'TEST' );
 ok( !-f 'op' );
 ok( !-d 'TEST' );
 ok( -r 'TEST' );
+
+{
+    local $@;  
+    eval {
+        -f "\x{30cb}"
+    };
+    like($@, qr/\QWide character in -f/, "-X croaks on non-downgradeable UTF-8");
+
+    my $file_d = "filetest.\x{e0}.tmp";
+    my $file_u = $file_d;
+    utf8::upgrade($file_u);
+
+    open my $fh, ">", $file_d;
+    close $fh;
+    
+    ok(-f $file_d, "-f works on latin-1");
+    is( -f stat($file_d), -f stat($file_u), "and tests the same file regardless of UTF-8ness" );
+
+    1 while unlink $file_d;
+}
 
 # Make a read only file
 my $ro_file = tempfile();

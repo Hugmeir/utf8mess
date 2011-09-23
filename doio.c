@@ -1309,6 +1309,10 @@ Perl_my_stat_flags(pTHX_ const U32 flags)
         }
 
 	s = SvPV_flags_const(sv, len, flags);
+        if (SvUTF8(sv)) {
+            sv_utf8_downgrade(sv,0);
+            s = SvPV_nomg_const(sv, len);
+        }
 	PL_statgv = NULL;
 	sv_setpvn(PL_statname, s, len);
 	s = SvPVX_const(PL_statname);		/* s now NUL-terminated */
@@ -1353,6 +1357,10 @@ Perl_my_lstat_flags(pTHX_ const U32 flags)
     sv = POPs;
     PUTBACK;
     file = SvPV_flags_const_nolen(sv, flags);
+    if (SvUTF8(sv)) {
+        sv_utf8_downgrade(sv,0);
+        file = SvPV_nomg_const_nolen(sv);
+    }
     sv_setpv(PL_statname,file);
     PL_laststatval = PerlLIO_lstat(file,&PL_statcache);
     if (PL_laststatval < 0 && ckWARN(WARN_NEWLINE) && strchr(file, '\n'))
