@@ -3027,11 +3027,11 @@ Perl_sv_copypv(pTHX_ SV *const dsv, register SV *const ssv)
 }
 
 /*
-=for apidoc sv_2pvbyte
+=for apidoc sv_2pvbyte_flags
 
 Return a pointer to the byte-encoded representation of the SV, and set *lp
 to its length.  May cause the SV to be downgraded from UTF-8 as a
-side-effect.
+side-effect. If the flags contain SV_GMAGIC, then it does an mg_get() first.
 
 Usually accessed via the C<SvPVbyte> macro.
 
@@ -3039,13 +3039,22 @@ Usually accessed via the C<SvPVbyte> macro.
 */
 
 char *
+Perl_sv_2pvbyte_flags(pTHX_ register SV *const sv, STRLEN *const lp, const I32 flags)
+{
+    PERL_ARGS_ASSERT_SV_2PVBYTE_FLAGS;
+
+    if (flags & SV_GMAGIC)
+        SvGETMAGIC(sv);
+    sv_utf8_downgrade(sv,0);
+    return lp ? SvPV_nomg(sv,*lp) : SvPV_nomg_nolen(sv);
+}
+
+char *
 Perl_sv_2pvbyte(pTHX_ register SV *const sv, STRLEN *const lp)
 {
     PERL_ARGS_ASSERT_SV_2PVBYTE;
 
-    SvGETMAGIC(sv);
-    sv_utf8_downgrade(sv,0);
-    return lp ? SvPV_nomg(sv,*lp) : SvPV_nomg_nolen(sv);
+    return sv_2pvbyte_flags(sv, lp, SV_GMAGIC);
 }
 
 /*

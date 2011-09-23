@@ -1615,6 +1615,9 @@ Like sv_utf8_upgrade, but doesn't do magic on C<sv>
     ((SvFLAGS(sv) & (SVf_POK|SVf_UTF8)) == (SVf_POK)\
      ? SvPVX(sv) : sv_2pvbyte(sv, 0))
 
+#define SvPVbyte_nomg_nolen(sv) \
+    ((SvFLAGS(sv) & (SVf_POK|SVf_UTF8)) == (SVf_POK)\
+     ? SvPVX(sv) : sv_2pvbyte_flags(sv, 0, 0))
 
     
 /* define FOOx(): idempotent versions of FOO(). If possible, use a local

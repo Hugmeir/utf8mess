@@ -1164,6 +1164,8 @@ Amb	|char*	|sv_2pv		|NULLOK SV *sv|NULLOK STRLEN *lp
 Apd	|char*	|sv_2pv_flags	|NULLOK SV *const sv|NULLOK STRLEN *const lp|const I32 flags
 Apd	|char*	|sv_2pvutf8	|NN SV *const sv|NULLOK STRLEN *const lp
 Apd	|char*	|sv_2pvbyte	|NN SV *const sv|NULLOK STRLEN *const lp
+Apd	|char*	|sv_2pvbyte_flags	|NN SV *const sv|NULLOK STRLEN *const lp \
+                                        |const I32 flags
 Ap	|char*	|sv_pvn_nomg	|NN SV* sv|NULLOK STRLEN* lp
 Amb	|UV	|sv_2uv		|NULLOK SV *sv
 Apd	|UV	|sv_2uv_flags	|NULLOK SV *const sv|const I32 flags
