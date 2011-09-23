@@ -293,7 +293,7 @@ PP(pp_backtick)
 {
     dVAR; dSP; dTARGET;
     PerlIO *fp;
-    const char * const tmps = POPpconstx;
+    const char * const tmps = POPpbytex;
     const I32 gimme = GIMME_V;
     const char *mode = "r";
 

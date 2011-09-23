@@ -69,7 +69,7 @@ unlike( $r, qr/^256(?:\r?\n)?$/s, '-Ci: auto-UTF-8 open for input has file scope
 $r = runperl( switches => [ '-CA', '-w' ],
 	      prog     => 'print ord shift',
               stderr   => 1,
-              args     => [ chr(256) ] );
+              args     => [ do { my $x = chr(256); utf8::encode($x); $x } ] );
 like( $r, qr/^256(?:\r?\n)?$/s, '-CA: @ARGV' );
 
 $r = runperl( switches => [ '-CS', '-w' ],

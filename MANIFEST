@@ -4796,6 +4796,7 @@ t/io/binmode.t			See if binmode() works
 t/io/bom.t			See if scripts can start with a byte order mark
 t/io/crlf.t			See if :crlf works
 t/io/crlf_through.t		See if pipe passes data intact with :crlf
+t/io/croaks.t			See if system calls croak on UTF-8 data
 t/io/data.t			See if DATA works
 t/io/defout.t			See if PL_defoutgv works
 t/io/dup.t			See if >& works right
