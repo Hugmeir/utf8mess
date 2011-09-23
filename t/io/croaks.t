@@ -12,7 +12,7 @@ BEGIN {
 use strict;
 use Fcntl ();
 
-plan tests => 4;
+plan tests => 5;
 
 {
     #pp_backtick
@@ -31,24 +31,14 @@ plan tests => 4;
     };
     like($@, $re, "qx() croaks on non-downgradeable UTF-8");
 
-=begin TODO
-    my $down = "\x{e0}";
-    my $up   = "\x{e0}";
-    utf8::upgrade($up);
-
-    local $@;
-    eval {
-        
-    };
-    unlike($@, $re, "`` treats latin-1 the same as UTF-8");
-
-    local $@;
-    eval {
-        
-    };
-    unlike($@, $re, "qx() treats latin-1 the same as UTF-8");
+    # This next test relies on runperl running things through ``
+    my $prog = "print length q(\x{e0})";
+    my $down = runperl( prog => $prog );
     
-=cut
+    utf8::upgrade($prog);
+    my $up   = runperl( prog => $prog );;
+
+    is($up, $down, "`` treats upgarded and downgraded Latin-1 the same");
 }
 
 {
