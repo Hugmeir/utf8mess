@@ -67,4 +67,12 @@ fresh_perl_like(<<'EOP', qr/^no crash/, {}, 'RT #68182');
   print "no crash";
 EOP
 
+{
+    local $@;  
+    eval {
+        opendir my $fh, "\x{30cb}"
+    };
+    like($@, qr/\QWide character in opendir\E/, "opendir croaks on non-downgradeable UTF-8");
+}
+
 done_testing();

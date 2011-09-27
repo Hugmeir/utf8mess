@@ -3779,7 +3779,7 @@ PP(pp_open_dir)
 {
 #if defined(Direntry_t) && defined(HAS_READDIR)
     dVAR; dSP;
-    const char * const dirname = POPpconstx;
+    const char * const dirname = POPpbytex;
     GV * const gv = MUTABLE_GV(POPs);
     register IO * const io = GvIOn(gv);
 
