@@ -6,7 +6,7 @@ BEGIN {
     require './test.pl';
 }
 
-plan tests => 22;
+plan tests => 24;
 
 unless (eval {
     require File::Path;
@@ -54,4 +54,18 @@ $_ = 'lfrulb';
     ok(-d 'blurfl');
     ok(!-d 'lfrulb');
     ok(rmdir);
+}
+
+{
+    local $@;
+    eval { mkdir("\x{30cb}") };
+    like( $@, qr/\QWide character in mkdir\E/,
+                "mkdir() croaks on non-downgradeable UTF-8");
+}
+
+{
+    local $@;
+    eval { rmdir("\x{30cb}") };
+    like( $@, qr/\QWide character in rmdir\E/,
+                "rmdir() croaks on non-downgradeable UTF-8");
 }

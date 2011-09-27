@@ -3718,7 +3718,7 @@ S_dooneliner(pTHX_ const char *cmd, const char *filename)
  * -d, chdir(), chmod(), chown(), chroot(), fcntl()?,
  * (mkdir()), opendir(), rename(), rmdir(), stat(). --jhi */
 
-#define TRIMSLASHES(tmps,len,copy) (tmps) = SvPV_const(TOPs, (len)); \
+#define TRIMSLASHES(tmps,len,copy) (tmps) = SvPVbyte(TOPs, (len)); \
     if ((len) > 1 && (tmps)[(len)-1] == '/') { \
 	do { \
 	    (len)--; \
