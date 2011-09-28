@@ -36,7 +36,7 @@ $ENV{LANGUAGE} = 'C';		# Ditto in GNU.
 my $Is_VMS   = $^O eq 'VMS';
 my $Is_Win32 = $^O eq 'MSWin32';
 
-plan(tests => 22);
+plan(tests => 30);
 
 my $Perl = which_perl();
 
@@ -117,6 +117,42 @@ unless ( ok( $! == 2  or  $! =~ /\bno\b.*\bfile/i or
     printf "# \$! eq %d, '%s'\n", $!, $!;
 }
 
+
+{
+    #exec croak on UTF-8:
+    local $@;
+    eval { exec "\x{30cb}" };
+    like( $@, qr/Wide characer in exec/, "exec UTF8 croaks on UTF-8");
+
+    local $@;
+    eval { exec { "\x{30cb}" } 1 };
+    like( $@, qr/Wide characer in exec/, "exec { UTF8 } croaks on UTF-8");
+
+    local $@;
+    eval { exec { "lskdjfalksdjfdjfkls" } "\x{30cb}" };
+    like( $@, qr/Wide characer in exec/, 'exec { gargabe } UTF8 croaks on UTF-8');
+
+    local $@;
+    eval { exec { $Perl } "\x{30cb}" };
+    like( $@, qr/Wide characer in exec/, 'exec { $Perl } UTF8 croaks on UTF-8');
+
+    #system croak on UTF-8:
+    local $@;
+    eval { system "\x{30cb}" };
+    like( $@, qr/Wide characer in system/, "system UTF8 croaks on UTF-8");
+
+    local $@;
+    eval { system { "\x{30cb}" } 1 };
+    like( $@, qr/Wide characer in system/, "system { UTF8 } croaks on UTF-8");
+
+    local $@;
+    eval { system { "lskdjfalksdjfdjfkls" } "\x{30cb}" };
+    like( $@, qr/Wide characer in system/, 'system { gargabe } UTF8 croaks on UTF-8');
+
+    local $@;
+    eval { system { $Perl } "\x{30cb}" };
+    like( $@, qr/Wide characer in system/, 'system { $Perl } UTF8 croaks on UTF-8');
+}
 
 is( `$Perl -le "print 'ok'"`,   "ok\n",     'basic ``' );
 is( <<`END`,                    "ok\n",     '<<`HEREDOC`' );

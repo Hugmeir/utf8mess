@@ -215,7 +215,7 @@ Perl_do_openn(pTHX_ GV *gv, register const char *oname, I32 len, int as_raw,
 	    }
 #endif /* USE_STDIO */
 	    name = (SvOK(*svp) || SvGMAGICAL(*svp)) ?
-			savesvpv (*svp) : savepvs ("");
+			savepv(SvPVbyte_nolen(*svp)) : savepvs ("");
 	    SAVEFREEPV(name);
 	}
 	else {
@@ -1399,13 +1399,13 @@ Perl_do_aexec5(pTHX_ SV *really, register SV **mark, register SV **sp,
 
 	while (++mark <= sp) {
 	    if (*mark)
-		*a++ = SvPV_nolen_const(*mark);
+		*a++ = (const char*)SvPVbyte_nolen(*mark);
 	    else
 		*a++ = "";
 	}
 	*a = NULL;
 	if (really)
-	    tmps = SvPV_nolen_const(really);
+	    tmps = (const char*)SvPVbyte_nolen(really);
 	if ((!really && *PL_Argv[0] != '/') ||
 	    (really && *tmps != '/'))		/* will execvp use PATH? */
 	    TAINT_ENV();		/* testing IFS here is overkill, probably */

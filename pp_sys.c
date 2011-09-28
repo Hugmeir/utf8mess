@@ -612,7 +612,7 @@ PP(pp_open)
 	sv = GvSVn(gv);
     }
 
-    tmps = SvPV_const(sv, len);
+    tmps = SvPVbyte(sv, len);
     ok = do_openn(gv, tmps, len, FALSE, O_RDONLY, 0, NULL, MARK+1, (SP-MARK));
     SP = ORIGMARK;
     if (ok)
@@ -4169,7 +4169,9 @@ PP(pp_system)
 	else if (SP - MARK != 1)
 	    value = (I32)do_aexec5(NULL, MARK, SP, pp[1], did_pipes);
 	else {
-	    value = (I32)do_exec3(SvPVx_nolen(sv_mortalcopy(*SP)), pp[1], did_pipes);
+	    value = (I32)do_exec3((PL_tainting
+                            ? SvPVbyte_nomg_nolen(sv_mortalcopy(*SP))
+                            : SvPVbyte_nolen(sv_mortalcopy(*SP))), pp[1], did_pipes);
 	}
 	PerlProc__exit(-1);
     }
@@ -4192,7 +4194,9 @@ PP(pp_system)
 #  endif
     }
     else {
-	value = (I32)do_spawn(SvPVx_nolen(sv_mortalcopy(*SP)));
+	value = (I32)do_spawn(PL_tainting
+                            ? SvPVbyte_nomg_nolen(sv_mortalcopy(*SP))
+                            : SvPVbyte_nolen(sv_mortalcopy(*SP)));
     }
     if (PL_statusvalue == -1)	/* hint that value must be returned as is */
 	result = 1;
@@ -4240,13 +4244,19 @@ PP(pp_exec)
 #endif
     else {
 #ifdef VMS
-	value = (I32)vms_do_exec(SvPVx_nolen(sv_mortalcopy(*SP)));
+	value = (I32)vms_do_exec(PL_tainting
+                            ? SvPVbyte_nomg_nolen(sv_mortalcopy(*SP))
+                            : SvPVbyte_nolen(sv_mortalcopy(*SP)));
 #else
 #  ifdef __OPEN_VM
-	(void) do_spawn(SvPVx_nolen(sv_mortalcopy(*SP)));
+	(void) do_spawn(PL_tainting
+                            ? SvPVbyte_nomg_nolen(sv_mortalcopy(*SP))
+                            : SvPVbyte_nolen(sv_mortalcopy(*SP)));
 	value = 0;
 #  else
-	value = (I32)do_exec(SvPVx_nolen(sv_mortalcopy(*SP)));
+	value = (I32)do_exec(PL_tainting
+                            ? SvPVbyte_nomg_nolen(sv_mortalcopy(*SP))
+                            : SvPVbyte_nolen(sv_mortalcopy(*SP)));
 #  endif
 #endif
     }
