@@ -209,6 +209,7 @@ from=''
 run=''
 targetarch=''
 to=''
+sysroot=''
 usecrosscompile=''
 extern_C=''
 mistrustnm=''
@@ -1956,6 +1957,13 @@ true)
 	exit 0
 	;;
 esac
+
+: Set 'sysroot' to change the logical root directory to your headers and libraries see man gcc
+: This is primarily meant for cross-compile environments, and may fail to be useful in other cases
+
+if test "X$sysroot" != X; then
+  echo "Using $sysroot to find your headers and libraries"
+fi
 
 : Eunice requires " " instead of "", can you believe it
 echo " "
@@ -4521,9 +4529,10 @@ case "$gccversion" in
 esac
 
 : What should the include directory be ?
+: Use sysroot if set, so findhdr looks in the right place.
 echo " "
 $echo $n "Hmm...  $c"
-dflt='/usr/include'
+dflt="$sysroot/usr/include"
 incpath=''
 mips_type=''
 if $test -f /bin/mips && /bin/mips; then
@@ -4727,14 +4736,21 @@ case "$libpth" in
 esac
 
 : Now check and see which directories actually exist, avoiding duplicates
+: Use sysroot for checking so we find cross-compiler dirs
 libpth=''
+: create list of actual paths on disk, for lib hunting later
+libsearchpth=''
 for xxx in $dlist
 do
-    if $test -d $xxx; then
+    if $test -d $sysroot$xxx; then
 		case " $libpth " in
 		*" $xxx "*) ;;
 		*) libpth="$libpth $xxx";;
 		esac
+        case " $libsearchpth " in
+		*" $sysroot$xxx "*) ;;
+		*) libsearchpth="$libsearchpth $sysroot$xxx";;
+		esac            
     fi
 done
 $cat <<'EOM'
@@ -4745,6 +4761,14 @@ know not to be holding relevant libraries, and add any that are needed.
 Say "none" for none.
 
 EOM
+
+if test "X$sysroot" != X; then
+  $cat <<EOM
+You have set sysroot to $sysroot, please supply the directories excluding sysroot
+
+EOM
+fi
+
 case "$libpth" in
 '') dflt='none';;
 *)
@@ -4759,11 +4783,20 @@ case "$ans" in
 none) libpth=' ';;
 *) libpth="$ans";;
 esac
+: reset libsearchpth, listing each path with sysroot included, removing any duplicates
+libsearchpth=''
+for xxx in $libpth
+do
+    case " $libsearchpth " in
+    *" $sysroot$xxx "*) ;;
+    *) libsearchpth="$libsearchpth $sysroot$xxx";;
+    esac
+done
 
 : compute shared library extension
 case "$so" in
 '')
-	if xxx=`./loc libc.sl X $libpth`; $test -f "$xxx"; then
+	if xxx=`./loc libc.sl X $libsearchpth`; $test -f "$xxx"; then
 		dflt='sl'
 	else
 		dflt='so'
@@ -4910,7 +4943,7 @@ libsfound=''
 libsfiles=''
 libsdirs=''
 libspath=''
-for thisdir in $libpth $xlibpth; do
+for thisdir in $libsearchpth $xlibpth; do
   test -d $thisdir && libspath="$libspath $thisdir"
 done
 for thislib in $libswanted; do
@@ -7484,7 +7517,7 @@ echo " "
 case "$libc" in
 '') libc=unknown
 	case "$libs" in
-	*-lc_s*) libc=`./loc libc_s$_a $libc $libpth`
+	*-lc_s*) libc=`./loc libc_s$_a $libc $libsearchpth`
 	esac
 	;;
 esac
@@ -7497,17 +7530,17 @@ case "$libs" in
 		;;
 	-l*)
 		thislib=`echo $thislib | $sed -e 's/^-l//'`
-		if try=`./loc lib$thislib.$so.'*' X $libpth`; $test -f "$try"; then
+		if try=`./loc lib$thislib.$so.'*' X $libsearchpth`; $test -f "$try"; then
 			:
-		elif try=`./loc lib$thislib.$so X $libpth`; $test -f "$try"; then
+		elif try=`./loc lib$thislib.$so X $libsearchpth`; $test -f "$try"; then
 			:
-		elif try=`./loc lib$thislib$_a X $libpth`; $test -f "$try"; then
+		elif try=`./loc lib$thislib$_a X $libsearchpth`; $test -f "$try"; then
 			:
-		elif try=`./loc $thislib$_a X $libpth`; $test -f "$try"; then
+		elif try=`./loc $thislib$_a X $libsearchpth`; $test -f "$try"; then
 			:
-		elif try=`./loc lib$thislib X $libpth`; $test -f "$try"; then
+		elif try=`./loc lib$thislib X $libsearchpth`; $test -f "$try"; then
 			:
-		elif try=`./loc $thislib X $libpth`; $test -f "$try"; then
+		elif try=`./loc $thislib X $libsearchpth`; $test -f "$try"; then
 			:
 		elif try=`./loc Slib$thislib$_a X $xlibpth`; $test -f "$try"; then
 			:
@@ -7525,7 +7558,7 @@ xxx=normal
 case "$libc" in
 unknown)
 	set /lib/libc.$so
-	for xxx in $libpth; do
+	for xxx in $libsearchpth; do
 		$test -r $1 || set $xxx/libc.$so
 		: The messy sed command sorts on library version numbers.
 		$test -r $1 || \
@@ -7566,10 +7599,10 @@ elif $test -r /lib/libc$_a; then
 	libc=/lib/libc$_a;
 	echo "Your C library seems to be in $libc.  You're normal."
 else
-	if tans=`./loc libc$_a blurfl/dyick $libpth`; $test -r "$tans"; then
+	if tans=`./loc libc$_a blurfl/dyick $libsearchpth`; $test -r "$tans"; then
 		:
-	elif tans=`./loc libc blurfl/dyick $libpth`; $test -r "$tans"; then
-		libnames="$libnames "`./loc clib blurfl/dyick $libpth`
+	elif tans=`./loc libc blurfl/dyick $libsearchpth`; $test -r "$tans"; then
+		libnames="$libnames "`./loc clib blurfl/dyick $libsearchpth`
 	elif tans=`./loc clib blurfl/dyick $libpth`; $test -r "$tans"; then
 		:
 	elif tans=`./loc Slibc$_a blurfl/dyick $xlibpth`; $test -r "$tans"; then
@@ -7596,7 +7629,7 @@ compiler, or your machine supports multiple models), you can override it here.
 EOM
 else
 	dflt=''
-	echo $libpth | $tr ' ' $trnl | $sort | $uniq > libpath
+	echo $libsearchpth | $tr ' ' $trnl | $sort | $uniq > libpath
 	cat >&4 <<EOM
 I can't seem to find your C library.  I've looked in the following places:
 
@@ -23651,6 +23684,7 @@ libperl='$libperl'
 libpth='$libpth'
 libs='$libs'
 libsdirs='$libsdirs'
+libsearchpth='$libsearchpth'
 libsfiles='$libsfiles'
 libsfound='$libsfound'
 libspath='$libspath'
@@ -23868,6 +23902,7 @@ strings='$strings'
 submit='$submit'
 subversion='$subversion'
 sysman='$sysman'
+sysroot='$sysroot'
 tail='$tail'
 tar='$tar'
 targetarch='$targetarch'
