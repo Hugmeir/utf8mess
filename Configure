@@ -209,6 +209,8 @@ from=''
 run=''
 targetarch=''
 to=''
+sysroot=''
+sysrootflag=''
 usecrosscompile=''
 extern_C=''
 mistrustnm=''
@@ -1954,6 +1956,14 @@ true)
 	;;
 esac
 
+: Set 'sysroot' to change the logical root directory to your headers and libraries see man gcc
+: This is primarily meant for cross-compile environments, and may fail to be useful in other cases
+
+if test "X$sysroot" != X; then
+  echo "Using $sysroot to find your headers and libraries, and setting the sysrootflag"
+  sysrootflag="--sysroot=$sysroot"
+fi
+
 : Eunice requires " " instead of "", can you believe it
 echo " "
 : Here we go...
@@ -2569,7 +2579,7 @@ int main(int argc, char *argv[]) {
   return 0;
 }
 EOM
-    if $cc -o try $ccflags $ldflags try.c; then
+    if $cc -o try $sysrootflag $ccflags $ldflags try.c; then
        :
     else
         echo "Uh-oh, the C compiler '$cc' doesn't seem to be working." >&4
@@ -2641,7 +2651,7 @@ int main(int argc, char *argv[]) {
   return 0;
 }
 EOM
-    if $cc -o try $ccflags $ldflags try.c; then
+    if $cc -o try $sysrootflag $ccflags $ldflags try.c; then
        :
     else
         if $test X"$despair" = Xyes; then
@@ -4437,7 +4447,7 @@ int main() {
 	return(0);
 }
 EOM
-if $cc -o try $ccflags $ldflags try.c; then
+if $cc -o try $sysrootflag $ccflags $ldflags try.c; then
 	gccversion=`$run ./try`
 	case "$gccversion" in
 	'') echo "You are not using GNU cc." ;;
@@ -4501,7 +4511,7 @@ case "$gccversion" in
 3*)
     echo "main(){}">try.c
     for incdir in $locincpth; do
-       warn=`$cc $ccflags -I$incdir -c try.c 2>&1 | \
+       warn=`$cc $sysrootflag $ccflags -I$incdir -c try.c 2>&1 | \
 	     grep '^c[cp]p*[01]: warning: changing search order '`
        if test "X$warn" != X; then
 	   locincpth=`echo " $locincpth " | sed "s! $incdir ! !"`
@@ -4511,9 +4521,10 @@ case "$gccversion" in
 esac
 
 : What should the include directory be ?
+: Use sysroot if set, so findhdr looks in the right place.
 echo " "
 $echo $n "Hmm...  $c"
-dflt='/usr/include'
+dflt="$sysroot/usr/include"
 incpath=''
 mips_type=''
 if $test -f /bin/mips && /bin/mips; then
@@ -4717,14 +4728,21 @@ case "$libpth" in
 esac
 
 : Now check and see which directories actually exist, avoiding duplicates
+: Use sysroot for checking so we find cross-compiler dirs
 libpth=''
+: create list of actual paths on disk, for lib hunting later
+libsearchpth=''
 for xxx in $dlist
 do
-    if $test -d $xxx; then
+    if $test -d $sysroot$xxx; then
 		case " $libpth " in
 		*" $xxx "*) ;;
 		*) libpth="$libpth $xxx";;
 		esac
+        case " $libsearchpth " in
+		*" $sysroot$xxx "*) ;;
+		*) libsearchpth="$libsearchpth $sysroot$xxx";;
+		esac            
     fi
 done
 $cat <<'EOM'
@@ -4735,6 +4753,14 @@ know not to be holding relevant libraries, and add any that are needed.
 Say "none" for none.
 
 EOM
+
+if test "X$sysroot" != X; then
+  $cat <<EOM
+You have set sysroot to $sysroot, please supply the directories excluding sysroot
+
+EOM
+fi
+
 case "$libpth" in
 '') dflt='none';;
 *)
@@ -4749,11 +4775,20 @@ case "$ans" in
 none) libpth=' ';;
 *) libpth="$ans";;
 esac
+: reset libsearchpth, listing each path with sysroot included, removing any duplicates
+libsearchpth=''
+for xxx in $libpth
+do
+    case " $libsearchpth " in
+    *" $sysroot$xxx "*) ;;
+    *) libsearchpth="$libsearchpth $sysroot$xxx";;
+    esac
+done
 
 : compute shared library extension
 case "$so" in
 '')
-	if xxx=`./loc libc.sl X $libpth`; $test -f "$xxx"; then
+	if xxx=`./loc libc.sl X $libsearchpth`; $test -f "$xxx"; then
 		dflt='sl'
 	else
 		dflt='so'
@@ -4900,7 +4935,7 @@ libsfound=''
 libsfiles=''
 libsdirs=''
 libspath=''
-for thisdir in $libpth $xlibpth; do
+for thisdir in $libsearchpth $xlibpth; do
   test -d $thisdir && libspath="$libspath $thisdir"
 done
 for thislib in $libswanted; do
@@ -5306,7 +5341,7 @@ $cat > try.c <<'EOF'
 #include <stdio.h>
 int main() { printf("Ok\n"); return(0); }
 EOF
-set X $cc -o try $optimize $ccflags $ldflags try.c $libs
+set X $cc -o try $optimize $sysrootflag $ccflags $ldflags try.c $libs
 shift
 $cat >try.msg <<'EOM'
 I've tried to compile and run the following simple program:
@@ -5325,7 +5360,7 @@ and I got the following output:
 
 EOM
 dflt=y
-if $sh -c "$cc -o try $optimize $ccflags $ldflags try.c $libs" >>try.msg 2>&1; then
+if $sh -c "$cc -o try $optimize $sysrootflag $ccflags $ldflags try.c $libs" >>try.msg 2>&1; then
 	if $sh -c "$run ./try " >>try.msg 2>&1; then
 		xxx=`$run ./try`
 		case "$xxx" in
@@ -5386,12 +5421,12 @@ echo "Internal Configure script bug - compiler test file ${mc_file}.c is missing
 exit 1;
 fi;
 esac;
-$cc -o ${mc_file} $optimize $ccflags $ldflags $* ${mc_file}.c $libs > /dev/null 2>&1;'
+$cc -o ${mc_file} $optimize $sysrootflag $ccflags $ldflags $* ${mc_file}.c $libs > /dev/null 2>&1;'
 : define a shorthand compile call for compilations that should be ok.
 compile_ok='
 mc_file=$1;
 shift;
-$cc -o ${mc_file} $optimize $ccflags $ldflags $* ${mc_file}.c $libs;'
+$cc -o ${mc_file} $optimize $sysrootflag $ccflags $ldflags $* ${mc_file}.c $libs;'
 
 : determine filename position in cpp output
 echo " "
@@ -6665,6 +6700,102 @@ $rm_try
 set i_malloc
 eval $setvar
 
+: check for void type
+echo " "
+echo "Checking to see how well your C compiler groks the void type..." >&4
+case "$voidflags" in
+'')
+	$cat >try.c <<EOCP
+#$i_stdlib I_STDLIB
+#ifdef I_STDLIB
+#include <stdlib.h>
+#endif
+#if TRY & 1
+void sub() {
+#else
+sub() {
+#endif
+	extern void moo();	/* function returning void */
+	void (*goo)();		/* ptr to func returning void */
+#if TRY & 8
+	void *hue;		/* generic ptr */
+#endif
+#if TRY & 2
+	void (*foo[10])();
+#endif
+
+#if TRY & 4
+	if(goo == moo) {
+		exit(0);
+	}
+#endif
+	exit(0);
+}
+int main() { sub(); }
+EOCP
+	if $cc $sysrootflag $ccflags -c -DTRY=$defvoidused try.c >.out 2>&1 ; then
+		voidflags=$defvoidused
+	echo "Good.  It appears to support void to the level $package wants.">&4
+		if $contains warning .out >/dev/null 2>&1; then
+			echo "However, you might get some warnings that look like this:"
+			$cat .out
+		fi
+	else
+echo "Hmm, your compiler has some difficulty with void. Checking further..." >&4
+		if $cc $sysrootflag $ccflags -c -DTRY=1 try.c >/dev/null 2>&1; then
+			echo "It supports 1..."
+			if $cc $sysrootflag $ccflags -c -DTRY=3 try.c >/dev/null 2>&1; then
+				echo "It also supports 2..."
+				if $cc $sysrootflag $ccflags -c -DTRY=7 try.c >/dev/null 2>&1; then
+					voidflags=7
+					echo "And it supports 4 but not 8 definitely."
+				else
+					echo "It doesn't support 4..."
+					if $cc $sysrootflag $ccflags -c -DTRY=11 try.c >/dev/null 2>&1; then
+						voidflags=11
+						echo "But it supports 8."
+					else
+						voidflags=3
+						echo "Neither does it support 8."
+					fi
+				fi
+			else
+				echo "It does not support 2..."
+				if $cc $sysrootflag $ccflags -c -DTRY=13 try.c >/dev/null 2>&1; then
+					voidflags=13
+					echo "But it supports 4 and 8."
+				else
+					if $cc $sysrootflag $ccflags -c -DTRY=5 try.c >/dev/null 2>&1; then
+						voidflags=5
+						echo "And it supports 4 but has not heard about 8."
+					else
+						echo "However it supports 8 but not 4."
+					fi
+				fi
+			fi
+		else
+			echo "There is no support at all for void."
+			voidflags=0
+		fi
+	fi
+esac
+case "$voidflags" in
+"$defvoidused") ;;
+*)	$cat >&4 <<'EOM'
+  Support flag bits are:
+    1: basic void declarations.
+    2: arrays of pointers to functions returning void.
+    4: operations between pointers to and addresses of void functions.
+    8: generic void pointers.
+EOM
+	dflt="$voidflags";
+	rp="Your void support flags add up to what?"
+	. ./myread
+	voidflags="$ans"
+	;;
+esac
+$rm_try
+
 : check for length of pointer
 echo " "
 case "$ptrsize" in
@@ -6807,7 +6938,7 @@ void free();
 END
 case "$malloctype" in
 '')
-	if $cc $ccflags -c -DTRY_MALLOC malloc.c >/dev/null 2>&1; then
+	if $cc $sysrootflag $ccflags -c -DTRY_MALLOC malloc.c >/dev/null 2>&1; then
 		malloctype='void *'
 	else
 		malloctype='char *'
@@ -6818,7 +6949,7 @@ echo "Your system wants malloc to return '$malloctype', it would seem." >&4
 
 case "$freetype" in
 '')
-	if $cc $ccflags -c -DTRY_FREE malloc.c >/dev/null 2>&1; then
+	if $cc $sysrootflag $ccflags -c -DTRY_FREE malloc.c >/dev/null 2>&1; then
 		freetype='void'
 	else
 		freetype='int'
@@ -7023,7 +7154,7 @@ $cat >prototype.c <<EOCP
 int main(int argc, char *argv[]) {
 	exit(0);}
 EOCP
-if $cc $ccflags -c prototype.c >prototype.out 2>&1 ; then
+if $cc $sysrootflag $ccflags -c prototype.c >prototype.out 2>&1 ; then
 	echo "Your C compiler appears to support function prototypes."
 	val="$define"
 else
@@ -7044,7 +7175,7 @@ case "$prototype" in
 $me:  FATAL ERROR:
 This version of $package can only be compiled by a compiler that 
 understands function prototypes.  Unfortunately, your C compiler 
-	$cc $ccflags
+	$cc $sysrootflag $ccflags
 doesn't seem to understand them.  Sorry about that.
 
 If GNU cc is available for your system, perhaps you could try that instead.  
@@ -7426,7 +7557,7 @@ echo " "
 case "$libc" in
 '') libc=unknown
 	case "$libs" in
-	*-lc_s*) libc=`./loc libc_s$_a $libc $libpth`
+	*-lc_s*) libc=`./loc libc_s$_a $libc $libsearchpth`
 	esac
 	;;
 esac
@@ -7439,17 +7570,17 @@ case "$libs" in
 		;;
 	-l*)
 		thislib=`echo $thislib | $sed -e 's/^-l//'`
-		if try=`./loc lib$thislib.$so.'*' X $libpth`; $test -f "$try"; then
+		if try=`./loc lib$thislib.$so.'*' X $libsearchpth`; $test -f "$try"; then
 			:
-		elif try=`./loc lib$thislib.$so X $libpth`; $test -f "$try"; then
+		elif try=`./loc lib$thislib.$so X $libsearchpth`; $test -f "$try"; then
 			:
-		elif try=`./loc lib$thislib$_a X $libpth`; $test -f "$try"; then
+		elif try=`./loc lib$thislib$_a X $libsearchpth`; $test -f "$try"; then
 			:
-		elif try=`./loc $thislib$_a X $libpth`; $test -f "$try"; then
+		elif try=`./loc $thislib$_a X $libsearchpth`; $test -f "$try"; then
 			:
-		elif try=`./loc lib$thislib X $libpth`; $test -f "$try"; then
+		elif try=`./loc lib$thislib X $libsearchpth`; $test -f "$try"; then
 			:
-		elif try=`./loc $thislib X $libpth`; $test -f "$try"; then
+		elif try=`./loc $thislib X $libsearchpth`; $test -f "$try"; then
 			:
 		elif try=`./loc Slib$thislib$_a X $xlibpth`; $test -f "$try"; then
 			:
@@ -7467,7 +7598,7 @@ xxx=normal
 case "$libc" in
 unknown)
 	set /lib/libc.$so
-	for xxx in $libpth; do
+	for xxx in $libsearchpth; do
 		$test -r $1 || set $xxx/libc.$so
 		: The messy sed command sorts on library version numbers.
 		$test -r $1 || \
@@ -7508,10 +7639,10 @@ elif $test -r /lib/libc$_a; then
 	libc=/lib/libc$_a;
 	echo "Your C library seems to be in $libc.  You're normal."
 else
-	if tans=`./loc libc$_a blurfl/dyick $libpth`; $test -r "$tans"; then
+	if tans=`./loc libc$_a blurfl/dyick $libsearchpth`; $test -r "$tans"; then
 		:
-	elif tans=`./loc libc blurfl/dyick $libpth`; $test -r "$tans"; then
-		libnames="$libnames "`./loc clib blurfl/dyick $libpth`
+	elif tans=`./loc libc blurfl/dyick $libsearchpth`; $test -r "$tans"; then
+		libnames="$libnames "`./loc clib blurfl/dyick $libsearchpth`
 	elif tans=`./loc clib blurfl/dyick $libpth`; $test -r "$tans"; then
 		:
 	elif tans=`./loc Slibc$_a blurfl/dyick $xlibpth`; $test -r "$tans"; then
@@ -7538,7 +7669,7 @@ compiler, or your machine supports multiple models), you can override it here.
 EOM
 else
 	dflt=''
-	echo $libpth | $tr ' ' $trnl | $sort | $uniq > libpath
+	echo $libsearchpth | $tr ' ' $trnl | $sort | $uniq > libpath
 	cat >&4 <<EOM
 I can't seem to find your C library.  I've looked in the following places:
 
@@ -7756,13 +7887,13 @@ yes)
 			tval=true;
 		elif $test "$mistrustnm" = compile -o "$mistrustnm" = run; then
 			echo "$extern_C void *$1$tdc; void *(*(p()))$tdc { return &$1; } int main() { if(p()) return(0); else return(1); }"> try.c;
-			$cc -o try $optimize $ccflags $ldflags try.c >/dev/null 2>&1 $libs && tval=true;
+			$cc -o try $optimize $sysrootflag $ccflags $ldflags try.c >/dev/null 2>&1 $libs && tval=true;
 			$test "$mistrustnm" = run -a -x try && { $run ./try$_exe >/dev/null 2>&1 || tval=false; };
 			$rm_try;
 		fi;
 	else
 		echo "$extern_C void *$1$tdc; void *(*(p()))$tdc { return &$1; } int main() { if(p()) return(0); else return(1); }"> try.c;
-		$cc -o try $optimize $ccflags $ldflags try.c $libs >/dev/null 2>&1 && tval=true;
+		$cc -o try $optimize $sysrootflag $ccflags $ldflags try.c $libs >/dev/null 2>&1 && tval=true;
 		$rm_try;
 	fi;
 	;;
@@ -7938,7 +8069,7 @@ int main() {
 		exit(1); /* fail */
 }
 EOM
-	if $cc $ccflags $ldflags try.c >/dev/null 2>&1 && $run ./a.out; then
+	if $cc $sysrootflag $ccflags $ldflags try.c >/dev/null 2>&1 && $run ./a.out; then
 		bin_ELF="$define"
 	fi
 	$rm_try
@@ -8087,7 +8218,7 @@ LIBTEST_42 {
  local: *;
  };
 EOM
-    if $cc $cccdlflags $ccdlflags $ccflags \
+    if $cc $cccdlflags $ccdlflags $sysrootflag $ccflags \
            $ldflags $lddlflags -o a.out try.c \
            -Wl,--version-script=try.h >/dev/null 2>&1 \
        &&  $test -s a.out ; then
@@ -10057,7 +10188,7 @@ cat >> try.c <<'EOCP'
 EOCP
 echo "$foo" >> try.c
 echo 'int no_real_function_has_this_name _((void)) { return 0; }' >> try.c
-$cc $optimize $ccflags -c try.c > /dev/null 2>&1
+$cc $optimize $sysrootflag $ccflags -c try.c > /dev/null 2>&1
 status=$?
 $rm_try
 exit $status
@@ -10304,7 +10435,7 @@ $cat >attrib.c <<'EOCP'
 #include <stdio.h>
 void my_special_printf(char* pat,...) __attribute__((__format__(__printf__,1,2)));
 EOCP
-if $cc $ccflags -c attrib.c >attrib.out 2>&1 ; then
+if $cc $sysrootflag $ccflags -c attrib.c >attrib.out 2>&1 ; then
 	if $contains 'warning' attrib.out >/dev/null 2>&1; then
 		echo "Your C compiler doesn't support __attribute__((format))."
 		val="$undef"
@@ -10339,7 +10470,7 @@ int null_printf (char* pat,...) __attribute__((__format__(__printf__,1,2)));
 int null_printf (char* pat,...) { return (int)pat; }
 int main () { exit(null_printf(NULL)); }
 EOCP
-	if $cc $ccflags -o attrib attrib.c >attrib.out 2>&1 ; then
+	if $cc $sysrootflag $ccflags -o attrib attrib.c >attrib.out 2>&1 ; then
 	    : run the executable in case it produces a run-time warning
 	    if $run ./attrib >>attrib.out 2>&1; then
 		if $contains 'warning' attrib.out >/dev/null 2>&1; then
@@ -10376,7 +10507,7 @@ $cat >attrib.c <<'EOCP'
 #include <stdio.h>
 char *go_get_some_memory( int how_many_bytes ) __attribute__((malloc));
 EOCP
-if $cc $ccflags -c attrib.c >attrib.out 2>&1 ; then
+if $cc $sysrootflag $ccflags -c attrib.c >attrib.out 2>&1 ; then
 	if $contains 'warning' attrib.out >/dev/null 2>&1; then
 		echo "Your C compiler doesn't support __attribute__((malloc))."
 		val="$undef"
@@ -10404,7 +10535,7 @@ $cat >attrib.c <<'EOCP'
 #include <stdio.h>
 void do_something (char *some_pointer,...) __attribute__((nonnull(1)));
 EOCP
-if $cc $ccflags -c attrib.c >attrib.out 2>&1 ; then
+if $cc $sysrootflag $ccflags -c attrib.c >attrib.out 2>&1 ; then
 	if $contains 'warning' attrib.out >/dev/null 2>&1; then
 		echo "Your C compiler doesn't support __attribute__((nonnull))."
 		val="$undef"
@@ -10432,7 +10563,7 @@ $cat >attrib.c <<'EOCP'
 #include <stdio.h>
 void fall_over_dead( void ) __attribute__((noreturn));
 EOCP
-if $cc $ccflags -c attrib.c >attrib.out 2>&1 ; then
+if $cc $sysrootflag $ccflags -c attrib.c >attrib.out 2>&1 ; then
 	if $contains 'warning' attrib.out >/dev/null 2>&1; then
 		echo "Your C compiler doesn't support __attribute__((noreturn))."
 		val="$undef"
@@ -10460,7 +10591,7 @@ $cat >attrib.c <<'EOCP'
 #include <stdio.h>
 int square( int n ) __attribute__((pure));
 EOCP
-if $cc $ccflags -c attrib.c >attrib.out 2>&1 ; then
+if $cc $sysrootflag $ccflags -c attrib.c >attrib.out 2>&1 ; then
 	if $contains 'warning' attrib.out >/dev/null 2>&1; then
 		echo "Your C compiler doesn't support __attribute__((pure))."
 		val="$undef"
@@ -10488,7 +10619,7 @@ $cat >attrib.c <<'EOCP'
 #include <stdio.h>
 int do_something( int dummy __attribute__((unused)), int n );
 EOCP
-if $cc $ccflags -c attrib.c >attrib.out 2>&1 ; then
+if $cc $sysrootflag $ccflags -c attrib.c >attrib.out 2>&1 ; then
 	if $contains 'warning' attrib.out >/dev/null 2>&1; then
 		echo "Your C compiler doesn't support __attribute__((unused))."
 		val="$undef"
@@ -10516,7 +10647,7 @@ $cat >attrib.c <<'EOCP'
 #include <stdio.h>
 int I_am_deprecated(void) __attribute__((deprecated));
 EOCP
-if $cc $ccflags -c attrib.c >attrib.out 2>&1 ; then
+if $cc $sysrootflag $ccflags -c attrib.c >attrib.out 2>&1 ; then
 	if $contains 'warning' attrib.out >/dev/null 2>&1; then
 		echo "Your C compiler doesn't support __attribute__((deprecated))."
 		val="$undef"
@@ -10544,7 +10675,7 @@ $cat >attrib.c <<'EOCP'
 #include <stdio.h>
 int I_will_not_be_ignored(void) __attribute__((warn_unused_result));
 EOCP
-if $cc $ccflags -c attrib.c >attrib.out 2>&1 ; then
+if $cc $sysrootflag $ccflags -c attrib.c >attrib.out 2>&1 ; then
 	if $contains 'warning' attrib.out >/dev/null 2>&1; then
 		echo "Your C compiler doesn't support __attribute__((warn_unused_result))."
 		val="$undef"
@@ -10605,10 +10736,10 @@ int main()
 	exit(1);
 }
 EOP
-	if $cc -o try -DTRY_BSD_PGRP $ccflags $ldflags try.c $libs >/dev/null 2>&1 && $run ./try; then
+	if $cc -o try -DTRY_BSD_PGRP $sysrootflag $ccflags $ldflags try.c $libs >/dev/null 2>&1 && $run ./try; then
 		echo "You have to use getpgrp(pid) instead of getpgrp()." >&4
 		val="$define"
-	elif $cc -o try $ccflags $ldflags try.c $libs >/dev/null 2>&1 && $run ./try; then
+	elif $cc -o try $sysrootflag $ccflags $ldflags try.c $libs >/dev/null 2>&1 && $run ./try; then
 		echo "You have to use getpgrp() instead of getpgrp(pid)." >&4
 		val="$undef"
 	else
@@ -10671,10 +10802,10 @@ int main()
 	exit(1);
 }
 EOP
-	if $cc -o try -DTRY_BSD_PGRP $ccflags $ldflags try.c $libs >/dev/null 2>&1 && $run ./try; then
+	if $cc -o try -DTRY_BSD_PGRP $sysrootflag $ccflags $ldflags try.c $libs >/dev/null 2>&1 && $run ./try; then
 		echo 'You have to use setpgrp(pid,pgrp) instead of setpgrp().' >&4
 		val="$define"
-	elif $cc -o try $ccflags $ldflags try.c $libs >/dev/null 2>&1 && $run ./try; then
+	elif $cc -o try $sysrootflag $ccflags $ldflags try.c $libs >/dev/null 2>&1 && $run ./try; then
 		echo 'You have to use setpgrp() instead of setpgrp(pid,pgrp).' >&4
 		val="$undef"
 	else
@@ -10824,7 +10955,7 @@ va_dcl
 EOP
 $cat > varargs <<EOP
 $startsh
-if $cc -c $ccflags -D\$1 varargs.c >/dev/null 2>&1; then
+if $cc -c $sysrootflag $ccflags -D\$1 varargs.c >/dev/null 2>&1; then
 	echo "true"
 else
 	echo "false"
@@ -11485,7 +11616,7 @@ int main()
 	const spug y = { 0 };
 }
 EOCP
-if $cc -c $ccflags const.c >/dev/null 2>&1 ; then
+if $cc -c $sysrootflag $ccflags const.c >/dev/null 2>&1 ; then
 	val="$define"
 	echo "Yup, it does."
 else
@@ -12036,10 +12167,10 @@ int main()
 }
 EOM
 	: Call the object file tmp-dyna.o in case dlext=o.
-	if $cc $ccflags $cccdlflags -c dyna.c > /dev/null 2>&1 &&
+	if $cc $sysrootflag $ccflags $cccdlflags -c dyna.c > /dev/null 2>&1 &&
 		mv dyna${_o} tmp-dyna${_o} > /dev/null 2>&1 &&
 		$ld -o dyna.$dlext $ldflags $lddlflags tmp-dyna${_o} > /dev/null 2>&1 &&
-		$cc -o fred $ccflags $ldflags $cccdlflags $ccdlflags fred.c $libs > /dev/null 2>&1 && $to dyna.$dlext; then
+		$cc -o fred $sysrootflag $ccflags $ldflags $cccdlflags $ccdlflags fred.c $libs > /dev/null 2>&1 && $to dyna.$dlext; then
 		xxx=`$run ./fred`
 		case $xxx in
 		1)	echo "Test program failed using dlopen." >&4
@@ -15068,7 +15199,7 @@ int main() {
 		return 1 ;
 }
 EOCP
-if $cc $ccflags $ldflags -o isblank isblank.c $libs >/dev/null 2>&1 ; then
+if $cc $sysrootflag $ccflags $ldflags -o isblank isblank.c $libs >/dev/null 2>&1 ; then
 	echo "isblank() found." >&4
 	val="$define"
 else
@@ -15414,7 +15545,7 @@ case "$i_sysmman$d_mmap" in
 #include <sys/mman.h>
 void *mmap();
 END
-	if $cc $ccflags -c mmap.c >/dev/null 2>&1; then
+	if $cc $sysrootflag $ccflags -c mmap.c >/dev/null 2>&1; then
 		mmaptype='void *'
 	else
 		mmaptype='caddr_t'
@@ -15647,7 +15778,7 @@ int main()
 	foo = foo;
 }
 EOCP
-if $cc -c $ccflags try.c >/dev/null 2>&1 ; then
+if $cc -c $sysrootflag $ccflags try.c >/dev/null 2>&1 ; then
 	val="$define"
 	echo "Yup, it does."
 else
@@ -17504,7 +17635,7 @@ case "$d_shmat" in
 #include <sys/shm.h>
 void *shmat();
 END
-	if $cc $ccflags -c shmat.c >/dev/null 2>&1; then
+	if $cc $sysrootflag $ccflags -c shmat.c >/dev/null 2>&1; then
 		shmattype='void *'
 	else
 		shmattype='char *'
@@ -19319,7 +19450,7 @@ int main()
 }
 #endif
 EOCP
-	if $cc $ccflags -c try.c >try.out 2>&1 ; then
+	if $cc $sysrootflag $ccflags -c try.c >try.out 2>&1 ; then
 		if $contains warning try.out >>/dev/null 2>&1 ; then
 			db_hashtype='int'
 		else
@@ -19364,7 +19495,7 @@ int main()
 }
 #endif
 EOCP
-	if $cc $ccflags -c try.c  >try.out 2>&1 ; then
+	if $cc $sysrootflag $ccflags -c try.c  >try.out 2>&1 ; then
 		if $contains warning try.out >>/dev/null 2>&1 ; then
 			db_prefixtype='int'
 		else
@@ -20387,11 +20518,11 @@ $cat > foo.c <<EOP
 #endif
 int main() { printf("%d\n", bar1()); exit(0); }
 EOP
-$cc $ccflags -c bar1.c >/dev/null 2>&1
-$cc $ccflags -c bar2.c >/dev/null 2>&1
-$cc $ccflags -c foo.c >/dev/null 2>&1
+$cc $sysrootflag $ccflags -c bar1.c >/dev/null 2>&1
+$cc $sysrootflag $ccflags -c bar2.c >/dev/null 2>&1
+$cc $sysrootflag $ccflags -c foo.c >/dev/null 2>&1
 $ar rc bar$_a bar2$_o bar1$_o >/dev/null 2>&1
-if $cc -o foobar $ccflags $ldflags foo$_o bar$_a $libs > /dev/null 2>&1 &&
+if $cc -o foobar $sysrootflag $ccflags $ldflags foo$_o bar$_a $libs > /dev/null 2>&1 &&
 	$run ./foobar >/dev/null 2>&1; then
 	echo "$ar appears to generate random libraries itself."
 	orderlib=false
@@ -20399,13 +20530,13 @@ if $cc -o foobar $ccflags $ldflags foo$_o bar$_a $libs > /dev/null 2>&1 &&
 	    ranlib=":"
 	fi
 elif $ar s bar$_a >/dev/null 2>&1 &&
-	$cc -o foobar $ccflags $ldflags foo$_o bar$_a $libs > /dev/null 2>&1 &&
+	$cc -o foobar $sysrootflag $ccflags $ldflags foo$_o bar$_a $libs > /dev/null 2>&1 &&
 	$run ./foobar >/dev/null 2>&1; then
 		echo "a table of contents needs to be added with '$ar s'."
 		orderlib=false
 		ranlib="$ar s"
 elif $ar ts bar$_a >/dev/null 2>&1 &&
-	$cc -o foobar $ccflags $ldflags foo$_o bar$_a $libs > /dev/null 2>&1 &&
+	$cc -o foobar $sysrootflag $ccflags $ldflags foo$_o bar$_a $libs > /dev/null 2>&1 &&
 	$run ./foobar >/dev/null 2>&1; then
 		echo "a table of contents needs to be added with '$ar ts'."
 		orderlib=false
@@ -21737,7 +21868,7 @@ int func()
 	return ENOTSOCK;
 }
 EOM
-	if $cc $ccflags -c try.c >/dev/null 2>&1; then
+	if $cc $sysrootflag $ccflags -c try.c >/dev/null 2>&1; then
 		echo "We'll be including <net/errno.h>." >&4
 	else
 		echo "We won't be including <net/errno.h>." >&4
@@ -21889,7 +22020,7 @@ case "$osname-$gccversion" in
 irix-) ccflags="\$ccflags -woff 1178" ;;
 os2-*) ccflags="\$ccflags -Zlinker /PM:VIO" ;;
 esac
-$cc -o try -Dcpp_stuff=$cpp_stuff $optimize \$ccflags $ldflags try.c $libs && $run ./try | $sed 's/ /\\\\ /g'
+$cc -o try -Dcpp_stuff=$cpp_stuff $optimize $sysrootflag \$ccflags $ldflags try.c $libs && $run ./try | $sed 's/ /\\\\ /g'
 EOSH
 chmod +x Cppsym.try
 $eunicefix Cppsym.try
@@ -23449,6 +23580,7 @@ libperl='$libperl'
 libpth='$libpth'
 libs='$libs'
 libsdirs='$libsdirs'
+libsearchpth='$libsearchpth'
 libsfiles='$libsfiles'
 libsfound='$libsfound'
 libspath='$libspath'
@@ -23666,6 +23798,8 @@ strings='$strings'
 submit='$submit'
 subversion='$subversion'
 sysman='$sysman'
+sysroot='$sysroot'
+sysrootflag='$sysrootflag'
 tail='$tail'
 tar='$tar'
 targetarch='$targetarch'
