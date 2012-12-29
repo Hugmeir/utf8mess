@@ -1,6 +1,7 @@
 #!./miniperl -w
 
 use strict;
+use Config;
 if (@ARGV) {
     my $dir = shift;
     chdir $dir or die "Can't chdir '$dir': $!";
@@ -52,4 +53,5 @@ print <<"EOT";
 # Reset \@INC completely, adding the directories we need, and removing the
 # installed directories (which we don't need to read, and may confuse us)
 \@INC = ($inc);
+\$^O = '$Config{osname}';
 EOT
