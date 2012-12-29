@@ -34,11 +34,7 @@
 #ifdef PERL_MICRO
 #   include "uconfig.h"
 #else
-#   ifndef USE_CROSS_COMPILE
-#       include "config.h"
-#   else
-#       include "xconfig.h"
-#   endif
+#   include "config.h"
 #endif
 
 /* See L<perlguts/"The Perl API"> for detailed notes on
