@@ -39,7 +39,7 @@ cat >Makefile <<!GROK!THIS!
 
 PERL = $perl
 REALPERL = ../perl
-RUN = $run  # Used mainly cross-compilation setups.
+RUN =   # Used mainly cross-compilation setups.
 
 !GROK!THIS!
 
