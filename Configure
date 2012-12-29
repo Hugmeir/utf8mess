@@ -8106,7 +8106,7 @@ EOM
 			      '') dflt="$dflt +vnocompatwarnings" ;;
 			      esac
 			      ;;
-			linux|irix*|gnu*)  dflt="-shared $optimize" ;;
+			linux*|irix*|gnu*)  dflt="-shared $optimize" ;;
 			next)  dflt='none' ;;
 			solaris) # See [perl #66604].  On Solaris 11, gcc -m64 on amd64
 				# appears not to understand -G.  gcc versions at
@@ -8180,7 +8180,7 @@ say "none".
 EOM
     case "$ccdlflags" in
     '') case "$osname" in
-	    linux|hpux|gnu*)	dflt='-Wl,-E' ;;
+	    linux*|hpux|gnu*)	dflt='-Wl,-E' ;;
 	    next|sunos)	dflt='none' ;;
 	    *)		dflt='none' ;;
 	    esac ;;
