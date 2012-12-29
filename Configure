@@ -2810,110 +2810,128 @@ esac
 case "$usecrosscompile" in
 $define|true|[yY]*)
 	$echo "Cross-compiling..."
-        croak=''
-    	case "$cc" in
+    croak=''
+    case "$cc" in
 	*-*-gcc) # A cross-compiling gcc, probably.
 	    targetarch=`$echo $cc|$sed 's/-gcc$//'`
+        $echo "Your targetarch is now set to: $targetarch"
 	    ar=$targetarch-ar
 	    # leave out ld, choosing it is more complex
 	    nm=$targetarch-nm
 	    ranlib=$targetarch-ranlib
-	    $echo 'extern int foo;' > try.c
-	    set X `$cc -v -E try.c 2>&1 | $awk '/^#include </,/^End of search /'|$grep '/include'`
-	    shift
+        # if sysroot is set we already have our incpath and libpath
+	    if test "X$sysroot" == X; then
+	        $echo 'extern int foo;' > try.c
+	        set X `$cc -v -E try.c 2>&1 | $awk '/^#include </,/^End of search /'|$grep '/include'`
+	        shift
             if $test $# -gt 0; then
-	        incpth="$incpth $*"
-		incpth="`$echo $incpth|$sed 's/^ //'`"
+	            incpth="$incpth $*"
+		        incpth="`$echo $incpth|$sed 's/^ //'`"
                 echo "Guessing incpth '$incpth'." >&4
                 for i in $*; do
-		    j="`$echo $i|$sed 's,/include$,/lib,'`"
-		    if $test -d $j; then
-			libpth="$libpth $j"
-		    fi
+		            j="`$echo $i|$sed 's,/include$,/lib,'`"
+ 		            if $test -d $j; then
+			            libpth="$libpth $j"
+		            fi
                 done   
-		libpth="`$echo $libpth|$sed 's/^ //'`"
+		        libpth="`$echo $libpth|$sed 's/^ //'`"
                 echo "Guessing libpth '$libpth'." >&4
-	    fi
-	    $rm -f try.c
-	    ;;
+	        fi
+	        $rm -f try.c
+        fi
+        ;;
 	esac
 	case "$targetarch" in
 	'') echo "Targetarch not defined." >&4; croak=y ;;
         *)  echo "Using targetarch $targetarch." >&4 ;;
 	esac
-	case "$incpth" in
-	'') echo "Incpth not defined." >&4; croak=y ;;
-        *)  echo "Using incpth '$incpth'." >&4 ;;
-	esac
-	case "$libpth" in
-	'') echo "Libpth not defined." >&4; croak=y ;;
-        *)  echo "Using libpth '$libpth'." >&4 ;;
-	esac
-	case "$usrinc" in
-	'') for i in $incpth; do
-	        if $test -f $i/errno.h -a -f $i/stdio.h -a -f $i/time.h; then
-		    usrinc=$i
-	            echo "Guessing usrinc $usrinc." >&4
-		    break
-		fi
-	    done
-	    case "$usrinc" in
-	    '') echo "Usrinc not defined." >&4; croak=y ;;
+    if test "X$sysroot" == X; then
+	    case "$incpth" in
+	        '') echo "Incpth not defined." >&4; croak=y ;;
+            *)  echo "Using incpth '$incpth'." >&4 ;;
 	    esac
-            ;;
-        *)  echo "Using usrinc $usrinc." >&4 ;;
-	esac
-	case "$targethost" in
-	'') echo "Targethost not defined." >&4; croak=y ;;
-        *)  echo "Using targethost $targethost." >&4
-	esac
-	locincpth=' '
-	loclibpth=' '
-	case "$croak" in
-	y) echo "Cannot continue, aborting." >&4; exit 1 ;;
-	esac
-	case "$src" in
-	/*) run=$src/Cross/run
-	    targetmkdir=$src/Cross/mkdir
-	    to=$src/Cross/to
-	    from=$src/Cross/from
-	    ;;
-	*)  pwd=`$test -f ../Configure & cd ..; pwd`
-	    run=$pwd/Cross/run
-	    targetmkdir=$pwd/Cross/mkdir
-	    to=$pwd/Cross/to
-	    from=$pwd/Cross/from
-	    ;;
-	esac
-	case "$targetrun" in
-	'') targetrun=ssh ;;
-	esac
-	case "$targetto" in
-	'') targetto=scp ;;
-	esac
-	case "$targetfrom" in
-	'') targetfrom=scp ;;
-	esac
-    	run=$run-$targetrun
-    	to=$to-$targetto
-    	from=$from-$targetfrom
-	case "$targetdir" in
-	'')  targetdir=/tmp
-             echo "Guessing targetdir $targetdir." >&4
-             ;;
-	esac
-	case "$targetuser" in
-	'')  targetuser=root
-             echo "Guessing targetuser $targetuser." >&4
-             ;;
-	esac
-	case "$targetfrom" in
-	scp)	q=-q ;;
-	*)	q='' ;;
-	esac
-	case "$targetrun" in
-	ssh|rsh)
-	    cat >$run <<EOF
+	    case "$libpth" in
+	        '') echo "Libpth not defined." >&4; croak=y ;;
+            *)  echo "Using libpth '$libpth'." >&4 ;;
+	    esac
+	    case "$usrinc" in
+	        '') for i in $incpth; do
+	            if $test -f $i/errno.h -a -f $i/stdio.h -a -f $i/time.h; then
+		            usrinc=$i
+	                echo "Guessing usrinc $usrinc." >&4
+		            break
+		        fi
+	            done
+	            case "$usrinc" in
+	                '') echo "Usrinc not defined." >&4; croak=y ;;
+	            esac
+                ;;
+            *)  echo "Using usrinc $usrinc." >&4 ;;
+	    esac
+	    case "$croak" in
+	        y) echo "Cannot continue, aborting." >&4; exit 1 ;;
+	    esac
+        locincpth=' '
+        loclibpth=' '
+    else
+        echo "Cross-compiling using sysroot $sysroot, guessing of GCC inc/lib paths skipped" >&4
+    fi
+    ;;
+*)
+    usecrosscompile='undef'
+    ;;
+esac
+
+## Define -Dtargethost=somecomputer to run compiled tests on another machine
+case "$targethost" in
+    '') echo "No targethost for running compiler tests against defined, running locally" >&4
+        run=''
+        to=:
+        from=:
+        ;;
+    *) echo "Using targethost $targethost." >&4
+       case "$src" in
+	       /*) run=$src/Cross/run
+	           targetmkdir=$src/Cross/mkdir
+	           to=$src/Cross/to
+	           from=$src/Cross/from
+	           ;;
+	       *)  pwd=`$test -f ../Configure && cd ..; pwd`
+	           run=$pwd/Cross/run
+	           targetmkdir=$pwd/Cross/mkdir
+	           to=$pwd/Cross/to
+	           from=$pwd/Cross/from
+	           ;;
+	   esac
+	   case "$targetrun" in
+	       '') targetrun=ssh ;;
+	   esac
+	   case "$targetto" in
+	       '') targetto=scp ;;
+	   esac
+	   case "$targetfrom" in
+	       '') targetfrom=scp ;;
+	   esac
+       run=$run-$targetrun
+       to=$to-$targetto
+       from=$from-$targetfrom
+	   case "$targetdir" in
+	       '')  targetdir=/tmp
+               echo "Guessing targetdir $targetdir." >&4
+               ;;
+	   esac
+	   case "$targetuser" in
+	       '')  targetuser=root
+               echo "Guessing targetuser $targetuser." >&4
+               ;;
+	   esac
+	   case "$targetfrom" in
+	       scp)	q=-q ;;
+	       *)	q='' ;;
+	   esac
+	   case "$targetrun" in
+	       ssh|rsh)
+	           cat >$run <<EOF
 #!/bin/sh
 case "\$1" in
 -cwd)
@@ -2934,25 +2952,25 @@ fi
 $targetrun -l $targetuser $targethost "cd \$cwd && ./\$exe \$@"
 EOF
 	    ;;
-	*)  echo "Unknown targetrun '$targetrun'" >&4
-	    exit 1
-	    ;;
-	esac
-	case "$targetmkdir" in
-	*/Cross/mkdir)
+	       *)  echo "Unknown targetrun '$targetrun'" >&4
+	           exit 1
+	           ;;
+	   esac
+	   case "$targetmkdir" in
+	       */Cross/mkdir)
 	    cat >$targetmkdir <<EOF
 #!/bin/sh
 $targetrun -l $targetuser $targethost "mkdir -p \$@"
 EOF
 	    $chmod a+rx $targetmkdir
 	    ;;
-	*)  echo "Unknown targetmkdir '$targetmkdir'" >&4
-	    exit 1
-	    ;;
-	esac
-	case "$targetto" in
-	scp|rcp)
-	    cat >$to <<EOF
+	       *)  echo "Unknown targetmkdir '$targetmkdir'" >&4
+	           exit 1
+	           ;;
+	   esac
+	   case "$targetto" in
+	       scp|rcp)
+	           cat >$to <<EOF
 #!/bin/sh
 for f in \$@
 do
@@ -2969,8 +2987,8 @@ do
 done
 exit 0
 EOF
-	    ;;
-	cp) cat >$to <<EOF
+	           ;;
+	       cp) cat >$to <<EOF
 #!/bin/sh
 for f in \$@
 do
@@ -2987,14 +3005,14 @@ do
 done
 exit 0
 EOF
-	    ;;
-	*)  echo "Unknown targetto '$targetto'" >&4
-	    exit 1
-	    ;;
-	esac
-	case "$targetfrom" in
-	scp|rcp)
-	  cat >$from <<EOF
+	           ;;
+	       *)  echo "Unknown targetto '$targetto'" >&4
+	           exit 1
+	           ;;
+	   esac
+	   case "$targetfrom" in
+	       scp|rcp)
+	           cat >$from <<EOF
 #!/bin/sh
 for f in \$@
 do
@@ -3003,8 +3021,8 @@ do
 done
 exit 0
 EOF
-	    ;;
-	cp) cat >$from <<EOF
+	           ;;
+	       cp) cat >$from <<EOF
 #!/bin/sh
 for f in \$@
 do
@@ -3013,42 +3031,36 @@ do
 done
 exit 0
 EOF
-	    ;;
-	*)  echo "Unknown targetfrom '$targetfrom'" >&4
-	    exit 1
-	    ;;
-	esac
-	if $test ! -f $run; then
-	    echo "Target 'run' script '$run' not found." >&4
-	else
-	    $chmod a+rx $run
-	fi
-	if $test ! -f $to; then
-	    echo "Target 'to' script '$to' not found." >&4
-	else
-	    $chmod a+rx $to
-	fi
-	if $test ! -f $from; then
-	    echo "Target 'from' script '$from' not found." >&4
-	else
-	    $chmod a+rx $from
-	fi
-	if $test ! -f $run -o ! -f $to -o ! -f $from; then
-	    exit 1
-	fi
-	cat >&4 <<EOF
+	           ;;
+	       *)  echo "Unknown targetfrom '$targetfrom'" >&4
+	           exit 1
+	           ;;
+	   esac
+	   if $test ! -f $run; then
+	       echo "Target 'run' script '$run' not found." >&4
+	   else
+	       $chmod a+rx $run
+	   fi
+	   if $test ! -f $to; then
+	       echo "Target 'to' script '$to' not found." >&4
+	   else
+	       $chmod a+rx $to
+	   fi
+	   if $test ! -f $from; then
+	       echo "Target 'from' script '$from' not found." >&4
+	   else
+	       $chmod a+rx $from
+	   fi
+	   if $test ! -f $run -o ! -f $to -o ! -f $from; then
+	       exit 1
+	   fi
+	   cat >&4 <<EOF
 Using '$run' for remote execution,
 and '$from' and '$to'
 for remote file transfer.
 EOF
-	;;
-*)	run=''
-	to=:
-	from=:
-	usecrosscompile='undef'
-	targetarch=''
-	;;
-esac
+	   ;;
+esac # if targethost
 
 : see whether [:lower:] and [:upper:] are supported character classes
 echo " "
@@ -19610,7 +19622,13 @@ EOCP
                 set tryp
                 if eval $compile; then
                     $rm -f tryp.out
-                    $cat tryp.c | $run ./tryp 2>/dev/null > tryp.out
+                    # Copy the .c file to the remote host ($to is an ssh-alike if targethost is set)
+                    if $test "X$targethost" != X; then
+                        $to tryp.c
+                        $run ./tryp \< tryp.c 2>/dev/null > tryp.out
+                    else
+                        $cat tryp.c | $run ./tryp 2>/dev/null > tryp.out
+                    fi
                     if cmp tryp.c tryp.out >/dev/null 2>&1; then
                        $cat >&4 <<EOM
 fflush(NULL) seems to behave okay with input streams.
@@ -19674,7 +19692,12 @@ EOCP
 	set tryp
 	if eval $compile; then
 	    $rm -f tryp.out
-	    $cat tryp.c | $run ./tryp 2>/dev/null > tryp.out
+        if $test "X$targethost" != X; then
+            $to tryp.c
+            $run ./tryp \< tryp.c 2>/dev/null > tryp.out
+        else
+            $cat tryp.c | $run ./tryp 2>/dev/null > tryp.out
+        fi
 	    if cmp tryp.c tryp.out >/dev/null 2>&1; then
 	       $cat >&4 <<EOM
 Good, at least fflush(stdin) seems to behave okay when stdin is a pipe.
