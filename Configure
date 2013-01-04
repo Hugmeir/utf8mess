@@ -211,6 +211,8 @@ targetarch=''
 to=''
 sysroot=''
 usecrosscompile=''
+hostperl=''
+hostgenerate=''
 extern_C=''
 mistrustnm=''
 usedevel=''
@@ -2815,14 +2817,14 @@ $define|true|[yY]*)
 	$echo "Cross-compiling..."
     croak=''
     case "$cc" in
-	*-*-gcc) # A cross-compiling gcc, probably.
+	*-*-gcc) # A cross-compiling gcc, probably. Only supporting gcc at the moment.
 	    targetarch=`$echo $cc|$sed 's/-gcc$//'`
         $echo "Your targetarch is now set to: $targetarch"
 	    ar=$targetarch-ar
 	    # leave out ld, choosing it is more complex
 	    nm=$targetarch-nm
 	    ranlib=$targetarch-ranlib
-        # if sysroot is set we already have our incpath and libpath
+        # if sysroot is set we already have our incpath and libpath discovered, else try to get gcc to tell us
 	    if test "X$sysroot" == X; then
 	        $echo 'extern int foo;' > try.c
 	        set X `$cc -v -E try.c 2>&1 | $awk '/^#include </,/^End of search /'|$grep '/include'`
@@ -2878,6 +2880,20 @@ $define|true|[yY]*)
         loclibpth=' '
     else
         echo "Cross-compiling using sysroot $sysroot, guessing of GCC inc/lib paths skipped" >&4
+    fi
+    : compile a host miniperl and generate_uudmap, unless we got passed them
+    if $test "X$hostperl" == X; then
+      echo "Building host miniperl and generate_uudmap binaries" >&4
+      cd ..
+      test -d host || mkdir host
+      cd host && rm -r ./*
+      ../Configure -des -Dusedevel -Dmksymlinks
+      make miniperl
+      make generate_uudmap
+      hostperl=host/miniperl
+      hostgenerate=host/generate_uudmap
+      cd ..
+      cd UU
     fi
     ;;
 *)
@@ -23576,6 +23592,8 @@ html1dir='$html1dir'
 html1direxp='$html1direxp'
 html3dir='$html3dir'
 html3direxp='$html3direxp'
+hostgenerate='$hostgenerate'
+hostperl='$hostperl'
 i16size='$i16size'
 i16type='$i16type'
 i32size='$i32size'

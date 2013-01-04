@@ -304,6 +304,10 @@ LDLIBPTH = $ldlibpth
 # Sometimes running an executable is an adventure.
 RUN =
 
+# When cross-compiling we want to use a (mini)perl built for the host, not the target
+HOST_PERL = $hostperl
+HOST_GENERATE = $hostgenerate
+
 # These variables may need to be manually set for non-Unix systems.
 AR = $full_ar
 HOST_EXE_EXT = $_exe
@@ -665,10 +669,22 @@ bitcount.h: generate_uudmap$(HOST_EXE_EXT)
 	$(RUN) ./generate_uudmap$(HOST_EXE_EXT) $(generated_headers)
 
 generate_uudmap$(OBJ_EXT): mg_raw.h
+!NO!SUBS!
 
+if test "X$hostgenerate" != X; then
+	$spitshell >>$Makefile <<'!NO!SUBS!'
+generate_uudmap$(HOST_EXE_EXT): generate_uudmap$(OBJ_EXT)
+	-@rm generate_uudmap$(HOST_EXE_EXT)
+	ln -s $(HOST_GENERATE) generate_uudmap$(HOST_EXE_EXT)
+!NO!SUBS!
+else
+	$spitshell >>$Makefile <<'!NO!SUBS!'
 generate_uudmap$(HOST_EXE_EXT): generate_uudmap$(OBJ_EXT)
 	$(CC) -o generate_uudmap$(EXE_EXT) $(LDFLAGS) generate_uudmap$(OBJ_EXT) $(libs)
+!NO!SUBS!
+fi
 
+$spitshell >>$Makefile <<'!NO!SUBS!'
 miniperlmain$(OBJ_EXT): miniperlmain.c patchlevel.h
 	$(CCCMD) $(PLDLFLAGS) $*.c
 
@@ -876,13 +892,23 @@ $(MINIPERL_EXE): $& $(mini_obj)
 !NO!SUBS!
 		;;
 	*)
-		$spitshell >>$Makefile <<'!NO!SUBS!'
+		if test "X$hostperl" != X; then
+			$spitshell >>$Makefile <<'!NO!SUBS!'
+$(MINIPERL_EXE): $& $(mini_obj)
+	-@rm -f miniperl.xok
+	-@rm $(MINIPERL_EXE)
+	ln -s $(HOST_PERL) $(MINIPERL_EXE)
+	$(LDLIBPTH) $(RUN) ./miniperl$(HOST_EXE_EXT) -w -Ilib -MExporter -e '<?>' || $(MAKE) minitest
+!NO!SUBS!
+		else
+			$spitshell >>$Makefile <<'!NO!SUBS!'
 $(MINIPERL_EXE): $& $(mini_obj)
 	-@rm -f miniperl.xok
 	$(LDLIBPTH) $(CC) $(CLDFLAGS) -o $(MINIPERL_EXE) \
 	    $(mini_obj) $(libs)
 	$(LDLIBPTH) $(RUN) ./miniperl$(HOST_EXE_EXT) -w -Ilib -MExporter -e '<?>' || $(MAKE) minitest
 !NO!SUBS!
+		fi
 		;;
 	esac
 
@@ -1252,6 +1278,7 @@ realclean:	_realcleaner _mopup
 
 _clobber:
 	-@rm -f Cross/run-* Cross/to-* Cross/from-*
+	-rm -r host
 	rm -f t/test_state
 	rm -f config.sh cppstdin Policy.sh extras.lst
 
