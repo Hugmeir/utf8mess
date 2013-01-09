@@ -1201,7 +1201,7 @@ realclean:	_realcleaner _mopup
 
 _clobber:
 	-@rm -f Cross/run-* Cross/to-* Cross/from-*
-	-rm -r host
+	-rm -rf host
 	rm -f t/test_state
 	rm -f config.sh cppstdin Policy.sh extras.lst
 
