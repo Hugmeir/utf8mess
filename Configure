@@ -2822,7 +2822,7 @@ $define|true|[yY]*)
 	    nm=$targetarch-nm
 	    ranlib=$targetarch-ranlib
         # if sysroot is set we already have our incpath and libpath discovered, else try to get gcc to tell us
-	    if test "X$sysroot" == X; then
+	    if test "X$sysroot" = X; then
 	        $echo 'extern int foo;' > try.c
 	        set X `$cc -v -E try.c 2>&1 | $awk '/^#include </,/^End of search /'|$grep '/include'`
 	        shift
@@ -2847,7 +2847,7 @@ $define|true|[yY]*)
 	'') echo "Targetarch not defined." >&4; croak=y ;;
         *)  echo "Using targetarch $targetarch." >&4 ;;
 	esac
-    if test "X$sysroot" == X; then
+    if test "X$sysroot" = X; then
 	    case "$incpth" in
 	        '') echo "Incpth not defined." >&4; croak=y ;;
             *)  echo "Using incpth '$incpth'." >&4 ;;
@@ -2879,7 +2879,7 @@ $define|true|[yY]*)
         echo "Cross-compiling using sysroot $sysroot, guessing of GCC inc/lib paths skipped" >&4
     fi
     : compile a host miniperl and generate_uudmap, unless we got passed them
-    if $test "X$hostperl" == X; then
+    if $test "X$hostperl" = X; then
       echo "Building host miniperl and generate_uudmap binaries" >&4
       cd ..
       test -d host || mkdir host
