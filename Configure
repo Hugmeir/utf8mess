@@ -2883,7 +2883,7 @@ $define|true|[yY]*)
       echo "Building host miniperl and generate_uudmap binaries" >&4
       cd ..
       test -d host || mkdir host
-      cd host && rm -r ./*
+      cd host && rm -rf ./*
       ../Configure -des -Dusedevel -Dmksymlinks
       make miniperl
       make generate_uudmap
