@@ -1069,7 +1069,7 @@ $(CONFIGPOD): config.sh $(MINIPERL_EXE) configpm Porting/Glossary lib/Config_git
 lib/ExtUtils/Miniperl.pm: miniperlmain.c $(MINIPERL_EXE) minimod.pl $(CONFIGPM)
 	$(MINIPERL) minimod.pl > lib/ExtUtils/Miniperl.pm
 
-lib/buildcustomize.pl: $(MINIPERL_EXE) write_buildcustomize.pl
+lib/buildcustomize.pl: $(MINIPERL_EXE) write_buildcustomize.pl $(CONFIGPM)
 	$(MINIPERL) write_buildcustomize.pl >lib/buildcustomize.pl
 
 unidatafiles $(unidatafiles) pod/perluniprops.pod: uni.data
