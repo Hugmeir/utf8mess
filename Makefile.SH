@@ -1153,7 +1153,32 @@ no_install no-install:
 
 # Set this to an empty string to avoid an attempt of rebuild before install
 INSTALL_DEPENDENCE = all
+!NO!SUBS!
 
+if test "X$hostperl" != X; then
+	$spitshell >>$Makefile <<'!NO!SUBS!'
+install.perl:	$(INSTALL_DEPENDENCE) installperl
+	$(HOST_PERL) installperl --destdir=$(DESTDIR) $(INSTALLFLAGS) $(STRIPFLAGS)
+	-@test ! -s extras.lst || $(MAKE) extras.install
+
+install.man:	all installman
+	$(HOST_PERL) installman --destdir=$(DESTDIR) $(INSTALLFLAGS)
+
+# XXX Experimental. Hardwired values, but useful for testing.
+# Eventually Configure could ask for some of these values.
+install.html: all installhtml
+	-@test -f README.vms && cd vms && $(LNS) ../README.vms README_vms.pod && cd ..
+	$(HOST_PERL) installhtml   \
+      --podroot=. --podpath=. --recurse  \
+      --htmldir=$(privlib)/html   \
+      --htmlroot=$(privlib)/html  \
+      --splithead=pod/perlipc     \
+      --splititem=pod/perlfunc    \
+      --ignore=Porting/Maintainers.pm,Porting/pumpkin.pod,Porting/repository.pod \
+      --verbose
+!NO!SUBS!
+else
+	$spitshell >>$Makefile <<'!NO!SUBS!'
 install.perl:	$(INSTALL_DEPENDENCE) installperl
 	$(RUN_PERL) installperl --destdir=$(DESTDIR) $(INSTALLFLAGS) $(STRIPFLAGS)
 	-@test ! -s extras.lst || $(MAKE) extras.install
@@ -1173,7 +1198,10 @@ install.html: all installhtml
       --splititem=pod/perlfunc    \
       --ignore=Porting/Maintainers.pm,Porting/pumpkin.pod,Porting/repository.pod \
       --verbose
+!NO!SUBS!
+fi
 
+$spitshell >>$Makefile <<'!NO!SUBS!'
 
 # I now supply perly.c with the kits, so the following section is
 # used only if you force bison to run by saying
@@ -1296,6 +1324,7 @@ realclean:	_realcleaner _mopup
 _clobber:
 	-@rm -f Cross/run-* Cross/to-* Cross/from-*
 	-rm -rf host
+	-rm -rf install
 	rm -f t/test_state
 	rm -f config.sh cppstdin Policy.sh extras.lst
 
