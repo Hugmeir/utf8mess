@@ -1267,6 +1267,8 @@ META.yml:   FORCE
 META.json:   FORCE
 	PATH="`pwd`:${PATH}" PERL5LIB="`pwd`/lib" $(RUN_PERL) Porting/makemeta -j
 
+META.json:   FORCE
+	PATH="`pwd`:${PATH}" PERL5LIB="`pwd`/lib" $(RUN_PERL) Porting/makemeta Meta.json
 
 regen_all regen-all: regen regen_meta
 

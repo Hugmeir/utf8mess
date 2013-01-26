@@ -118,7 +118,11 @@
          "TestInit.pm"
       ]
    },
+<<<<<<< HEAD
    "release_status" : "testing",
+=======
+   "release_status" : "unstable",
+>>>>>>> Teach makemeta to use CPAN::Meta to generate both META.json and META.yml
    "resources" : {
       "bugtracker" : {
          "web" : "http://rt.perl.org/perlbug/"
