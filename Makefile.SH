@@ -707,7 +707,7 @@ if test "X$hostgenerate" != X; then
 	$spitshell >>$Makefile <<'!NO!SUBS!'
 generate_uudmap$(HOST_EXE_EXT): generate_uudmap$(OBJ_EXT)
 	-@rm generate_uudmap$(HOST_EXE_EXT)
-	ln -s $(HOST_GENERATE) generate_uudmap$(HOST_EXE_EXT)
+	$(LNS) $(HOST_GENERATE) generate_uudmap$(HOST_EXE_EXT)
 !NO!SUBS!
 else
 	$spitshell >>$Makefile <<'!NO!SUBS!'
@@ -941,7 +941,7 @@ lib/buildcustomize.pl: $& $(mini_obj) write_buildcustomize.pl $(CONFIGPM)
 lib/buildcustomize.pl: $& $(mini_obj) write_buildcustomize.pl $(CONFIGPM)
 	-@rm -f miniperl.xok
 	-@rm $(MINIPERL_EXE)
-	ln -s $(HOST_PERL) $(MINIPERL_EXE)
+	$(LNS) $(HOST_PERL) $(MINIPERL_EXE)
 	$(LDLIBPTH) ./miniperl$(HOST_EXE_EXT) -w -Ilib -MExporter -e '<?>' || $(MAKE) minitest
 !NO!SUBS!
 		else
