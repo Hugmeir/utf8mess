@@ -1417,19 +1417,57 @@ _test:
 # Architecture-neutral stuff:
 
 test_prep_pre: preplibrary utilities $(nonxs_ext)
+!NO!SUBS!
 
+case "$targethost" in
+'') $spitshell >>$Makefile <<'!NO!SUBS!'
 test_prep test-prep: test_prep_pre $(MINIPERL_EXE) $(unidatafiles) $(PERL_EXE) \
 	$(dynamic_ext) $(TEST_PERL_DLL) runtests x2p/s2p x2p/find2perl \
 	$(generated_pods)
 	cd t && (rm -f $(PERL_EXE); $(LNS) ../$(PERL_EXE) $(PERL_EXE))
 
+!NO!SUBS!
+;;
+*) $spitshell >>$Makefile <<!GROK!THIS!
+test_prep test-prep: test_prep_pre \$(MINIPERL_EXE) \$(unidatafiles) \$(PERL_EXE) \
+	\$(dynamic_ext) \$(TEST_PERL_DLL) runtests x2p/s2p x2p/find2perl \
+	\$(generated_pods)
+	$to t
+	$to lib
+	$to TestInit.pm
+	$to win32/FindExt.pm
+	$to MANIFEST
+	cd t && (rm -f \$(PERL_EXE); \$(LNS) ../\$(PERL_EXE) \$(PERL_EXE)) && cd ..
+	$to t/\$(PERL_EXE)
+
+!GROK!THIS!
+;;
+esac
+
+$spitshell >>$Makefile <<'!NO!SUBS!'
 test_prep_reonly: $(MINIPERL_EXE) $(PERL_EXE) $(dynamic_ext_re) $(TEST_PERL_DLL)
 	$(MINIPERL) make_ext.pl $(dynamic_ext_re) MAKE=$(MAKE) LIBPERL_A=$(LIBPERL) LINKTYPE=dynamic
 	cd t && (rm -f $(PERL_EXE); $(LNS) ../$(PERL_EXE) $(PERL_EXE))
+!NO!SUBS!
+
+case "$targethost" in
+'') $spitshell >>$Makefile <<'!NO!SUBS!'
 
 test check: test_prep
 	$(RUN_TESTS) choose
 
+!NO!SUBS!
+;;
+*) $spitshell >>$Makefile <<!GROK!THIS!
+
+test check: test_prep
+	$run -cwd $targetdir/t -env LD_LIBRARY_PATH=$targetdir:\\\$LD_LIBRARY_PATH ./TEST
+
+!GROK!THIS!
+;;
+esac
+
+$spitshell >>$Makefile <<'!NO!SUBS!'
 test_tty test-tty: test_prep
 	$(RUN_TESTS) tty
 
