@@ -778,8 +778,7 @@ META.json:	Porting/makemeta Porting/Maintainers.pl Porting/Maintainers.pm
 	$(LDLIBPTH) ./miniperl -Ilib Porting/makemeta -j
 
 META.json:	Porting/makemeta Porting/Maintainers.pl Porting/Maintainers.pm
-	$(LDLIBPTH) ./miniperl -Ilib Porting/makemeta META.json
->>>>>>> Teach makemeta to use CPAN::Meta to generate both META.json and META.yml
+	$(LDLIBPTH) ./miniperl -Ilib Porting/makemeta -j
 
 install-strip:
 	$(MAKE) STRIPFLAGS=-s install DESTDIR="$(DESTDIR)"
