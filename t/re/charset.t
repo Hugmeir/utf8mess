@@ -3,6 +3,7 @@
 BEGIN {
     chdir 't' if -d 't';
     @INC = '../lib';
+    require Config; import Config;
     require './test.pl';
 }
 
@@ -40,6 +41,7 @@ if (! is_miniperl() && $Config{d_setlocale}) {
     require POSIX;
     my $current_locale = POSIX::setlocale( &POSIX::LC_ALL, "C") // "";
     if ($current_locale eq 'C') {
+        require locale; import locale;
 
         # test for d_setlocale is repeated here because this one is compile
         # time, and the one above is run time
