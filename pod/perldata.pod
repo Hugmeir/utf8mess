@@ -122,6 +122,10 @@ rules apply:
 
     / (?[ ( \p{Word} & \p{XID_Start} ) + [_] ]) \p{XID_Continue}* /x
 
+That is, the intersection between the Word and XIDS properties
+(plus the underscore), followed by any number of XIDC characters,
+one or more times.
+
 If not under C<use utf8>, the source is treated as ASCII + 128 extra
 controls, and identifiers should match
 
@@ -137,18 +141,14 @@ Single quotes have similar rules, but with the exception that they are not
 legal at the end of an identifier: That is, C<$'foo> and C<$foo'bar> are
 legal, but C<$foo'bar'> are not.
 
+Historically, things like C<$::::'foo> and C<$foo::'bar> were legal, but
+C<$::'::foo> and C<$foo'::bar> were not.  This was changed in 5.18 to 
+a simple rule: in each separator, you can use either one pair of colons,
+or one single quote.
 
 Finally, if the identifier is preceded by a sigil --
-Moreso, normal identifiers can start or end with any number
-of double colons (::), and can contain several parts delimited
-by double colons.
-And additionally, if the identifier is preceded by a sigil --
 that is, if the identifier is part of a variable name -- it
 may optionally be enclosed in braces.
-
-While you can mix double colons with singles quotes, the quotes must come
-after the colons: C<$::::'foo> and C<$foo::'bar> are legal, but C<$::'::foo>
-and C<$foo'::bar> are not.
 
 Put together, a grammar to match a basic identifier becomes
 
@@ -162,13 +162,13 @@ Put together, a grammar to match a basic identifier becomes
                 )
             )
             (?<normal_identifier>
-                (?: :: )* '?
+                (?: :: | ' )?
                     (?&basic_identifier)
-                    (?: (?= (?: :: )+ '? | (?: :: )* ' ) (?&normal_identifier) )?
-                (?: :: )*
+                    (?: (?: :: | ' ) (?&basic_identifier) )*
+                (?: :: )?
             )
             (?<basic_identifier>
-              # is use utf8 on?
+            	# is use utf8 on?
                 (?(?{ (caller(0))[8] & $utf8::hint_bits })
                     (?&Perl_XIDS) \p{XID_Continue}*
                   | (?aa) (?!\d) \w+

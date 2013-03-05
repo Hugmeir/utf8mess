@@ -1610,6 +1610,7 @@
 #define missingterm(a)		S_missingterm(aTHX_ a)
 #define no_op(a,b)		S_no_op(aTHX_ a,b)
 #define parse_ident(a,b,c,d,e)	S_parse_ident(aTHX_ a,b,c,d,e)
+#define parse_package_separator(a,b,c)	S_parse_package_separator(aTHX_ a,b,c)
 #define pending_ident()		S_pending_ident(aTHX)
 #define readpipe_override()	S_readpipe_override(aTHX)
 #define scan_const(a)		S_scan_const(aTHX_ a)

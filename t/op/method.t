@@ -13,7 +13,7 @@ BEGIN {
 use strict;
 no warnings 'once';
 
-plan(tests => 141);
+plan(tests => 140);
 
 @A::ISA = 'B';
 @B::ISA = 'C';
@@ -479,8 +479,6 @@ sub SUPPER::foo { "supper" }
 is "SUPER"->foo, 'supper', 'SUPER->method';
 
 sub flomp { "flimp" }
-sub main::::flomp { "flump" }
-is "::"->flomp, 'flump', 'method call on ::';
 is "::main"->flomp, 'flimp', 'method call on ::main';
 eval { ""->flomp };
 like $@,

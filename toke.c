@@ -9183,9 +9183,32 @@ now_ok:
 }
 
 PERL_STATIC_INLINE void
+S_parse_package_separator(pTHX_ char **s, char **d, bool is_utf8) {
+    PERL_ARGS_ASSERT_PARSE_PACKAGE_SEPARATOR;
+
+    if (**s == '\'' && isIDFIRST_lazy_if(*s+1,is_utf8)) {
+        *(*d)++ = ':';
+        *(*d)++ = ':';
+        (*s)++;
+    }
+    else if (**s == ':' && (*s)[1] == ':'
+       /* Disallow things like Foo::$bar. For the curious, this is
+        * the code path that triggers the "Bad name after" warning
+        * when looking for barewords.
+        */
+       && (*s)[2] != '$') {
+        *(*d)++ = *(*s)++;
+        *(*d)++ = *(*s)++;
+    }
+}
+
+PERL_STATIC_INLINE void
 S_parse_ident(pTHX_ char **s, char **d, char * const e, int allow_package, bool is_utf8) {
     dVAR;
     PERL_ARGS_ASSERT_PARSE_IDENT;
+
+    if (allow_package)
+        parse_package_separator(s, d, is_utf8);
 
     for (;;) {
         if (*d >= e)
@@ -9204,25 +9227,15 @@ S_parse_ident(pTHX_ char **s, char **d, char * const e, int allow_package, bool 
             Copy(*s, *d, t - *s, char);
             *d += t - *s;
             *s = t;
+            if (allow_package)
+                parse_package_separator(s, d, is_utf8);
         }
         else if ( isWORDCHAR_A(**s) ) {
             do {
                 *(*d)++ = *(*s)++;
             } while isWORDCHAR_A(**s);
-        }
-        else if (allow_package && **s == '\'' && isIDFIRST_lazy_if(*s+1,is_utf8)) {
-            *(*d)++ = ':';
-            *(*d)++ = ':';
-            (*s)++;
-        }
-        else if (allow_package && **s == ':' && (*s)[1] == ':'
-           /* Disallow things like Foo::$bar. For the curious, this is
-            * the code path that triggers the "Bad name after" warning
-            * when looking for barewords.
-            */
-           && (*s)[2] != '$') {
-            *(*d)++ = *(*s)++;
-            *(*d)++ = *(*s)++;
+            if (allow_package)
+                parse_package_separator(s, d, is_utf8);
         }
         else
             break;

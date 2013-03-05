@@ -310,12 +310,11 @@ fresh_perl_is(
 }
 
 # [perl #88134] incorrect package structure
-{
-    package Bear::;
-    sub baz{1}
-    package main;
-    ok eval { Bear::::baz() },
-     'packages ending with :: are self-consistent';
+TODO: {
+    local $::TODO = "package Foo:: is currently legal";
+    local $@;
+    eval '{ package Bear::; sub baz{1} }';
+    unlike($@, qr/^$/, "package Foo:: should be illegal")
 }
 
 # [perl #88138] ' not equivalent to :: before a null

@@ -13,7 +13,7 @@ use warnings;
 use strict;
 use Test::More;
 
-my $tests = 18; # not counting those in the __DATA__ section
+my $tests = 17; # not counting those in the __DATA__ section
 
 use B::Deparse;
 my $deparse = B::Deparse->new();
@@ -165,18 +165,6 @@ eval <<EOFCODE and test($x);
    package main;
    1
 EOFCODE
-
-# Exotic sub declarations
-$a = `$^X $path "-MO=Deparse" -e "sub ::::{}sub ::::::{}" 2>&1`;
-$a =~ s/-e syntax OK\n//g;
-is($a, <<'EOCODG', "sub :::: and sub ::::::");
-sub :::: {
-    
-}
-sub :::::: {
-    
-}
-EOCODG
 
 # [perl #33752]
 {
@@ -433,9 +421,6 @@ my $f = sub {
 ####
 # bug #43010
 '::::'->();
-####
-# bug #43010
-&::::;
 ####
 # [perl #77172]
 package rt77172;

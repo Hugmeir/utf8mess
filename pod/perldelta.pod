@@ -50,6 +50,9 @@ the core, and so had slightly different behavior. For instance,
 C<${foo:bar}> was a legal variable name.  Since they are now both parsed
 by the same code, that is no longer the case.
 
+The rules for package separators were hugely simplified; things like
+C<$::::'foo>, C<$foo::'bar> and C<sub foo::::::::bar;> are no longer legal.
+
 [ List each incompatible change as a =head2 entry ]
 
 =head1 Deprecations

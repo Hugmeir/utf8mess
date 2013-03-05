@@ -2242,6 +2242,8 @@ s	|int	|ao		|int toketype
 s  |void|parse_ident|NN char **s|NN char **d \
                      |NN char * const e|int allow_package \
                      |bool is_utf8
+s   |void|parse_package_separator|NN char **s|NN char **d \
+                     |bool is_utf8
 #  if defined(PERL_CR_FILTER)
 s	|I32	|cr_textfilter	|int idx|NULLOK SV *sv|int maxlen
 s	|void	|strip_return	|NN SV *sv

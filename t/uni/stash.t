@@ -296,12 +296,11 @@ plan( tests => 58 );
     }
     
     # [perl #88134] incorrect package structure
-    {
-        package Bèàr::;
-        sub bàz{1}
-        package main;
-        ok eval { Bèàr::::bàz() },
-        'packages ending with :: are self-consistent';
+    TODO: {
+        local $::TODO = "package Foo:: is currently legal";
+        local $@;
+        eval '{ package Bèàr::; sub bàz{1} }';
+        unlike($@, qr/^$/, "package Foo:: should be illegal")
     }
     
     # [perl #88138] ' not equivalent to :: before a null

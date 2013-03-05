@@ -262,8 +262,10 @@ print ((exists $str{foo}      ? "" : "not ")."ok $test\n"); ++$test;
 print ((exists $str{bar}      ? "" : "not ")."ok $test\n"); ++$test;
 print ((exists $str{xyz::bar} ? "" : "not ")."ok $test\n"); ++$test;
 
-sub foo::::::bar { print "ok $test\n"; $test++ }
-foo::::::bar;
+eval('sub foo::::::bar { 1 } foo::::::bar');
+if ( $@ =~ /Illegal declaration of subroutine foo::/ ) { print "ok $test\n"; } else { print "not ok $test\n"; }
+
+$test++;
 
 eval "\$x =\xE2foo";
 if ($@ =~ /Unrecognized character \\xE2; marked by <-- HERE after \$x =<-- HERE near column 5/) { print "ok $test\n"; } else { print "not ok $test\n"; }
