@@ -47,6 +47,7 @@ values only, not array values.
     left	&&
     left	|| //
     nonassoc	..  ...
+    nonassoc	infix subroutines
     right	?:
     right	= += -= *= etc. goto last next redo dump
     left	, =>

@@ -1375,3 +1375,21 @@ my($a, $b, $c) = @_;
 use feature 'lexical_subs';
 my sub f {}
 print f();
+####
+# SKIP ?$] < 5.017010 && "infix subs not implemented on this Perl version"
+# infix subroutine
+no warnings 'experimental';
+sub ss ($>$) {1}
+1 ss 2;
+>>>>
+BEGIN {${^WARNING_BITS} = "TUUUUUUUUUUU\025\000\001"}
+1 ss 2;
+####
+# SKIP ?$] < 5.017010 && "infix subs not implemented on this Perl version"
+# infix subroutine, (@>%) prototype
+no warnings 'experimental';
+sub ah (@>%) {1}
+(1, 2) ah qw/a b/;
+>>>>
+BEGIN {${^WARNING_BITS} = "TUUUUUUUUUUU\025\000\001"}
+(1, 2) ah ('a', 'b');

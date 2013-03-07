@@ -1362,6 +1362,38 @@ starts scribbling on your C<@_> parameter list.  Ouch!
 This is all very powerful, of course, and should be used only in moderation
 to make the world a better place.
 
+=head2 Infix Subroutines
+X<infix>
+
+B<WARNING>: Infix subroutines are experimental.  The feature will
+definitely change if it ever lands on a stable version of Perl.
+
+Infix subroutines are only available under the C<use feature
+'infix_subs'> pragma, and produce warnings unless the
+"experimental::infix_subs" warnings category is disabled.
+
+If enabled, you can declare a subroutine with the "C<< > >>" prototype.
+This allows you to do things like this:
+
+    sub myeq ($>$)           "string" myeq "string"
+    sub dor  ($>$)           $maybe_undef dor 1
+    sub zip  (@>@)           qw/a b c d/ zip (1, 2, 3, 4)
+    sub in   (@>%)           @keys in %hash ? 'Yes' : 'No'
+    sub to   (\[$@]>*)       @lines to $filehandle
+
+Infix subroutines receive exactly two arguments in C<@_>: C<$_[0]> holds
+the arguments from the left side, and C<$_[1]> from right side;  The
+reftype the arguments show up as depend on the prototype used, which function 
+pretty much like normal prototypes, but with some exceptions:  If
+the prototype for a side is a single C<@>, the argument will show up in
+an arrayref, and similarly, if it is a single C<%>, it will show up as
+a hashref.
+
+Because at least one arguments on each sides is mandatory, the C<_>
+prototype is useless.
+Similarly, the C<&> prototype is unimplemented for infix subroutines,
+so do not expect C<{ ... } foo { ... }> to work.
+
 =head2 Constant Functions
 X<constant>
 

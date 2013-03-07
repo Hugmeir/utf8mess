@@ -4443,3 +4443,11 @@ test_isQUOTEMETA(UV ord)
         RETVAL = _isQUOTEMETA(ord);
     OUTPUT:
         RETVAL
+
+IV
+xs_infix(...)
+PROTOTYPE: $>$
+CODE:
+    RETVAL = SvIV(ST(0)) + SvIV(ST(1));
+OUTPUT:
+    RETVAL

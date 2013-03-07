@@ -358,6 +358,7 @@ static struct debug_tokens {
     { GIVEN,		TOKENTYPE_IVAL,		"GIVEN" },
     { HASHBRACK,	TOKENTYPE_NONE,		"HASHBRACK" },
     { IF,		TOKENTYPE_IVAL,		"IF" },
+    { INFIXSUB, 	TOKENTYPE_OPVAL,	"INFIXSUB" },
     { LABEL,		TOKENTYPE_PVAL,		"LABEL" },
     { LOCAL,		TOKENTYPE_IVAL,		"LOCAL" },
     { LOOPEX,		TOKENTYPE_OPNUM,	"LOOPEX" },
@@ -6982,6 +6983,8 @@ Perl_yylex(pTHX)
 		off = 0;
 	    }
 	  just_a_word: {
+	        bool maybe_warn_no_op_bareword = FALSE;
+	        bool is_infix = FALSE;
 		int pkgname = 0;
 		const char lastchar = (PL_bufptr == PL_oldoldbufptr ? 0 : PL_bufptr[-1]);
 		const char penultchar =
@@ -7014,8 +7017,14 @@ Perl_yylex(pTHX)
 			Perl_warner(aTHX_ packWARN(WARN_SEMICOLON), "%s", PL_warn_nosemi);
 			CopLINE_inc(PL_curcop);
 		    }
+		    /* This used to be else no_op("Bareword", s), but with
+		     * infix subs around, 1 infix 2 isn't
+		     * necessarily a warnable offense, at least until
+		     * we've checked that the bareword
+		     * isn't an infix sub
+		     */
 		    else
-			no_op("Bareword",s);
+		        maybe_warn_no_op_bareword = TRUE;
 		}
 
 		/* Look for a subroutine with this name in current package,
@@ -7076,8 +7085,12 @@ Perl_yylex(pTHX)
 		pl_yylval.opval->op_private = OPpCONST_BARE;
 
 		/* And if "Foo::", then that's what it certainly is. */
-		if (len)
+		if (len) {
+                    if ( maybe_warn_no_op_bareword ) {
+                        no_op("Bareword",s);
+                    }
 		    goto safe_bareword;
+                }
 
 		if (!off)
 		{
@@ -7086,6 +7099,15 @@ Perl_yylex(pTHX)
 		    rv2cv_op = newCVREF(0, const_op);
 		    cv = lex ? GvCV(gv) : rv2cv_op_cv(rv2cv_op, 0);
 		}
+
+                /* Check if we have an infix sub */
+                if ( cv && SvPOK(cv) && memchr(CvPROTO(cv), '>', CvPROTOLEN(cv)) ) {
+                    is_infix = TRUE;
+                }
+                /* Otherwise, give the 'Bareword found where...' warning */
+                else if ( maybe_warn_no_op_bareword ) {
+                    no_op("Bareword",s);
+                }
 
 		/* See if it's the indirect object for a list operator. */
 
@@ -7153,8 +7175,10 @@ Perl_yylex(pTHX)
 		    TERM(WORD);
 		}
 
-		/* If followed by a paren, it's certainly a subroutine. */
-		if (*s == '(') {
+		/* If followed by a paren and not an infix sub,
+		 * it's certainly a subroutine.
+		 */
+		if (!is_infix && *s == '(') {
 		    CLINE;
 		    if (cv) {
 			d = s + 1;
@@ -7185,8 +7209,8 @@ Perl_yylex(pTHX)
 		    if (off)
 			 op_free(pl_yylval.opval), force_next(PRIVATEREF);
 		    else op_free(rv2cv_op),	   force_next(WORD);
-		    pl_yylval.ival = 0;
-		    TOKEN('&');
+	            pl_yylval.ival = 0;
+        	    TOKEN('&');
 		}
 
 		/* If followed by var or block, call it a method (unless sub) */
@@ -7239,6 +7263,10 @@ Perl_yylex(pTHX)
 		    PL_last_lop = PL_oldbufptr;
 		    PL_last_lop_op = OP_ENTERSUB;
 		    /* Is there a prototype? */
+                    if (is_infix) {
+                        CLINE;
+	                OPERATOR(INFIXSUB);
+                    }
 		    if (
 #ifdef PERL_MAD
 			cv &&
@@ -8567,6 +8595,9 @@ Perl_yylex(pTHX)
 		    bool must_be_last = FALSE;
 		    bool underscore = FALSE;
 		    bool seen_underscore = FALSE;
+		    bool malformed = FALSE;
+		    U32 infix_sub = 0;
+		    U32 optional  = 0;
 		    const bool warnillegalproto = ckWARN(WARN_ILLEGALPROTO);
                     STRLEN tmplen;
 
@@ -8576,59 +8607,81 @@ Perl_yylex(pTHX)
 		    /* strip spaces and check for bad characters */
 		    d = SvPV(PL_lex_stuff, tmplen);
 		    tmp = 0;
+
 		    for (p = d; tmplen; tmplen--, ++p) {
 			if (!isSPACE(*p)) {
                             d[tmp++] = *p;
 
-			    if (warnillegalproto) {
-				if (must_be_last)
-				    proto_after_greedy_proto = TRUE;
-				if (!strchr("$@%*;[]&\\_+", *p) || *p == '\0') {
-				    bad_proto = TRUE;
-				}
-				else {
-				    if ( underscore ) {
-					if ( !strchr(";@%", *p) )
-					    bad_proto = TRUE;
-					underscore = FALSE;
-				    }
-				    if ( *p == '[' ) {
-					in_brackets = TRUE;
-				    }
-				    else if ( *p == ']' ) {
-					in_brackets = FALSE;
-				    }
-				    else if ( (*p == '@' || *p == '%') &&
-					 ( tmp < 2 || d[tmp-2] != '\\' ) &&
-					 !in_brackets ) {
-					must_be_last = TRUE;
-					greedy_proto = *p;
-				    }
-				    else if ( *p == '_' ) {
-					underscore = seen_underscore = TRUE;
-				    }
-				}
-			    }
+                            if ( *p == '>' ) {
+                                if ( ++infix_sub > 1 || tmp <= 1 )
+                                    malformed = TRUE;
+                            }
+                            if (must_be_last && !infix_sub)
+                                proto_after_greedy_proto = TRUE;
+                            if (!strchr("$@%*;[]&\\_+>", *p) || *p == '\0') {
+                                bad_proto = TRUE;
+                            }
+                            else {
+                                if ( underscore ) {
+                                    if ( !strchr(";@%", *p) )
+                                        bad_proto = TRUE;
+                                    underscore = FALSE;
+                                }
+                                if ( *p == '[' ) {
+                                    in_brackets = TRUE;
+                                }
+                                else if ( *p == ']' ) {
+                                    in_brackets = FALSE;
+                                }
+                                else if ( (*p == '@' || *p == '%') &&
+                                     ( tmp < 2 || d[tmp-2] != '\\' ) &&
+                                     !in_brackets ) {
+                                    must_be_last = TRUE;
+                                    greedy_proto = *p;
+                                }
+                                else if ( *p == '_' ) {
+                                    underscore = seen_underscore = TRUE;
+                                }
+                                else if ( *p == ';' ) {
+                                    ++optional;
+                                }
+                            }
 			}
 		    }
+  		    if ( infix_sub ) {
+  		        Perl_ck_warner_d(aTHX_
+			    packWARN(WARN_EXPERIMENTAL__INFIX_SUBS),
+			    "Infix subs are experimental");
+   		        if ( optional || seen_underscore )
+		            malformed = TRUE;
+		    }
                     d[tmp] = '\0';
-		    if (proto_after_greedy_proto)
+		    if (warnillegalproto && proto_after_greedy_proto)
 			Perl_warner(aTHX_ packWARN(WARN_ILLEGALPROTO),
 				    "Prototype after '%c' for %"SVf" : %s",
 				    greedy_proto, SVfARG(PL_subname), d);
-		    if (bad_proto) {
+
+#define escape_proto(proto, protolen, utf8, dsv) (utf8 \
+                                        ? sv_uni_display(dsv, \
+                                            newSVpvn_flags(proto, protolen, SVs_TEMP | SVf_UTF8), \
+                                            protolen, \
+                                            UNI_DISPLAY_ISPRINT) \
+                                        : pv_pretty(dsv, proto, protolen, 60, NULL, NULL, \
+                                            PERL_PV_ESCAPE_NONASCII))
+
+		    if (warnillegalproto && bad_proto) {
                         SV *dsv = newSVpvs_flags("", SVs_TEMP);
 			Perl_warner(aTHX_ packWARN(WARN_ILLEGALPROTO),
 				    "Illegal character %sin prototype for %"SVf" : %s",
 				    seen_underscore ? "after '_' " : "",
 				    SVfARG(PL_subname),
-                                    SvUTF8(PL_lex_stuff)
-                                        ? sv_uni_display(dsv,
-                                            newSVpvn_flags(d, tmp, SVs_TEMP | SVf_UTF8),
-                                            tmp,
-                                            UNI_DISPLAY_ISPRINT)
-                                        : pv_pretty(dsv, d, tmp, 60, NULL, NULL,
-                                            PERL_PV_ESCAPE_NONASCII));
+                                    escape_proto(d, tmp, SvUTF8(PL_lex_stuff), dsv));
+                    }
+                    if (malformed) {
+                        SV *dsv = newSVpvs_flags("", SVs_TEMP);
+                        Perl_croak(aTHX_ "Malformed prototype for %"SVf": %s",
+                            SVfARG(PL_subname),
+                            escape_proto(d, tmp, SvUTF8(PL_lex_stuff), dsv));                    
                     }
                     SvCUR_set(PL_lex_stuff, tmp);
 		    have_proto = TRUE;

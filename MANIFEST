@@ -4052,6 +4052,7 @@ ext/XS-APItest/t/gv_fetchmeth.t		XS::APItest: tests for gv_fetchmeth() and varia
 ext/XS-APItest/t/gv_init.t	XS::APItest: tests for gv_init and variants
 ext/XS-APItest/t/handy.t	XS::APItest: tests for handy.h
 ext/XS-APItest/t/hash.t		XS::APItest: tests for hash related APIs
+ext/XS-APItest/t/infix_subs.t	XS::APItest: tests for infix subs from XS
 ext/XS-APItest/t/keyword_multiline.t	test keyword plugin parsing across lines
 ext/XS-APItest/t/keyword_plugin.t	test keyword plugin mechanism
 ext/XS-APItest/t/labelconst.aux	auxiliary file for label test
@@ -5352,6 +5353,7 @@ t/op/incfilter.t		See if the source filters in coderef-in-@INC work
 t/op/inc.t			See if inc/dec of integers near 32 bit limit work
 t/op/index.t			See if index works
 t/op/index_thr.t		See if index works in another thread
+t/op/infix_subs.t		See if infix subs work
 t/op/int.t			See if int works
 t/op/join.t			See if join works
 t/op/kill0.t			See if kill(0, $pid) works

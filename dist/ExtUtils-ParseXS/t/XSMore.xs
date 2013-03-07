@@ -133,6 +133,12 @@ CODE:
 	NOOP;
 
 void
+prototype_ssinfix()
+PROTOTYPE: $>$
+CODE:
+	NOOP;
+
+void
 attr_method(self, ...)
 ATTRS: method
 CODE:

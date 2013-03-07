@@ -1333,3 +1333,45 @@ q
 1
 1
 q
+########
+# toke.c
+1 infix 2;
+
+EXPECT
+Bareword found where operator expected at - line 2, near "1 infix"
+	(Missing operator before infix?)
+Number found where operator expected at - line 2, near "infix 2"
+	(Do you need to predeclare infix?)
+syntax error at - line 2, near "1 infix "
+Execution of - aborted due to compilation errors.
+########
+# toke.c
+sub infix; 1 infix 2;
+
+EXPECT
+Bareword found where operator expected at - line 2, near "1 infix"
+	(Missing operator before infix?)
+syntax error at - line 2, near "1 infix "
+Execution of - aborted due to compilation errors.
+########
+# toke.c
+sub infix ($>$); 1 infix 2;
+
+EXPECT
+Infix subs are experimental at - line 2.
+Undefined subroutine &main::infix called at - line 2.
+########
+# toke.c
+# Minor change in behavior. Pre infix subs, the 'Bareword found' warning
+# would've come first
+use warnings;
+1 infix:: 2;
+
+EXPECT
+Bareword "infix::" refers to nonexistent package at - line 5.
+Bareword found where operator expected at - line 5, near "1 infix::"
+	(Missing operator before infix::?)
+Number found where operator expected at - line 5, near "infix:: 2"
+	(Do you need to predeclare infix::?)
+syntax error at - line 5, near "1 infix::"
+Execution of - aborted due to compilation errors.

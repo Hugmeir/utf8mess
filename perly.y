@@ -74,7 +74,7 @@
 %token <i_tkval> '{' '}' '[' ']' '-' '+' '$' '@' '%' '*' '&' ';' '=' '.'
 
 %token <opval> WORD METHOD FUNCMETH THING PMFUNC PRIVATEREF QWLIST
-%token <opval> FUNC0OP FUNC0SUB UNIOPSUB LSTOPSUB
+%token <opval> FUNC0OP FUNC0SUB UNIOPSUB LSTOPSUB INFIXSUB
 %token <opval> PLUGEXPR PLUGSTMT
 %token <p_tkval> LABEL
 %token <i_tkval> FORMAT SUB ANONSUB PACKAGE USE
@@ -111,6 +111,7 @@
 %left <i_tkval> ','
 %right <i_tkval> ASSIGNOP
 %right <i_tkval> '?' ':'
+%nonassoc INFIXSUB
 %nonassoc DOTDOT YADAYADA
 %left <i_tkval> OROR DORDOR
 %left <i_tkval> ANDAND
@@ -804,6 +805,12 @@ listop	:	LSTOP indirob listexpr /* map {...} @args or print $fh @args */
 				op_append_elem(OP_LIST, scalar($1),
 				    newUNOP(OP_METHOD, 0, $3)));
 			  TOKEN_GETMAD($2,$$,'A');
+			}
+	|	term INFIXSUB term
+			{ $$ = convert(OP_ENTERSUB, OPf_STACKED,
+				op_append_elem(OP_LIST,
+				   op_prepend_elem(OP_LIST, $1, newLISTOP(OP_LIST, 0, $3, NULL)),
+				   $2));
 			}
 	|	METHOD indirob optlistexpr           /* new Class @args */
 			{ $$ = convert(OP_ENTERSUB, OPf_STACKED,

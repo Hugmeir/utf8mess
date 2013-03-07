@@ -9992,6 +9992,7 @@ Perl_ck_entersub_args_proto(pTHX_ OP *entersubop, GV *namegv, SV *protosv)
     const char *proto, *proto_end;
     OP *aop, *prev, *cvop;
     int optional = 0;
+    int infix_side = 0; /* 0 = not infix, 1 = lhs, 2 = rhs */
     I32 arg = 0;
     I32 contextclass = 0;
     const char *e = NULL;
@@ -10009,6 +10010,7 @@ Perl_ck_entersub_args_proto(pTHX_ OP *entersubop, GV *namegv, SV *protosv)
     prev = aop;
     aop = aop->op_sibling;
     for (cvop = aop; cvop->op_sibling; cvop = cvop->op_sibling) ;
+    if (memchr(proto, '>', proto_len)) infix_side++;
     while (aop != cvop) {
 	OP* o3;
 	if (PL_madskills && aop->op_type == OP_STUB) {
@@ -10023,7 +10025,12 @@ Perl_ck_entersub_args_proto(pTHX_ OP *entersubop, GV *namegv, SV *protosv)
 	if (proto >= proto_end)
 	    return too_many_arguments_sv(entersubop, gv_ename(namegv), 0);
 
+        
 	switch (*proto) {
+	    case '>':
+		proto++;
+		infix_side++;
+		continue;
 	    case ';':
 		optional = 1;
 		proto++;
@@ -10039,8 +10046,21 @@ Perl_ck_entersub_args_proto(pTHX_ OP *entersubop, GV *namegv, SV *protosv)
 		break;
 	    case '%':
 	    case '@':
-		list(aop);
 		arg++;
+		if ( infix_side ) {
+                    OP* const sib = aop->op_sibling;
+                    aop->op_sibling = 0;
+                    if ( *proto == '@' )
+                        aop = newANONLIST(aop);
+                    else
+                        aop = newANONHASH(aop);
+                    aop->op_sibling = sib;
+                    prev->op_sibling = aop;
+                    if ( infix_side == 1 )
+		        proto++;
+                    break;
+		}
+		list(aop);
 		break;
 	    case '&':
 		proto++;
@@ -10182,6 +10202,8 @@ Perl_ck_entersub_args_proto(pTHX_ OP *entersubop, GV *namegv, SV *protosv)
 			if (!contextclass)
 			    bad_type_sv(arg, "hash", gv_ename(namegv), 0, o3);
 			break;
+		    case '>':
+		        goto oops;
 		    wrapref:
 			{
 			    OP* const kid = aop;

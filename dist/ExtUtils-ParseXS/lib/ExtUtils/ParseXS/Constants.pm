@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Symbol;
 
-our $VERSION = '3.18';
+our $VERSION = '3.18_1';
 
 =head1 NAME
 
@@ -30,7 +30,7 @@ our @InitFileCode;
 
 # Note that to reduce maintenance, $PrototypeRegexp is used
 # by ExtUtils::Typemaps, too!
-our $PrototypeRegexp = "[" . quotemeta('\$%&*@;[]_') . "]";
+our $PrototypeRegexp = "[" . quotemeta('\$%&*@;[]_>') . "]";
 our @XSKeywords      = qw( 
   REQUIRE BOOT CASE PREINIT INPUT INIT CODE PPCODE
   OUTPUT CLEANUP ALIAS ATTRS PROTOTYPES PROTOTYPE

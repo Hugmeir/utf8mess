@@ -9,7 +9,7 @@ use ExtUtils::CBuilder;
 use attributes;
 use overload;
 
-plan tests => 28;
+plan tests => 29;
 
 my ($source_file, $obj_file, $lib_file);
 
@@ -67,6 +67,7 @@ SKIP: {
   is prototype(\&XSMore::include_ok), "", 'the PROTOTYPES keyword';
 
   is prototype(\&XSMore::prototype_ssa), '$$@', 'the PROTOTYPE keyword';
+  is prototype(\&XSMore::prototype_ssinfix), '$>$', 'infix prototypes work';
 
   is_deeply [attributes::get(\&XSMore::attr_method)], [qw(method)], 'the ATTRS keyword';
   is prototype(\&XSMore::attr_method), '$;@', 'ATTRS with prototype';

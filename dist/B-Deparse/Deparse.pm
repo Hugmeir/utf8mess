@@ -20,7 +20,7 @@ use B qw(class main_root main_start main_cv svref_2object opnumber perlstring
          CVf_METHOD CVf_LVALUE
 	 PMf_KEEP PMf_GLOBAL PMf_CONTINUE PMf_EVAL PMf_ONCE
 	 PMf_MULTILINE PMf_SINGLELINE PMf_FOLD PMf_EXTENDED);
-$VERSION = '1.19';
+$VERSION = '1.19_1';
 use strict;
 use vars qw/$AUTOLOAD/;
 use warnings ();
@@ -3651,6 +3651,24 @@ sub e_method {
     my $meth = $info->{method};
     $meth = $self->deparse($meth, 1) if $info->{variable_method};
     my $args = join(", ", map { $self->deparse($_, 6) } @{$info->{args}} );
+    
+    # Disambiguate between an indirect method call and an infix sub
+    if ($info->{method}->can('name') && $info->{method}->name eq "gv") {
+        my $gv = $self->gv_or_padgv($info->{method});
+        if (class($gv->CV) ne "SPECIAL") {
+            my $proto = $gv->CV->PV if $gv->CV->FLAGS & SVf_POK;
+            if ( index($proto, '>') != -1 ) {
+                # if an infix sub and the prototype is a lone @ or %,
+                # unwrap the ref that ->deparse gave us
+                s/\A\[/(/, s/\]\z/)/ for ($proto =~ /\@>/ ? $obj  : ()),
+                                         ($proto =~ />\@/ ? $args : ());
+                s/\A\{/(/, s/\}\z/)/ for ($proto =~ /\%>/ ? $obj  : ()),
+                                         ($proto =~ />\%/ ? $args : ());
+                return join " ", $obj, $meth, $args;
+            }
+        }
+    }
+
     if ($info->{object}->name eq 'scope' && want_list $info->{object}) {
 	# method { $object }
 	# This must be deparsed this way to preserve list context

@@ -2278,6 +2278,17 @@ parent '%s'
 C3-consistent, and you have enabled the C3 MRO for this class.  See the C3
 documentation in L<mro> for more information.
 
+=item Infix subs are experimental
+
+(S experimental::infix_subs) This warning is emitted if you
+declare an infix subroutine via the "C<< > >>" prototype.
+Simply suppress the warning if you want to use the feature, but
+know that in doing so you are taking the risk of using an experimental
+feature which may change or be removed in a future Perl version:
+
+    no warnings "experimental::infix_subs";
+    sub infix ($>$) { ... }
+
 =item In EBCDIC the v-string components cannot exceed 2147483647
 
 (F) An error peculiar to EBCDIC.  Internally, v-strings are stored as
