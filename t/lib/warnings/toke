@@ -1459,3 +1459,27 @@ no warnings 'deprecated';
 package foo::;
 sub foo::;
 EXPECT
+########
+# toke.c
+package ::foo;
+sub ::foo;
+
+::IO::Handle->can("can");
+$::foo{foo};
+print STDOUT ::doof;
+
+EXPECT
+Use of leading double colons in package declarations is deprecated at - line 2.
+Use of leading double colons in barewords is deprecated at - line 7.
+::doof
+########
+# toke.c
+no warnings 'deprecated';
+package ::foo;
+sub ::foo;
+
+::IO::Handle->can("can");
+$::foo{foo};
+print STDOUT ::doof;
+EXPECT
+::doof

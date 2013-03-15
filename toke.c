@@ -7564,7 +7564,13 @@ Perl_yylex(pTHX)
 		    pl_yylval.opval->op_private |= OPpCONST_STRICT;
 		else {
 		bareword:
-		    deprecate_trailing_colons(PL_tokenbuf, strlen(PL_tokenbuf));
+                {
+                    STRLEN tmplen = strlen(PL_tokenbuf);
+                    deprecate_trailing_colons(PL_tokenbuf, tmplen);
+                    if ( tmplen >= 3 && s[0] == ':' && s[1] == ':' && s[2] != ':' ) {
+                        deprecate("leading double colons in barewords");
+                    }
+                }
 		    /* after "print" and similar functions (corresponding to
 		     * "F? L" in opcode.pl), whatever wasn't already parsed as
 		     * a filehandle should be subject to "strict subs".
@@ -8369,6 +8375,9 @@ Perl_yylex(pTHX)
              */
             len = strlen(PL_tokenbuf);
             deprecate_trailing_colons(PL_tokenbuf, len);
+            if ( len >= 3 && PL_tokenbuf[0] == ':' && PL_tokenbuf[1] == ':' && PL_tokenbuf[2] != ':' ) {
+                deprecate("leading double colons in package declarations");
+            }
 	    s = SKIPSPACE1(s);
 	    s = force_strict_version(s);
 	    PL_lex_expect = XBLOCK;
