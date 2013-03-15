@@ -6,7 +6,7 @@ BEGIN {
     require './test.pl';
 }
 
-plan( tests => 27 );
+plan( tests => 28 );
 
 sub empty_sub {}
 
@@ -164,4 +164,9 @@ is eval {
     eval "()=time";
     is $w, undef,
       '*keyword = sub():method{$y} does not cause ambiguity warnings';
+}
+{
+    no warnings 'deprecated';
+    sub foo::::::bar { ok(1, "sub foo::::bar {} foo::::bar() works") }
+    foo::::::bar;
 }

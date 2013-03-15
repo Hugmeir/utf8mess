@@ -262,9 +262,6 @@ print ((exists $str{foo}      ? "" : "not ")."ok $test\n"); ++$test;
 print ((exists $str{bar}      ? "" : "not ")."ok $test\n"); ++$test;
 print ((exists $str{xyz::bar} ? "" : "not ")."ok $test\n"); ++$test;
 
-sub foo::::::bar { print "ok $test\n"; $test++ }
-foo::::::bar;
-
 eval "\$x =\xE2foo";
 if ($@ =~ /Unrecognized character \\xE2; marked by <-- HERE after \$x =<-- HERE near column 5/) { print "ok $test\n"; } else { print "not ok $test\n"; }
 $test++;
@@ -272,108 +269,126 @@ $test++;
 # Is "[~" scanned correctly?
 @a = (1,2,3);
 print "not " unless($a[~~2] == 3);
-print "ok 57\n";
+print "ok $test\n";
+$test++;
 
 $_ = "";
-eval 's/(?:)/"${\q||}".<<\END/e;
-ok 58 - heredoc after "" in s/// in eval
+eval 's/(?:)/"${\q||}ok $test".<<\END/e;
+ - heredoc after "" in s/// in eval
 END
 ';
-print $_ || "not ok 58\n";
+print $_ || "not ok $test\n";
+$test++;
 
 $_ = "";
-eval 's|(?:)|"${\<<\END}"
-ok 59 - heredoc in "" in multiline s///e in eval
+eval 's|(?:)|"ok $test ${\<<\END}"
+- heredoc in "" in multiline s///e in eval
 END
 |e
 ';
-print $_ || "not ok 59\n";
+print $_ || "not ok $test\n";
+$test++;
 
 $_ = "";
 eval "s/(?:)/<<foo/e #\0
-ok 60 - null on same line as heredoc in s/// in eval
+ok $test - null on same line as heredoc in s/// in eval
 foo
 ";
-print $_ || "not ok 60\n";
+print $_ || "not ok $test\n";
+$test++;
 
 $_ = "";
 eval ' s/(?:)/"${\<<END}"/e;
-ok 61 - heredoc in "" in single-line s///e in eval
+ok $test - heredoc in "" in single-line s///e in eval
 END
 ';
-print $_ || "not ok 61\n";
+print $_ || "not ok $test\n";
+$test++;
 
 $_ = "";
 s|(?:)|"${\<<END}"
-ok 62 - heredoc in "" in multiline s///e outside eval
+ok $test - heredoc in "" in multiline s///e outside eval
 END
 |e;
-print $_ || "not ok 62\n";
+print $_ || "not ok $test\n";
+$test++;
 
-$_ = "not ok 63 - s/// in s/// pattern\n";
+$_ = "not ok $test - s/// in s/// pattern\n";
 s/${s|||;\""}not //;
 print;
+$test++;
 
 /(?{print <<END
-ok 64 - here-doc in re-eval
+ok $test - here-doc in re-eval
 END
 })/;
+$test++;
 
 eval '/(?{print <<END
-ok 65 - here-doc in re-eval in string eval
+ok $test - here-doc in re-eval in string eval
 END
 })/';
+$test++;
 
-eval 'print qq ;ok 66 - eval ending with semicolon\n;'
-  or print "not ok 66 - eval ending with semicolon\n";
+eval 'print qq ;ok $test - eval ending with semicolon\n;'
+  or print "not ok $test - eval ending with semicolon\n";
+$test++;
 
 print "not " unless qr/(?{<<END})/ eq '(?^:(?{<<END}))';
 foo
 END
-print "ok 67 - here-doc in single-line re-eval\n";
+print "ok $test - here-doc in single-line re-eval\n";
+$test++;
 
 $_ = qr/(?{"${<<END}"
 foo
 END
 })/;
 print "not " unless /foo/;
-print "ok 68 - here-doc in quotes in multiline re-eval\n";
+print "ok $test - here-doc in quotes in multiline re-eval\n";
+$test++;
 
 eval 's//<<END/e if 0; $_ = "a
 END
 b"';
 print "not " if $_ =~ /\n\n/;
-print "ok 69 - eval 's//<<END/' does not leave extra newlines\n";
+print "ok $test - eval 's//<<END/' does not leave extra newlines\n";
+$test++;
 
 $_ = a;
 eval "s/a/'b\0'#/e";
 print 'not ' unless $_ eq "b\0";
-print "ok 70 - # after null in s/// repl\n";
+print "ok $test - # after null in s/// repl\n";
+$test++;
 
 s//"#" . <<END/e;
 foo
 END
-print "ok 71 - s//'#' . <<END/e\n";
+print "ok $test - s//'#' . <<END/e\n";
+$test++;
 
 eval "s//3}->{3/e";
 print "not " unless $@;
-print "ok 72 - s//3}->{3/e\n";
+print "ok $test - s//3}->{3/e\n";
+$test++;
 
-$_ = "not ok 73";
+$_ = "not ok $test";
 $x{3} = "not ";
 eval 's/${\%x}{3}//e';
 print "$_ - s//\${\\%x}{3}/e\n";
+$test++;
 
 eval 's/${foo#}//e';
 print "not " unless $@;
-print "ok 74 - s/\${foo#}//e\n";
+print "ok $test - s/\${foo#}//e\n";
+$test++;
 
 eval 'warn ({$_ => 1} + 1) if 0';
 print "not " if $@;
-print "ok 75 - listop({$_ => 1} + 1)\n";
+print "ok $test - listop({$_ => 1} + 1)\n";
 print "# $@" if $@;
+$test++;
 
-$test = 76;
 for(qw< require goto last next redo dump >) {
     eval "sub { $_ foo << 2 }";
     print "not " if $@;
@@ -385,65 +400,72 @@ for(qw< require goto last next redo dump >) {
 my $counter = 0;
 eval 'v23: $counter++; goto v23 unless $counter == 2';
 print "not " unless $counter == 2;
-print "ok 82 - Use v[0-9]+ as a label\n";
+print "ok $test - Use v[0-9]+ as a label\n";
+$test++;
 $counter = 0;
 eval 'v23 : $counter++; goto v23 unless $counter == 2';
 print "not " unless $counter == 2;
-print "ok 83 - Use v[0-9]+ as a label with space before colon\n";
+print "ok $test - Use v[0-9]+ as a label with space before colon\n";
+$test++;
  
 my $output = "";
 eval "package v10::foo; sub test2 { return 'v10::foo' }
       package v10; sub test { return v10::foo::test2(); }
       package main; \$output = v10::test(); "; 
 print "not " unless $output eq 'v10::foo';
-print "ok 84 - call a function in package v10::foo\n";
+print "ok $test - call a function in package v10::foo\n";
+$test++;
 
 print "not " unless (1?v65:"bar") eq 'A';
-print "ok 85 - colon detection after vstring does not break ? vstring :\n";
+print "ok $test - colon detection after vstring does not break ? vstring :\n";
+$test++;
 
 # Test pyoq ops with comments before the first delim
 q # comment
  "b"#
   eq 'b' or print "not ";
-print "ok 86 - q <comment> <newline> ...\n";
+print "ok $test - q <comment> <newline> ...\n"; $test++;
 qq # comment
  "b"#
   eq 'b' or print "not ";
-print "ok 87 - qq <comment> <newline> ...\n";
+print "ok $test - qq <comment> <newline> ...\n"; $test++;
 qw # comment
  "b"#
   [0] eq 'b' or print "not ";
-print "ok 88 - qw <comment> <newline> ...\n";
+print "ok $test - qw <comment> <newline> ...\n"; $test++;
 "b" =~ m # comment
  "b"#
    or print "not ";
-print "ok 89 - m <comment> <newline> ...\n";
+print "ok $test - m <comment> <newline> ...\n"; $test++;
 qr # comment
  "b"#
    eq qr/b/ or print "not ";
-print "ok 90 - qr <comment> <newline> ...\n";
+print "ok $test - qr <comment> <newline> ...\n"; $test++;
 $_ = "a";
 s # comment
  [a] #
  [b] #
  ;
 print "not " unless $_ eq 'b';
-print "ok 91 - s <comment> <newline> ...\n";
+print "ok $test - s <comment> <newline> ...\n"; $test++;
 $_ = "a";
 tr # comment
  [a] #
  [b] #
  ;
 print "not " unless $_ eq 'b';
-print "ok 92 - tr <comment> <newline> ...\n";
+print "ok $test - tr <comment> <newline> ...\n"; $test++;
 $_ = "a";
 y # comment
  [a] #
  [b] #
  ;
 print "not " unless $_ eq 'b';
-print "ok 93 - y <comment> <newline> ...\n";
+print "ok $test - y <comment> <newline> ...\n"; $test++;
 
 print "not " unless (time
                      =>) eq time=>;
-print "ok 94 - => quotes keywords across lines\n";
+print "ok $test - => quotes keywords across lines\n"; $test++;
+print "ok $test - colon detection after vstring does not break ? vstring :\n";
+$test++;
+
