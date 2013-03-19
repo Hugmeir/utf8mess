@@ -7100,13 +7100,16 @@ Perl_yylex(pTHX)
 		    cv = lex ? GvCV(gv) : rv2cv_op_cv(rv2cv_op, 0);
 		}
 
-                /* Check if we have an infix sub */
-                if ( cv && SvPOK(cv) && memchr(CvPROTO(cv), '>', CvPROTOLEN(cv)) ) {
-                    is_infix = TRUE;
-                }
-                /* Otherwise, give the 'Bareword found where...' warning */
-                else if ( maybe_warn_no_op_bareword ) {
-                    no_op("Bareword",s);
+                {
+                    const char *proto;
+                    /* Check if we have an infix sub */
+                    if ( cv && SvPOK(cv) && (proto = CvPROTO(cv)) && memchr(proto, '>', CvPROTOLEN(cv)) ) {
+                        is_infix = TRUE;
+                    }
+                    /* Otherwise, give the 'Bareword found where...' warning */
+                    else if ( maybe_warn_no_op_bareword ) {
+                        no_op("Bareword",s);
+                    }
                 }
 
 		/* See if it's the indirect object for a list operator. */
