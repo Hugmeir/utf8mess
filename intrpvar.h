@@ -392,7 +392,7 @@ PERLVAR(I, dbargs,	AV *)		/* args to call listed by caller function */
 
 /* symbol tables */
 PERLVAR(I, debstash,	HV *)		/* symbol table for perldb package */
-PERLVAR(I, globalstash,	HV *)		/* global keyword overrides imported here */
+PERLVAR(I, globalstashgv,GV *)		/* global keyword overrides imported here */
 PERLVAR(I, curstname,	SV *)		/* name of current package */
 PERLVAR(I, beginav,	AV *)		/* names of BEGIN subroutines */
 PERLVAR(I, endav,	AV *)		/* names of END subroutines */

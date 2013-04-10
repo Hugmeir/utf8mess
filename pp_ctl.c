@@ -3415,6 +3415,10 @@ S_doeval(pTHX_ int gimme, CV* outside, U32 seq, HV *hh)
     SAVEHINTS();
     if (clear_hints) {
 	PL_hints = 0;
+        /* *^H was deleted */
+        if (!isGV(PL_hintgv)) {
+             PL_hintgv = gv_fetchpvs("\010", GV_ADD|GV_NOTQUAL, SVt_PV);
+        }
 	hv_clear(GvHV(PL_hintgv));
     }
     else {

@@ -1412,6 +1412,11 @@ EXTERN_C char *crypt(const char *, const char *);
 # define SAVE_DEFSV SAVESPTR(GvSV(PL_defgv))
 #endif
 
+#define PL_globalstash  ( GvHV(isGV(PL_globalstashgv) \
+                            ? PL_globalstashgv        \
+                            : (PL_globalstashgv =     \
+                                    gv_fetchpvs("CORE::GLOBAL::", GV_ADDMULTI, SVt_PVHV))) )
+
 #define ERRHV GvHV(PL_errgv)	/* XXX unused, here for compatibility */
 
 #ifndef errno

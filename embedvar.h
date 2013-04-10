@@ -152,7 +152,7 @@
 #define PL_formtarget		(vTHX->Iformtarget)
 #define PL_generation		(vTHX->Igeneration)
 #define PL_gensym		(vTHX->Igensym)
-#define PL_globalstash		(vTHX->Iglobalstash)
+#define PL_globalstashgv	(vTHX->Iglobalstashgv)
 #define PL_globhook		(vTHX->Iglobhook)
 #define PL_hash_rand_bits	(vTHX->Ihash_rand_bits)
 #define PL_hintgv		(vTHX->Ihintgv)

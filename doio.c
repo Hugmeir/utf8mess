@@ -2388,12 +2388,12 @@ Perl_vms_start_glob
 #endif /* !CSH */
 #endif /* !DOSISH */
     {
-	GV * const envgv = gv_fetchpvs("ENV", 0, SVt_PVHV);
+	GV * const envgv = gv_fetchpvs("ENV", GV_ADD|GV_NOTQUAL, SVt_PVHV);
 	SV ** const home = hv_fetchs(GvHV(envgv), "HOME", 0);
 	SV ** const path = hv_fetchs(GvHV(envgv), "PATH", 0);
 	if (home && *home) SvGETMAGIC(*home);
 	if (path && *path) SvGETMAGIC(*path);
-	save_hash(gv_fetchpvs("ENV", 0, SVt_PVHV));
+	save_hash(gv_fetchpvs("ENV", GV_ADD|GV_NOTQUAL, SVt_PVHV));
 	if (home && *home) SvSETMAGIC(*home);
 	if (path && *path) SvSETMAGIC(*path);
     }

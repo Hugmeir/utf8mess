@@ -3634,8 +3634,13 @@ S_init_main_stash(pTHX)
     SET_CURSTASH(PL_defstash);
     CopSTASH_set(&PL_compiling, PL_defstash);
     PL_debstash = GvHV(gv_fetchpvs("DB::", GV_ADDMULTI, SVt_PVHV));
-    PL_globalstash = GvHV(gv_fetchpvs("CORE::GLOBAL::", GV_ADDMULTI,
-				      SVt_PVHV));
+    PL_globalstashgv = gv_fetchpvs("CORE::GLOBAL::", GV_ADDMULTI,
+				      SVt_PVHV);
+
+    /* Safeguard these from being freed */
+    SvREFCNT_inc_simple_void(PL_globalstashgv);
+    SvREFCNT_inc_simple_void(PL_hintgv);
+    
     /* We must init $/ before switches are processed. */
     sv_setpvs(get_sv("/", GV_ADD), "\n");
 }

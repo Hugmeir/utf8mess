@@ -3536,7 +3536,7 @@ S_regmatch(pTHX_ regmatch_info *reginfo, char *startpos, regnode *prog)
                                during a successful match */
     U32 lastopen = 0;       /* last open we saw */
     bool has_cutgroup = RX_HAS_CUTGROUP(rex) ? 1 : 0;   
-    SV* const oreplsv = GvSV(PL_replgv);
+    SV* oreplsv;
     /* these three flags are set by various ops to signal information to
      * the very next op. They have a useful lifetime of exactly one loop
      * iteration, and are not preserved or restored by state pushes/pops
@@ -3566,6 +3566,12 @@ S_regmatch(pTHX_ regmatch_info *reginfo, char *startpos, regnode *prog)
     GET_RE_DEBUG_FLAGS_DECL;
 #endif
 
+    /* *^R might've been deleted */
+    if (!isGV(PL_replgv)) {
+        PL_replgv = gv_fetchpvs("\022", GV_ADD|GV_NOTQUAL, SVt_PV);
+    }
+    oreplsv = GvSV(PL_replgv);
+    
     /* shut up 'may be used uninitialized' compiler warnings for dMULTICALL */
     multicall_oldcatch = 0;
     multicall_cv = NULL;

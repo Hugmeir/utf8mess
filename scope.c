@@ -1143,6 +1143,10 @@ Perl_leave_scope(pTHX_ I32 base)
 	    PL_op = (OP*)ARG0_PTR;
 	    break;
 	case SAVEt_HINTS:
+            /* *^H was deleted */
+            if (!isGV(PL_hintgv)) {
+                PL_hintgv = gv_fetchpvs("\010", GV_ADD|GV_NOTQUAL, SVt_PV);
+            }
 	    if ((PL_hints & HINT_LOCALIZE_HH)) {
 	      while (GvHV(PL_hintgv)) {
 		HV *hv = GvHV(PL_hintgv);
