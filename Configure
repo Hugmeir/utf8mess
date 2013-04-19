@@ -4412,7 +4412,7 @@ echo exit 1 >xenix
 echo exit 1 >venix
 echo exit 1 >os2
 d_bsd="$undef"
-$cat /usr/include/signal.h /usr/include/sys/signal.h >foo 2>/dev/null
+$cat $sysroot/usr/include/signal.h $sysroot/usr/include/sys/signal.h >foo 2>/dev/null
 if test -f /osf_boot || $contains 'OSF/1' /usr/include/ctype.h >/dev/null 2>&1
 then
 	echo "Looks kind of like an OSF/1 system, but we'll see..."
