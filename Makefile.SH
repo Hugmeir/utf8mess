@@ -1514,6 +1514,8 @@ test_prep test-prep: test_prep_pre \$(MINIPERL_EXE) \$(unidatafiles) \$(PERL_EXE
 	$to lib
 	$to TestInit.pm
 	$to win32/FindExt.pm
+	$to regen/keywords.pl
+	$to pod/perldiag.pod
 	$to MANIFEST
 	cd t && (rm -f \$(PERL_EXE); \$(LNS) ../\$(PERL_EXE) \$(PERL_EXE)) && cd ..
 	$to t/\$(PERL_EXE)
@@ -1539,7 +1541,7 @@ test check: test_prep
 *) $spitshell >>$Makefile <<!GROK!THIS!
 
 test check: test_prep
-	$run -cwd $targetdir/t -env LD_LIBRARY_PATH=$targetdir:\\\$LD_LIBRARY_PATH ./TEST
+	$run -cwd $targetdir/t -env LD_LIBRARY_PATH=$targetdir ./TEST
 
 !GROK!THIS!
 ;;
