@@ -6,6 +6,7 @@ BEGIN {
     require './test.pl';
     skip_all_without_perlio();
     skip_all_without_dynamic_extension('Fcntl'); # how did you get this far?
+    skip_all("No magic temp files on Android, no /tmp") if($^O eq 'linux-androideabi');
 }
 
 use strict;

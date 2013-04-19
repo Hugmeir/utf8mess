@@ -7,6 +7,7 @@
 BEGIN {
     chdir 't' if -d 't';
     @INC = '../lib';
+    require Config; import Config;
 }
 
 BEGIN { require "./test.pl"; }
@@ -110,22 +111,26 @@ SWTEST
 }
 
 {
-    my $tempdir = tempfile;
-    mkdir $tempdir, 0700 or die "Can't mkdir '$tempdir': $!";
 
-    local $ENV{'LC_ALL'} = 'C'; # Keep the test simple: expect English
-    local $ENV{LANGUAGE} = 'C';
-    setlocale(LC_ALL, "C");
-
-    # Win32 won't let us open the directory, so we never get to die with
-    # EISDIR, which happens after open.
-    my $error  = do { local $! = $^O eq 'MSWin32' ? EACCES : EISDIR; "$!" };
-    like(
-        runperl( switches => [ '-c' ], args  => [ $tempdir ], stderr => 1),
-        qr/Can't open perl script.*$tempdir.*\Q$error/s,
-        "RT \#61362: Cannot syntax-check a directory"
-    );
-    rmdir $tempdir or die "Can't rmdir '$tempdir': $!";
+  SKIP: {
+      skip 'No locale testing without d_setlocale', 1 if(!$Config{d_setlocale});
+      my $tempdir = tempfile;
+      mkdir $tempdir, 0700 or die "Can't mkdir '$tempdir': $!";
+      
+      local $ENV{'LC_ALL'} = 'C'; # Keep the test simple: expect English
+      local $ENV{LANGUAGE} = 'C';
+      setlocale(LC_ALL, "C");
+      
+      # Win32 won't let us open the directory, so we never get to die with
+      # EISDIR, which happens after open.
+      my $error  = do { local $! = $^O eq 'MSWin32' ? EACCES : EISDIR; "$!" };
+      like(
+          runperl( switches => [ '-c' ], args  => [ $tempdir ], stderr => 1),
+          qr/Can't open perl script.*$tempdir.*\Q$error/s,
+          "RT \#61362: Cannot syntax-check a directory"
+          );
+      rmdir $tempdir or die "Can't rmdir '$tempdir': $!";
+    }
 }
 
 # Tests for -l

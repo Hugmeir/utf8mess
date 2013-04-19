@@ -55,6 +55,7 @@ $Is_VMS      = $^O eq 'VMS';
 $Is_Dos      = $^O eq 'dos';
 $Is_os2      = $^O eq 'os2';
 $Is_Cygwin   = $^O eq 'cygwin';
+$Is_Android  = $^O =~ /android/;
 
 $PERL =
    ($Is_NetWare ? 'perl'   :
@@ -106,7 +107,7 @@ else              { is `echo \$FOO`, "hi there\n"; }
 unlink_all 'ajslkdfpqjsjfk';
 $! = 0;
 open(FOO,'ajslkdfpqjsjfk');
-isnt($!, 0);
+isnt($!, 0, "Unlinked file can't be opened");
 close FOO; # just mention it, squelch used-only-once
 
 SKIP: {
@@ -174,6 +175,7 @@ END
     close CMDPIPE;
     $? >>= 8 if $^O eq 'VMS'; # POSIX status hiding in 2nd byte
     my $todo = ($^O eq 'os2' ? ' # TODO: EMX v0.9d_fix4 bug: wrong nibble? ' : '');
+    $todo = ($^O eq 'linux-androideabi' ? '# TODO: Not sure whats going on here on Android' : '');
     print $? & 0xFF ? "ok $tn[4]$todo\n" : "not ok $tn[4]$todo\n";
 
     open(CMDPIPE, "| $PERL");
@@ -277,7 +279,7 @@ $$ = $pid; # Tests below use $$
     if ($^O eq 'qnx') {
 	chomp($wd = `/usr/bin/fullpath -t`);
     }
-    elsif($Is_Cygwin || $is_abs) {
+    elsif(($Is_Cygwin && !$Is_Android) || $is_abs) {
        # Cygwin turns the symlink into the real file
        chomp($wd = `pwd`);
        $wd =~ s#/t$##;
@@ -286,7 +288,7 @@ $$ = $pid; # Tests below use $$
 	   $wd = Cygwin::win_to_posix_path(Cygwin::posix_to_win_path($wd, 1));
        }
     }
-    elsif($Is_os2) {
+    elsif($Is_os2 || $Is_Android) {
        $wd = Cwd::sys_cwd();
     }
     else {
