@@ -291,6 +291,9 @@ parent got 10752
 $| = 1;
 $\ = "\n";
 my $echo = 'echo';
+if ($^O eq 'linux-androideabi') {
+    $echo = q{sh -c 'echo $@' -- };
+}
 if ($pid = fork) {
     waitpid($pid,0);
     print "parent got $?"
