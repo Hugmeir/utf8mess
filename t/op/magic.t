@@ -273,8 +273,13 @@ $$ = $pid; # Tests below use $$
 	chomp($wd = `/usr/bin/fullpath -t`);
     }
     elsif(($Is_Cygwin && !$Is_Android) || $is_abs) {
-       # Cygwin turns the symlink into the real file
-       chomp($wd = `pwd`);
+       if ( $Is_Android ) {
+           chomp($wd = `sh -c 'pwd'`);
+       }
+       else {
+           # Cygwin turns the symlink into the real file
+           chomp($wd = `pwd`);
+       }
        $wd =~ s#/t$##;
        $wd =~ /(.*)/; $wd = $1; # untaint
        if ($Is_Cygwin) {
