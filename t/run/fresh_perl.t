@@ -757,7 +757,7 @@ $_="foo";utf8::upgrade($_);/bar/i,warn$_;
 EXPECT
 foo at - line 1.
 ######## glob() bug Mon, 01 Sep 2003 02:25:41 -0700 <200309010925.h819Pf0X011457@smtp3.ActiveState.com>
-# SKIP "glob() works on Android, but this test doesn't" if($^O eq 'linux-androideabi');
+# SKIP: "glob() works on Android, but this test doesn't" if($^O eq 'linux-androideabi');
 -lw
 # Make sure the presence of the CORE::GLOBAL::glob typeglob does not affect
 # whether File::Glob::csh_glob is called.
