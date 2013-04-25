@@ -6,6 +6,10 @@ userelocatableinc='define'
 # On Android the shell is /system/bin/sh:
 targetsh='/system/bin/sh'
 
+# On some devices drand48 isn't functional
+randfunc='random'
+randbits='31'
+
 # Down with locales!
 # https://github.com/android/platform_bionic/blob/master/libc/CAVEATS
 d_locconv='undef'
