@@ -50,6 +50,7 @@ my %OSTYPES = qw(
   gnukfreebsd Unix
   nto         Unix
   qnx         Unix
+  linux-androideabi Unix
 
   dos         Windows
   MSWin32     Windows
