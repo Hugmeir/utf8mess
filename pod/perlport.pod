@@ -1853,6 +1853,12 @@ open to C<|-> and C<-|> are unsupported. (Win32, S<RISC OS>)
 Opening a process does not automatically flush output handles on some
 platforms.  (SunOS, Solaris, HP-UX)
 
+While you may use open with undef as the filename to create a temporary
+file, this is unreliable, as a system may not have a /tmp directory or
+equivalent, and have no $ENV{TMPDIR} set.  Consider using File::Temp
+instead.  Alternatively, you could explicitly set $ENV{TMPDIR} before
+calling open. (Android)
+
 =item readlink
 
 Not implemented. (Win32, VMS, S<RISC OS>)

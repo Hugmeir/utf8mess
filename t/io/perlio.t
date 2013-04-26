@@ -70,8 +70,8 @@ ok(close($utffh));
 
 # magic temporary file via 3 arg open with undef
 {
-SKIP: {
-    skip "No magic temp files on Android, no /tmp", 7 if($^O eq 'linux-androideabi');
+{
+    local $ENV{TMPDIR} = '.' if($^O eq 'linux-androideabi');
 
     ok( open(my $x,"+<",undef), 'magic temp file via 3 arg open with undef');
     ok( defined fileno($x),     '       fileno' );
@@ -91,8 +91,7 @@ SKIP: {
     # report after STDOUT is restored
     ok($status, '       re-open STDOUT');
     close OLDOUT;
-    }
-
+}
     SKIP: {
       skip("TMPDIR not honored on this platform", 4)
         if !$Config{d_mkstemp}
