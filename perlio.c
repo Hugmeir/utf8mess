@@ -5033,6 +5033,14 @@ PerlIO_tmpfile(void)
 	 /* else we try /tmp */
 	 fd = mkstemp(tempname);
      }
+     if (fd < 0) {
+         /* Try cwd */
+         if ( sv )
+             SvREFCNT_dec(sv);
+         sv = newSVpvs(".");
+         sv_catpv(sv, tempname + 4);
+         fd = mkstemp(SvPVX(sv));
+     }
      if (fd >= 0) {
 	  f = PerlIO_fdopen(fd, "w+");
 	  if (f)
