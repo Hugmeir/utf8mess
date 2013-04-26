@@ -15,9 +15,13 @@ BEGIN {
     }
 }
 
-use Test::More tests => 5;
+use Test::More;
 use IO::File;
 use IO::Seekable;
+
+local $ENV{TMPDIR} = '.' if($^O eq 'linux-androideabi');
+
+plan(tests => 5);
 
 $x = new_tmpfile IO::File;
 ok($x, "new_tmpfile");
