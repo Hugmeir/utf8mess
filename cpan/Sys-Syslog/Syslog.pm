@@ -3,6 +3,7 @@ use strict;
 use warnings;
 use warnings::register;
 use Carp;
+use Config;
 use Exporter        ();
 use Fcntl           qw< O_WRONLY >;
 use File::Basename;
@@ -431,7 +432,6 @@ sub syslog {
         $buf = $message;
     }
     else {
-        require Config;
         my $whoami = $ident;
         $whoami .= "[$$]" if $options{pid};
 
@@ -630,7 +630,10 @@ sub connect_log {
 sub connect_tcp {
     my ($errs) = @_;
 
-    my $proto = getprotobyname('tcp');
+    my $proto;
+    if ( $Config{d_getpbyname} ) {
+        $proto = getprotobyname('tcp');
+    }
     if (!defined $proto) {
 	push @$errs, "getprotobyname failed for tcp";
 	return 0;
@@ -678,7 +681,10 @@ sub connect_tcp {
 sub connect_udp {
     my ($errs) = @_;
 
-    my $proto = getprotobyname('udp');
+    my $proto;
+    if ( $Config{d_getpbyname} ) {
+        $proto = getprotobyname('udp');
+    }
     if (!defined $proto) {
 	push @$errs, "getprotobyname failed for udp";
 	return 0;
