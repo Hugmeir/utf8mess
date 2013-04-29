@@ -992,7 +992,7 @@ sub fake_getaddrinfo
     my @ports; # Actually ARRAYrefs of [ socktype, protocol, port ]
     my $protname = "";
     if( $protocol ) {
-	$protname = getprotobynumber( $protocol );
+	$protname = eval { getprotobynumber( $protocol ) };
     }
 
     if( $service ne "" and $service !~ m/^\d+$/ ) {
@@ -1023,7 +1023,7 @@ sub fake_getaddrinfo
 	    $port = 0;
 	}
 
-	push @ports, [ $this_socktype, scalar getprotobyname( $this_protname ) || 0, $port ];
+	push @ports, [ $this_socktype, eval { scalar getprotobyname( $this_protname ) } || 0, $port ];
     }
 
     my @ret;
