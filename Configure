@@ -28,7 +28,7 @@
 # See Porting/pumpkin.pod for more information on metaconfig.
 #
 
-# Generated on Wed May  8 15:28:09 CEST 2013 [metaconfig 3.5 PL0]
+# Generated on Fri May 10 11:59:51 BST 2013 [metaconfig 3.5 PL0]
 # (with additional metaconfig patches by perlbug@perl.org)
 
 cat >c1$$ <<EOF
@@ -206,16 +206,16 @@ ccsymbols=''
 cppccsymbols=''
 cppsymbols=''
 from=''
+hostgenerate=''
+hostperl=''
 run=''
 targetarch=''
 targetdir=''
 targethost=''
+targetmkdir=''
+targetport=''
 to=''
-sysroot=''
 usecrosscompile=''
-hostperl=''
-hostgenerate=''
-targetsh=''
 extern_C=''
 mistrustnm=''
 usedevel=''
@@ -318,6 +318,7 @@ RCSfile=''
 Revision=''
 Source=''
 State=''
+sysroot=''
 _a=''
 _exe=''
 _o=''
@@ -831,6 +832,7 @@ d_semctl_semun=''
 d_union_semun=''
 d_unordered=''
 d_unsetenv=''
+d_useshellcmds=''
 d_usleep=''
 d_usleepproto=''
 d_ustat=''
@@ -1010,6 +1012,7 @@ shrpenv=''
 useshrplib=''
 glibpth=''
 libpth=''
+libsearchpth=''
 loclibpth=''
 plibpth=''
 xlibpth=''
@@ -1167,6 +1170,7 @@ scriptdirexp=''
 selectminbits=''
 selecttype=''
 sh=''
+targetsh=''
 sig_count=''
 sig_name=''
 sig_name_init=''
@@ -1328,10 +1332,6 @@ fi
 
 groupstype=''
 i_whoami=''
-: Trailing extension.  Override this in a hint file, if needed.
-: Extra object files, if any, needed on this platform.
-archobjs=''
-archname=''
 : Possible local include directories to search.
 : Set locincpth to "" in a hint file to defeat local include searches.
 locincpth="/usr/local/include /opt/local/include /usr/gnu/include"
@@ -1344,6 +1344,9 @@ inclwanted=''
 EBUGGING=''
 DEBUGGING=''
 
+: Trailing extension.  Override this in a hint file, if needed.
+: Extra object files, if any, needed on this platform.
+archobjs=''
 libnames=''
 : change the next line if compiling for Xenix/286 on Xenix/386
 xlibpth='/usr/lib/386 /lib/386'
@@ -1367,8 +1370,6 @@ plibpth=''
 libswanted=''
 : some systems want to use only the non-versioned libso:s
 ignore_versioned_solibs=''
-: set usethreads on the Configure command line to enable threads.
-usereentrant='undef'
 : full support for void wanted by default
 defvoidused=15
 
@@ -1385,6 +1386,9 @@ ldflags_uselargefiles=''
 libswanted_uselargefiles=''
 : set usemultiplicity on the Configure command line to enable multiplicity.
 : set usesocks on the Configure command line to enable socks.
+archname=''
+: set usethreads on the Configure command line to enable threads.
+usereentrant='undef'
 : List of libraries we want.
 : If anyone needs extra -lxxx, put those in a hint file.
 libswanted="sfio socket bind inet nsl nm ndbm gdbm dbm db malloc dl dld ld sun"
@@ -1967,29 +1971,6 @@ true)
 	;;
 esac
 
-: Set 'sysroot' to change the logical root directory to your headers and libraries see man gcc
-: This is primarily meant for cross-compile environments, and may fail to be useful in other cases
-
-if test "X$sysroot" != X; then
-  echo "Using $sysroot to find your headers and libraries, adding to ccflags"
-  case "$ccflags" in
-  *sysroot*) ;;
-  'undef'|*)
-       ccflags="$ccflags --sysroot=$sysroot"
-  esac
-  case "$ldflags" in
-  *sysroot*) ;;
-  'undef'|*)
-       ldflags="$ldflags --sysroot=$sysroot"
-  esac
-  case "$cccdlflags" in
-  *sysroot*) ;;
-  'undef'|*)
-       cccdlflags="$cccdlflags --sysroot=$sysroot"
-  esac
-  # lddlflags updated below in lddlflags section
-fi
-
 : Eunice requires " " instead of "", can you believe it
 echo " "
 : Here we go...
@@ -2020,7 +2001,7 @@ rm -f .echotmp
 echo " "
 if test -f "$rsrc/MANIFEST"; then
 	echo "First let's make sure your kit is complete.  Checking..." >&4
-	awk '$1 !~ /PACK[A-Z]+/ {print $1}' "$rsrc/MANIFEST" | \
+	awk '$1 !~ /PACK[A-Z]+/ {print $1}' "$rsrc/MANIFEST" |\
 		(split -l 50 2>/dev/null || split -50)
 	rm -f missing
 	tmppwd=`pwd`
@@ -2818,6 +2799,28 @@ $define|true|[yY]*)
 	;;
 esac
 
+: Set 'sysroot' to change the logical root directory to your headers and libraries see man gcc
+: This is primarily meant for cross-compile environments, and may fail to be useful in other cases
+if $test "X$sysroot" != X; then
+  $echo "Using $sysroot to find your headers and libraries, adding to ccflags"
+  case "$ccflags" in
+  *sysroot*) ;;
+  'undef'|*)
+       ccflags="$ccflags --sysroot=$sysroot"
+  esac
+  case "$ldflags" in
+  *sysroot*) ;;
+  'undef'|*)
+       ldflags="$ldflags --sysroot=$sysroot"
+  esac
+  case "$cccdlflags" in
+  *sysroot*) ;;
+  'undef'|*)
+       cccdlflags="$cccdlflags --sysroot=$sysroot"
+  esac
+  # lddlflags updated below in lddlflags section
+fi
+
 : Check for Cross-Compilation
 case "$usecrosscompile" in
 $define|true|[yY]*)
@@ -2908,7 +2911,7 @@ $define|true|[yY]*)
     ;;
 esac
 
-: Define -Dtargethost=somecomputer to run compiled tests on another machine
+: Define -Dtargethost to run compiled tests on another machine
 case "$targethost" in
     '') echo "Checking for cross-compile" >&4
     case "$usecrosscompile$multiarch" in
@@ -3177,7 +3180,6 @@ case "$config_sh" in
 myuname=`$uname -a 2>/dev/null`
 $test -z "$myuname" && myuname=`hostname 2>/dev/null`
 # Downcase everything to avoid ambiguity.
-# Remove slashes and single quotes so we can use parts of this in
 # directory and file names.
 # Remove newlines so myuname is sane to use elsewhere.
 # tr '[A-Z]' '[a-z]' would not work in EBCDIC
@@ -4827,14 +4829,12 @@ know not to be holding relevant libraries, and add any that are needed.
 Say "none" for none.
 
 EOM
-
 if test "X$sysroot" != X; then
   $cat <<EOM
 You have set sysroot to $sysroot, please supply the directories excluding sysroot
 
 EOM
 fi
-
 case "$libpth" in
 '') dflt='none';;
 *)
@@ -6123,7 +6123,7 @@ rp='What is your architecture name'
 . ./myread
 archname="$ans"
 
-: optionally add API version to the architecture for versioned archlibs
+: optionally add api version to the architecture for versioned archlibs
 case "$useversionedarchname" in
 $define|true|[yY]*) dflt='y';;
 *)                  dflt='n';;
@@ -7583,7 +7583,7 @@ echo " "
 case "$libc" in
 '') libc=unknown
 	case "$libs" in
-	*-lc_s*) libc=`./loc libc_s$_a $libc $libsearchpth`
+	*-lc_s*) libc=`./loc libc_s$_a $libc $libpth`
 	esac
 	;;
 esac
@@ -7669,7 +7669,7 @@ else
 		:
 	elif tans=`./loc libc blurfl/dyick $libsearchpth`; $test -r "$tans"; then
 		libnames="$libnames "`./loc clib blurfl/dyick $libsearchpth`
-	elif tans=`./loc clib blurfl/dyick $libpth`; $test -r "$tans"; then
+	elif tans=`./loc clib blurfl/dyick $libsearchpth`; $test -r "$tans"; then
 		:
 	elif tans=`./loc Slibc$_a blurfl/dyick $xlibpth`; $test -r "$tans"; then
 		:
@@ -7919,10 +7919,11 @@ yes)
 			echo "$extern_C void *$1$tdc; void *(*(p()))$tdc { return &$1; } int main() { if(p()) return(0); else return(1); }"> try.c;
 			$cc -o try $optimize $ccflags $ldflags try.c >/dev/null 2>&1 $libs && tval=true;
 			$test "$mistrustnm" = run -a -x try && { $run ./try$_exe >/dev/null 2>&1 || tval=false; };
+			$rm_try;
 		fi;
 	else
 		echo "$extern_C void *$1$tdc; void *(*(p()))$tdc { return &$1; } int main() { if(p()) return(0); else return(1); }"> try.c;
-		$cc -o try $optimize $ccflags $ldflags try.c $libs && tval=true;
+		$cc -o try $optimize $ccflags $ldflags try.c $libs >/dev/null 2>&1 && tval=true;
 		$rm_try;
 	fi;
 	;;
@@ -8994,8 +8995,8 @@ while test "$cont"; do
 	*)  maildomain="$MAILDOMAIN";;
 	esac
 	case "$cf_email" in
-	'') dflt="$cf_by@$maildomain";;
-	*)  dflt="$cf_email";;
+	'') dflt="$cf_by@$myhostname$mydomain";;
+	*) dflt="$cf_email";;
 	esac
 	rp='What is your e-mail address?'
 	. ./myread
@@ -19085,6 +19086,26 @@ eval $inlibc
 set unsetenv d_unsetenv
 eval $inlibc
 
+: determine whether target system wants us to only use shell commands for echo, test etc.
+$cat << EOM
+
+By default, Perl will only create a shell subprocess for system(), backticks etc, if you
+use shell metacharacters in your shell command. Some operating systems (eg Android) do not
+install the separate echo and test binaries, so we can force it to always spawn a shell using
+this variable. Set this to 'y' to always create a shell subprocess.
+
+EOM
+
+dflt='n'
+rp='Always use a shell subprocess?'
+. ./myread
+case "$ans" in
+y|Y)    val="$define" ;;
+*)      val="$undef"  ;;
+esac
+set d_useshellcmds
+eval $setvar
+
 : see if usleep exists
 set usleep d_usleep
 eval $inlibc
@@ -23508,6 +23529,7 @@ d_uname='$d_uname'
 d_union_semun='$d_union_semun'
 d_unordered='$d_unordered'
 d_unsetenv='$d_unsetenv'
+d_useshellcmds='$d_useshellcmds'
 d_usleep='$d_usleep'
 d_usleepproto='$d_usleepproto'
 d_ustat='$d_ustat'
@@ -23611,12 +23633,12 @@ h_fcntl='$h_fcntl'
 h_sysfile='$h_sysfile'
 hint='$hint'
 hostcat='$hostcat'
+hostgenerate='$hostgenerate'
+hostperl='$hostperl'
 html1dir='$html1dir'
 html1direxp='$html1direxp'
 html3dir='$html3dir'
 html3direxp='$html3direxp'
-hostgenerate='$hostgenerate'
-hostperl='$hostperl'
 i16size='$i16size'
 i16type='$i16type'
 i32size='$i32size'
@@ -23991,6 +24013,8 @@ tar='$tar'
 targetarch='$targetarch'
 targetdir='$targetdir'
 targethost='$targethost'
+targetmkdir='$targetmkdir'
+targetport='$targetport'
 targetsh='$targetsh'
 tbl='$tbl'
 tee='$tee'

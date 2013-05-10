@@ -1,5 +1,6 @@
 # set -x
 
+# Install the perl and its libraries anywhere:
 userelocatableinc='define'
 
 # On Android the shell is /system/bin/sh:
@@ -11,6 +12,9 @@ d_locconv='undef'
 d_setlocale='undef'
 d_setlocale_r='undef'
 i_locale='undef'
+
+# Default to USE_SHELL_ALWAYS
+d_useshellcmds='define'
 
 
 case "$src" in
@@ -65,7 +69,7 @@ $to \$exe > /dev/null 2>&1
 
 # send copy results to /dev/null as otherwise it outputs speed stats which gets in our way.
 # sometimes there is no $?, I dunno why? we then get Cross/run-adb-shell: line 39: exit: XX: numeric argument required
-foo=\`adb -s $targethost shell "sh -c '(cd \$cwd && \$env ; \$exe \$args) > $targetdir/output.stdout ; \$doexit '"\`
+foo=\`adb -s $targethost shell "sh -c '(cd \$cwd && \$env ; \$exe \$args > $targetdir/output.stdout 2>/dev/null) ; \$doexit '"\`
 # We get back Ok\r\n on android for some reason, grrr:
 $from output.stdout
 result=\`cat output.stdout\`
