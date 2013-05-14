@@ -158,6 +158,7 @@ is_deeply(\@a, ['a', 'b']);
 # and RCS files.  Filter them out, and .pm files too, and patch temp files.
 @a = grep !/(,v$|~$|\.(pm|ori?g|rej)$)/, @a;
 @a = (grep !/test.pl/, @a) if $^O eq 'VMS';
+@a = (grep !/\.stdout$/, @a) if $^O eq 'linux-androideabi';
 
 map { $_  =~ s/test\.?/TEST/i } @a if $^O eq 'VMS';
 print "# @a\n";
