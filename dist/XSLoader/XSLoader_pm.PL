@@ -8,7 +8,7 @@ print OUT <<'EOT';
 
 package XSLoader;
 
-$VERSION = "0.16";
+$VERSION = "0.17";
 
 #use strict;
 
@@ -88,10 +88,17 @@ EOT
 
 my $dl_dlext = quotemeta($Config::Config{'dlext'});
 
-print OUT <<"EOT";
+if ( $Config::Config{d_libname_unique} ) {
+    print OUT <<"EOT";
+    my \$module_sym = join("_", \@modparts);
+    my \$file = "\$modlibname/auto/\$modpname/Perl_\$module_sym.$dl_dlext";
+EOT
+}
+else {
+    print OUT <<"EOT";
     my \$file = "\$modlibname/auto/\$modpname/\$modfname.$dl_dlext";
 EOT
-
+}
 print OUT <<'EOT';
 
 #   print STDERR "XSLoader::load for $module ($file)\n" if $dl_debug;
