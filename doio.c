@@ -1456,8 +1456,10 @@ bool
 Perl_do_exec3(pTHX_ const char *incmd, int fd, int do_report)
 {
     dVAR;
+#ifndef USE_SHELL_ALWAYS
     const char **a;
     char *s;
+#endif
     char *buf;
     char *cmd;
     /* Make a copy so we can change it */
