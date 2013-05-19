@@ -1,5 +1,5 @@
 use strict;
-use Test::More tests => 5;
+use Test::More tests => 6;
 
 # Grab all of the plain routines from File::Spec
 use File::Spec;
@@ -29,3 +29,8 @@ SKIP: {
 
 File::Spec::Win32->tmpdir;
 is(scalar keys %ENV, $num_keys, "Win32->tmpdir() shouldn't change the contents of %ENV");
+
+ok(
+    File::Spec->file_name_is_absolute(File::Spec->tmpdir()),
+    "tmpdir() always returns an absolute path"
+);

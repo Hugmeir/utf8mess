@@ -162,6 +162,9 @@ sub _tmpdir {
     }
     $tmpdir = $self->curdir unless defined $tmpdir;
     $tmpdir = defined $tmpdir && $self->canonpath($tmpdir);
+    if ( $tmpdir eq '.' ) {
+        $tmpdir = defined $tmpdir && $self->rel2abs($tmpdir);
+    }
     return $tmpdir;
 }
 
