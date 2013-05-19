@@ -15,7 +15,7 @@ i_locale='undef'
 
 # Default to USE_SHELL_ALWAYS
 d_useshellcmds='define'
-
+d_libname_unique='define'
 
 case "$src" in
     /*) run=$src/Cross/run
@@ -69,15 +69,21 @@ $to \$exe > /dev/null 2>&1
 
 # send copy results to /dev/null as otherwise it outputs speed stats which gets in our way.
 # sometimes there is no $?, I dunno why? we then get Cross/run-adb-shell: line 39: exit: XX: numeric argument required
-foo=\`adb -s $targethost shell "sh -c '(cd \$cwd && \$env ; \$exe \$args > $targetdir/output.stdout 2>/dev/null) ; \$doexit '"\`
+foo=\`adb -s $targethost shell "sh -c '(cd \$cwd && \$env ; \$exe \$args > $targetdir/output.stdout 2>$targetdir/output.stderr) ; \$doexit '"\`
 # We get back Ok\r\n on android for some reason, grrr:
 $from output.stdout
+$from output.stderr
 result=\`cat output.stdout\`
+result_err=\`cat output.stderr\`
 rm output.stdout
 result=\`echo "\$result" | sed -e 's|\r||g'\`
+result_err=\`echo "\$result_err" | sed -e 's|\r||g'\`
 foo=\`echo \$foo | sed -e 's|\r||g'\`
 # Also, adb doesn't exit with the commands exit code, like ssh does, double-grr
 echo "\$result"
+if test "X\$result_err" != X; then
+  echo "\$result_err" >&2
+fi
 exit \$foo
 
 EOF

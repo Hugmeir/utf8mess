@@ -28,7 +28,7 @@
 # See Porting/pumpkin.pod for more information on metaconfig.
 #
 
-# Generated on Fri May 10 11:59:51 BST 2013 [metaconfig 3.5 PL0]
+# Generated on Sun May 19 12:13:04 BST 2013 [metaconfig 3.5 PL0]
 # (with additional metaconfig patches by perlbug@perl.org)
 
 cat >c1$$ <<EOF
@@ -99,7 +99,7 @@ if test -d c:/. || ( uname -a | grep -i 'os\(/\|\)2' ) 2>&1 >/dev/null ; then
 		is_os2=yes
 	elif test -n "$DJGPP"; then
 		case "X${MACHTYPE:-nonesuchmach}" in
-		*cygwin) ;;
+		*cygwin|*msys) ;;
 		*) p_=\; ;;
 		esac
 	fi
@@ -1207,6 +1207,7 @@ sitescript=''
 sitescriptexp=''
 sizesize=''
 sizetype=''
+d_libname_unique=''
 so=''
 socksizetype=''
 sharpbang=''
@@ -2827,8 +2828,8 @@ $define|true|[yY]*)
 	$echo "Cross-compiling..."
     croak=''
     case "$cc" in
-	*-*-gcc) # A cross-compiling gcc, probably. Only supporting gcc at the moment.
-	    targetarch=`$echo $cc|$sed 's/-gcc$//'`
+	*-*-gcc|*-*-g++) # A cross-compiling gcc, probably. Only supporting gcc at the moment.
+	    targetarch=`$echo $cc|$sed 's/-g..$//'`
         $echo "Your targetarch is now set to: $targetarch"
 	    ar=$targetarch-ar
 	    # leave out ld, choosing it is more complex
@@ -2912,6 +2913,7 @@ $define|true|[yY]*)
 esac
 
 : Define -Dtargethost to run compiled tests on another machine
+: We are keeping targethost etc around in config.sh, thus they make it into %Config, not sure yet if this is clever.
 case "$targethost" in
     '') echo "Checking for cross-compile" >&4
     case "$usecrosscompile$multiarch" in
@@ -3180,6 +3182,7 @@ case "$config_sh" in
 myuname=`$uname -a 2>/dev/null`
 $test -z "$myuname" && myuname=`hostname 2>/dev/null`
 # Downcase everything to avoid ambiguity.
+# Remove slashes and single quotes so we can use parts of this in
 # directory and file names.
 # Remove newlines so myuname is sane to use elsewhere.
 # tr '[A-Z]' '[a-z]' would not work in EBCDIC
@@ -4881,6 +4884,25 @@ rp='What is the file extension used for shared libraries?'
 . ./myread
 so="$ans"
 
+: Does target system insist that shared library basenames are unique
+$cat << EOM
+
+Some crazy dynamic loaders assume that the *basename* of shared library filenames
+are globally unique. (Hello Android!) We'll default this to undef as we assume
+your system is not this crazy. Set to defined if you're on one of them.
+
+EOM
+
+dflt='n'
+rp='Make shared library basenames unique?'
+. ./myread
+case "$ans" in
+y|Y)    val="$define" ;;
+*)      val="$undef"  ;;
+esac
+set d_libname_unique
+eval $setvar
+
 : Define several unixisms.
 : Hints files or command line option can be used to override them.
 : The convoluted testing is in case hints files set either the old
@@ -6123,7 +6145,7 @@ rp='What is your architecture name'
 . ./myread
 archname="$ans"
 
-: optionally add api version to the architecture for versioned archlibs
+: optionally add API version to the architecture for versioned archlibs
 case "$useversionedarchname" in
 $define|true|[yY]*) dflt='y';;
 *)                  dflt='n';;
@@ -8147,7 +8169,8 @@ EOM
 			      ;;
 			*linux*|irix*|gnu*)  dflt="-shared $optimize" ;;
 			next)  dflt='none' ;;
-			solaris) # See [perl #66604].  On Solaris 11, gcc -m64 on amd64
+			solaris) # See [perl #66604].
+				# On Solaris 11, gcc -m64 on amd64 
 				# appears not to understand -G.  gcc versions at
 				# least as old as 3.4.3 support -shared, so just
 				# use that with Solaris 11 and later, but keep
@@ -8984,16 +9007,6 @@ your organization...
 EOM
 cont=x
 while test "$cont"; do
-	case "$MAILDOMAIN" in
-	'')
-		if $test -s /etc/mailname; then
-			maildomain=`$cat /etc/mailname`
-		else
-			maildomain="$myhostname$mydomain"
-		fi
-		;;
-	*)  maildomain="$MAILDOMAIN";;
-	esac
 	case "$cf_email" in
 	'') dflt="$cf_by@$myhostname$mydomain";;
 	*) dflt="$cf_email";;
@@ -19274,39 +19287,6 @@ esac
 : set the base revision
 baserev=5.0
 
-: Determine if this is an EBCDIC system
-echo " "
-echo "Determining whether or not we are on an EBCDIC system..." >&4
-$cat >try.c <<'EOM'
-int main()
-{
-  if ('M'==0xd4) return 0;
-  return 1;
-}
-EOM
-
-case "$BOOTSTRAP_CHARSET" in
-    Y|y|define) bootstrap_charset=$define	;;
-    *)		bootstrap_charset=$undef	;;
-esac
-
-val=$undef
-set try
-if eval $compile_ok; then
-	if $run ./try; then
-		echo "You seem to speak EBCDIC." >&4
-		val="$define"
-	else
-		echo "Nope, no EBCDIC, probably ASCII or some ISO Latin. Or UTF-8." >&4
-	fi
-else
-	echo "I'm unable to compile the test program." >&4
-	echo "I'll assume ASCII or some ISO Latin. Or UTF8." >&4
-fi
-$rm_try
-set ebcdic
-eval $setvar
-
 : length of character in bytes. Is always 1, otherwise it is not C
 : This used to be a test using sizeof
 charsize=1
@@ -19703,6 +19683,39 @@ EOCP
 		;;
 	esac
 done
+
+: Determine if this is an EBCDIC system
+echo " "
+echo "Determining whether or not we are on an EBCDIC system..." >&4
+$cat >try.c <<'EOM'
+int main()
+{
+  if ('M'==0xd4) return 0;
+  return 1;
+}
+EOM
+
+case "$BOOTSTRAP_CHARSET" in
+    Y|y|define) bootstrap_charset=$define	;;
+    *)		bootstrap_charset=$undef	;;
+esac
+
+val=$undef
+set try
+if eval $compile_ok; then
+	if $run ./try; then
+		echo "You seem to speak EBCDIC." >&4
+		val="$define"
+	else
+		echo "Nope, no EBCDIC, probably ASCII or some ISO Latin. Or UTF-8." >&4
+	fi
+else
+	echo "I'm unable to compile the test program." >&4
+	echo "I'll assume ASCII or some ISO Latin. Or UTF8." >&4
+fi
+$rm_try
+set ebcdic
+eval $setvar
 
 : Check how to flush
 echo " "
@@ -23302,6 +23315,7 @@ d_killpg='$d_killpg'
 d_lchown='$d_lchown'
 d_ldbl_dig='$d_ldbl_dig'
 d_libm_lib_version='$d_libm_lib_version'
+d_libname_unique='$d_libname_unique'
 d_link='$d_link'
 d_localtime64='$d_localtime64'
 d_localtime_r='$d_localtime_r'
