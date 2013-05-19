@@ -24,6 +24,9 @@ use Config;
 use File::Path 'rmtree';
 use Cwd;
 
+skip_all("\$Config{cc} ($Config{cc}) does not exist")
+    if !-e $Config{cc};
+
 plan(tests => 1);
 
 my $VERBOSE = grep {$_ eq '-v'} @ARGV;

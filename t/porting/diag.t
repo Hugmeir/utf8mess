@@ -1,10 +1,15 @@
 #!/usr/bin/perl
 use warnings;
 use strict;
+use Config;
 
 BEGIN {
   chdir 't';
   require './test.pl';
+}
+
+if ( $Config{usecrosscompile} ) {
+  skip_all( "Not all files might be available during cross-compilation" );
 }
 
 plan('no_plan');

@@ -23,6 +23,10 @@ unless (defined $Config{usedl}) {
     skip_all "FindExt just plain broken for static perl.";
 }
 
+if ( $Config{usecrosscompile} ) {
+  skip_all( "Not all files might be available during cross-compilation" );
+}
+
 plan tests => 10;
 use FindExt;
 
