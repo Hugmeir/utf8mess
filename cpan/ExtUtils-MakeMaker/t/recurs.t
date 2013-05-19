@@ -9,8 +9,16 @@ BEGIN {
 use strict;
 use Config;
 
-use Test::More tests => 26;
+use Test::More;
 use MakeMaker::Test::Utils;
+BEGIN {
+    if ( !make_run() ) {
+        plan skip_all => "make isn't available";
+    }
+    else {
+        plan tests => 26;
+    }
+}
 use MakeMaker::Test::Setup::Recurs;
 
 # 'make disttest' sets a bunch of environment variables which interfere

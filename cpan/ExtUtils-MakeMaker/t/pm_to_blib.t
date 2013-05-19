@@ -5,18 +5,21 @@
 use strict;
 use lib 't/lib';
 
-use Test::More 'no_plan';
+use Test::More;
 
 use ExtUtils::MakeMaker;
 
 use MakeMaker::Test::Utils;
+my $make;
+BEGIN {
+    $make = make_run();
+    plan skip_all => "make isn't available" if !$make;
+}
 use MakeMaker::Test::Setup::BFD;
 
 
 my $perl     = which_perl();
 my $makefile = makefile_name();
-my $make     = make_run();
-
 
 # Setup our test environment
 {
@@ -68,3 +71,5 @@ my $make     = make_run();
 
     ok( -e "blib/lib/Big/Dummy.pm", "blib copied pm file" );
 }
+
+done_testing;
