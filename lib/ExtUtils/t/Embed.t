@@ -11,14 +11,20 @@ chdir 't';
 use Config;
 use ExtUtils::Embed;
 use File::Spec;
+use IPC::Cmd qw(can_run);
 
 open(my $fh,">embed_test.c") || die "Cannot open embed_test.c:$!";
 print $fh <DATA>;
 close($fh);
 
 $| = 1;
-print "1..9\n";
 my $cc = $Config{'cc'};
+if ( $Config{usecrosscompile} && !can_run($cc) ) {
+    print "1..0 # SKIP Cross-compiling and the target doesn't have $cc";
+    exit;
+}
+
+print "1..9\n";
 my $cl  = ($^O eq 'MSWin32' && $cc eq 'cl');
 my $skip_exe = $^O eq 'os2' && $Config{ldflags} =~ /(?<!\S)-Zexe\b/;
 my $exe = 'embed_test';
