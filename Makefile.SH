@@ -1514,9 +1514,63 @@ test_prep test-prep: test_prep_pre \$(MINIPERL_EXE) \$(unidatafiles) \$(PERL_EXE
 	$to lib
 	$to TestInit.pm
 	$to win32/FindExt.pm
-	$to regen/keywords.pl
-	$to pod/perldiag.pod
+	$to regen
+	$to pod
 	$to MANIFEST
+	$to Porting
+	$to cpan/*/t
+	$to dist/*/t
+	$to ext/*/t
+	$to cpan/Term-Cap/test.pl
+	$to cpan/Pod-Usage
+	$to cpan/Pod-Parser
+	$to cpan/IO-Compress/examples
+	$to cpan/HTTP-Tiny/lib
+	$to cpan/Filter-Util-Call/filter-util.pl
+	$to cpan/File-CheckTree/lib
+	$to cpan/Digest-MD5/README
+	$to cpan/Digest-MD5/MD5.xs
+	$to cpan/Digest-SHA/src
+	$to cpan/Test-Simple/examples
+	$to cpan/Pod-Parser/lib
+	$to cpan/Test-Harness/MANIFEST
+	$to cpan/Test-Harness/MANIFEST.CUMMULATIVE
+	$to cpan/List-Util/blib
+	$to ext/IPC-Open3/Makefile
+	$to ext/Tie-Memoize/lib
+	$to ext/POSIX/POSIX.xs
+	$to ext/POSIX/Makefile.PL
+	$to dist/IO/Makefile.PL
+# --- These two are needed by ExtUtils::MM_Unix to verify PERL_CORE
+	$to config_h.SH
+	$to perl.h
+	$to cflags
+# --- For Module::Build
+	$to cpan/Module-Build/lib
+	$to *.h
+# --- For t/porting/perlfunc.t
+	$to ext/Pod-Functions
+# --- For t/porting/pod_rules.t
+	$to Makefile.SH
+	$to cpan/perlfaq
+	$to cpan/Pod-Perldoc/lib/perldoc.pod
+	$to dist/ExtUtils-ParseXS/lib/perlxs.pod
+	$to dist/ExtUtils-ParseXS/lib/perlxstut.pod
+	$to dist/ExtUtils-ParseXS/lib/perlxstypemap.pod
+	$to win32/Makefile
+	$to win32/makefile.mk
+	$to win32/pod.mak
+	$to vms/descrip_mms.template
+# --- For t/porting/regen.t
+	$to keywords.c
+	$to regen.pl
+	$to regen_perly.pl
+	$to perly.tab
+	$to perly.act
+	$to perly.y
+	$to uconfig.sh
+# --- For t/x2p/s2p.t
+	$to x2p
 	cd t && (rm -f \$(PERL_EXE); \$(LNS) ../\$(PERL_EXE) \$(PERL_EXE)) && cd ..
 	$to t/\$(PERL_EXE)
 
