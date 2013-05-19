@@ -964,7 +964,7 @@ sub _gunzip_bin {
         return $self->_error(loc("Could not open '%1' for writing: %2",
                             $self->_gunzip_to, $! ));
 
-    my $cmd = [ $self->bin_gzip, '-cdf', $self->archive ];
+    my $cmd = [ $self->bin_gzip, '-c', '-d', '-f', $self->archive ];
 
     my $buffer;
     unless( scalar run( command => $cmd,
