@@ -12,12 +12,17 @@ use CPANPLUS::Dist;
 use CPANPLUS::Dist::MM;
 use CPANPLUS::Internals::Constants;
 
-use Test::More 'no_plan';
+use Test::More;
 use Cwd;
 use Config;
 use Data::Dumper;
 use File::Basename ();
 use File::Spec ();
+use IPC::Cmd ();
+
+if ( !IPC::Cmd::can_run('make') ) {
+    plan skip_all => "make is not available, can't test CPANPLUS::Dist::MM";
+}
 
 my $conf    = gimme_conf();
 my $cb      = CPANPLUS::Backend->new( $conf );
@@ -419,6 +424,7 @@ sub _custom_makefile_pl_sub {
     }
 }
 
+done_testing;
 
 # Local variables:
 # c-indentation-style: bsd

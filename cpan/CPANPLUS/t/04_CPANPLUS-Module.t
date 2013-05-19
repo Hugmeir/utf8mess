@@ -16,6 +16,7 @@ use Test::More 'no_plan';
 use Data::Dumper;
 use File::Spec;
 use File::Path ();
+use IPC::Cmd qw(can_run);
 
 my $Conf    = gimme_conf();
 my $CB      = CPANPLUS::Backend->new( $Conf );
@@ -305,9 +306,12 @@ isa_ok( $Auth->parent,          'CPANPLUS::Backend' );
                                 "       Object" );
 
     ### skiptests to make sure we don't get any test header mismatches
-    my $rv = $bundle->create( prereq_target => 'create', skiptest => 1 );
-    ok( $rv,                    "   Tested prereqs" );
-
+    SKIP: {
+        skip "make isn't available, not testing ->create", 1
+            if !can_run('make');
+        my $rv = $bundle->create( prereq_target => 'create', skiptest => 1 );
+        ok( $rv,                    "   Tested prereqs" );
+    }
 }
 
 ### test module from perl core ###
