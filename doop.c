@@ -27,7 +27,7 @@
 #include <signal.h>
 #endif
 
-STATIC I32
+PERL_STATIC_INLINE I32
 S_do_trans_simple(pTHX_ SV * const sv)
 {
     dVAR;
@@ -96,7 +96,7 @@ S_do_trans_simple(pTHX_ SV * const sv)
     return matches;
 }
 
-STATIC I32
+PERL_STATIC_INLINE I32
 S_do_trans_count(pTHX_ SV * const sv)
 {
     dVAR;
@@ -134,7 +134,7 @@ S_do_trans_count(pTHX_ SV * const sv)
     return matches;
 }
 
-STATIC I32
+PERL_STATIC_INLINE I32
 S_do_trans_complex(pTHX_ SV * const sv)
 {
     dVAR;
@@ -298,7 +298,7 @@ S_do_trans_complex(pTHX_ SV * const sv)
     return matches;
 }
 
-STATIC I32
+PERL_STATIC_INLINE I32
 S_do_trans_simple_utf8(pTHX_ SV * const sv)
 {
     dVAR;
@@ -403,7 +403,7 @@ S_do_trans_simple_utf8(pTHX_ SV * const sv)
     return matches;
 }
 
-STATIC I32
+PERL_STATIC_INLINE I32
 S_do_trans_count_utf8(pTHX_ SV * const sv)
 {
     dVAR;
@@ -453,7 +453,7 @@ S_do_trans_count_utf8(pTHX_ SV * const sv)
     return matches;
 }
 
-STATIC I32
+PERL_STATIC_INLINE I32
 S_do_trans_complex_utf8(pTHX_ SV * const sv)
 {
     dVAR;

@@ -128,7 +128,7 @@ recursive, but it's recursive on basic blocks, not on tree nodes.
 #define SIZE_TO_PSIZE(x)	(((x) + sizeof(I32 *) - 1)/sizeof(I32 *))
 #define DIFF(o,p)		((size_t)((I32 **)(p) - (I32**)(o)))
 
-static OPSLAB *
+PERL_STATIC_INLINE OPSLAB *
 S_new_slab(pTHX_ size_t sz)
 {
 #ifdef PERL_DEBUG_READONLY_OPS
@@ -468,7 +468,7 @@ Perl_op_refcnt_dec(pTHX_ OP *o)
 	o->op_ppaddr = PL_ppaddr[type];		\
     } STMT_END
 
-STATIC SV*
+PERL_STATIC_INLINE SV*
 S_gv_ename(pTHX_ GV *gv)
 {
     SV* const tmpsv = sv_newmortal();
@@ -479,7 +479,7 @@ S_gv_ename(pTHX_ GV *gv)
     return tmpsv;
 }
 
-STATIC OP *
+PERL_STATIC_INLINE OP *
 S_no_fh_allowed(pTHX_ OP *o)
 {
     PERL_ARGS_ASSERT_NO_FH_ALLOWED;
@@ -489,7 +489,7 @@ S_no_fh_allowed(pTHX_ OP *o)
     return o;
 }
 
-STATIC OP *
+PERL_STATIC_INLINE OP *
 S_too_few_arguments_sv(pTHX_ OP *o, SV *namesv, U32 flags)
 {
     PERL_ARGS_ASSERT_TOO_FEW_ARGUMENTS_SV;
@@ -498,7 +498,7 @@ S_too_few_arguments_sv(pTHX_ OP *o, SV *namesv, U32 flags)
     return o;
 }
 
-STATIC OP *
+PERL_STATIC_INLINE OP *
 S_too_few_arguments_pv(pTHX_ OP *o, const char* name, U32 flags)
 {
     PERL_ARGS_ASSERT_TOO_FEW_ARGUMENTS_PV;
@@ -506,7 +506,7 @@ S_too_few_arguments_pv(pTHX_ OP *o, const char* name, U32 flags)
     return o;
 }
  
-STATIC OP *
+PERL_STATIC_INLINE OP *
 S_too_many_arguments_pv(pTHX_ OP *o, const char *name, U32 flags)
 {
     PERL_ARGS_ASSERT_TOO_MANY_ARGUMENTS_PV;
@@ -515,7 +515,7 @@ S_too_many_arguments_pv(pTHX_ OP *o, const char *name, U32 flags)
     return o;
 }
 
-STATIC OP *
+PERL_STATIC_INLINE OP *
 S_too_many_arguments_sv(pTHX_ OP *o, SV *namesv, U32 flags)
 {
     PERL_ARGS_ASSERT_TOO_MANY_ARGUMENTS_SV;
@@ -525,7 +525,7 @@ S_too_many_arguments_sv(pTHX_ OP *o, SV *namesv, U32 flags)
     return o;
 }
 
-STATIC void
+PERL_STATIC_INLINE void
 S_bad_type_pv(pTHX_ I32 n, const char *t, const char *name, U32 flags, const OP *kid)
 {
     PERL_ARGS_ASSERT_BAD_TYPE_PV;
@@ -534,7 +534,7 @@ S_bad_type_pv(pTHX_ I32 n, const char *t, const char *name, U32 flags, const OP 
 		 (int)n, name, t, OP_DESC(kid)), flags);
 }
 
-STATIC void
+PERL_STATIC_INLINE void
 S_bad_type_sv(pTHX_ I32 n, const char *t, SV *namesv, U32 flags, const OP *kid)
 {
     PERL_ARGS_ASSERT_BAD_TYPE_SV;
@@ -543,7 +543,7 @@ S_bad_type_sv(pTHX_ I32 n, const char *t, SV *namesv, U32 flags, const OP *kid)
 		 (int)n, SVfARG(namesv), t, OP_DESC(kid)), SvUTF8(namesv) | flags);
 }
 
-STATIC void
+PERL_STATIC_INLINE void
 S_no_bareword_allowed(pTHX_ OP *o)
 {
     PERL_ARGS_ASSERT_NO_BAREWORD_ALLOWED;
@@ -663,7 +663,7 @@ Perl_alloccopstash(pTHX_ HV *hv)
 /* free the body of an op without examining its contents.
  * Always use this rather than FreeOp directly */
 
-static void
+PERL_STATIC_INLINE void
 S_op_destroy(pTHX_ OP *o)
 {
     FreeOp(o);
@@ -916,7 +916,7 @@ clear_pmop:
     }
 }
 
-STATIC void
+PERL_STATIC_INLINE void
 S_cop_free(pTHX_ COP* cop)
 {
     PERL_ARGS_ASSERT_COP_FREE;
@@ -927,7 +927,7 @@ S_cop_free(pTHX_ COP* cop)
     cophh_free(CopHINTHASH_get(cop));
 }
 
-STATIC void
+PERL_STATIC_INLINE void
 S_forget_pmop(pTHX_ PMOP *const o
 	      )
 {
@@ -963,7 +963,7 @@ S_forget_pmop(pTHX_ PMOP *const o
 	PL_curpm = NULL;
 }
 
-STATIC void
+PERL_STATIC_INLINE void
 S_find_and_forget_pmops(pTHX_ OP *o)
 {
     PERL_ARGS_ASSERT_FIND_AND_FORGET_PMOPS;
@@ -1086,7 +1086,7 @@ Perl_op_linklist(pTHX_ OP *o)
     return o->op_next;
 }
 
-static OP *
+PERL_STATIC_INLINE OP *
 S_scalarkids(pTHX_ OP *o)
 {
     if (o && o->op_flags & OPf_KIDS) {
@@ -1097,7 +1097,7 @@ S_scalarkids(pTHX_ OP *o)
     return o;
 }
 
-STATIC OP *
+PERL_STATIC_INLINE OP *
 S_scalarboolean(pTHX_ OP *o)
 {
     dVAR;
@@ -1548,7 +1548,7 @@ Perl_scalarvoid(pTHX_ OP *o)
     return o;
 }
 
-static OP *
+PERL_STATIC_INLINE OP *
 S_listkids(pTHX_ OP *o)
 {
     if (o && o->op_flags & OPf_KIDS) {
@@ -1630,7 +1630,7 @@ Perl_list(pTHX_ OP *o)
     return o;
 }
 
-static OP *
+PERL_STATIC_INLINE OP *
 S_scalarseq(pTHX_ OP *o)
 {
     dVAR;
@@ -1657,7 +1657,7 @@ S_scalarseq(pTHX_ OP *o)
     return o;
 }
 
-STATIC OP *
+PERL_STATIC_INLINE OP *
 S_modkids(pTHX_ OP *o, I32 type)
 {
     if (o && o->op_flags & OPf_KIDS) {
@@ -1691,7 +1691,7 @@ Perl_finalize_optree(pTHX_ OP* o)
     LEAVE;
 }
 
-STATIC void
+PERL_STATIC_INLINE void
 S_finalize_op(pTHX_ OP* o)
 {
     PERL_ARGS_ASSERT_FINALIZE_OP;
@@ -2245,7 +2245,7 @@ Perl_op_lvalue_flags(pTHX_ OP *o, I32 type, U32 flags)
     return o;
 }
 
-STATIC bool
+PERL_STATIC_INLINE bool
 S_scalar_mod_type(const OP *o, I32 type)
 {
     switch (type) {
@@ -2295,7 +2295,7 @@ S_scalar_mod_type(const OP *o, I32 type)
     }
 }
 
-STATIC bool
+PERL_STATIC_INLINE bool
 S_is_handle_constructor(const OP *o, I32 numargs)
 {
     PERL_ARGS_ASSERT_IS_HANDLE_CONSTRUCTOR;
@@ -2320,7 +2320,7 @@ S_is_handle_constructor(const OP *o, I32 numargs)
     }
 }
 
-static OP *
+PERL_STATIC_INLINE OP *
 S_refkids(pTHX_ OP *o, I32 type)
 {
     if (o && o->op_flags & OPf_KIDS) {
@@ -2431,7 +2431,7 @@ Perl_doref(pTHX_ OP *o, I32 type, bool set_op_ref)
 
 }
 
-STATIC OP *
+PERL_STATIC_INLINE OP *
 S_dup_attrlist(pTHX_ OP *o)
 {
     dVAR;
@@ -2462,7 +2462,7 @@ S_dup_attrlist(pTHX_ OP *o)
     return rop;
 }
 
-STATIC void
+PERL_STATIC_INLINE void
 S_apply_attrs(pTHX_ HV *stash, SV *target, OP *attrs)
 {
     dVAR;
@@ -2488,7 +2488,7 @@ S_apply_attrs(pTHX_ HV *stash, SV *target, OP *attrs)
     LEAVE;
 }
 
-STATIC void
+PERL_STATIC_INLINE void
 S_apply_attrs_my(pTHX_ HV *stash, OP *target, OP *attrs, OP **imopsp)
 {
     dVAR;
@@ -2591,7 +2591,7 @@ Perl_apply_attrs_string(pTHX_ const char *stashpv, CV *cv,
                                                attrs)));
 }
 
-STATIC OP *
+PERL_STATIC_INLINE OP *
 S_my_kid(pTHX_ OP *o, OP *attrs, OP **imopsp)
 {
     dVAR;
@@ -2996,7 +2996,7 @@ Perl_blockhook_register(pTHX_ BHK *hk)
     Perl_av_create_and_push(aTHX_ &PL_blockhooks, newSViv(PTR2IV(hk)));
 }
 
-STATIC OP *
+PERL_STATIC_INLINE OP *
 S_newDEFSVOP(pTHX)
 {
     dVAR;
@@ -3218,7 +3218,7 @@ S_op_integerize(pTHX_ OP *o)
     return o;
 }
 
-static OP *
+PERL_STATIC_INLINE OP *
 S_fold_constants(pTHX_ OP *o)
 {
     dVAR;
@@ -3369,7 +3369,7 @@ S_fold_constants(pTHX_ OP *o)
     return o;
 }
 
-static OP *
+PERL_STATIC_INLINE OP *
 S_gen_constant_list(pTHX_ OP *o)
 {
     dVAR;
@@ -3844,7 +3844,7 @@ Perl_newNULLLIST(pTHX)
     return newOP(OP_STUB, 0);
 }
 
-static OP *
+PERL_STATIC_INLINE OP *
 S_force_list(pTHX_ OP *o)
 {
     if (!o || o->op_type != OP_LIST)
@@ -4060,7 +4060,7 @@ static int uvcompare(const void *a, const void *b)
     return 0;
 }
 
-static OP *
+PERL_STATIC_INLINE OP *
 S_pmtrans(pTHX_ OP *o, OP *expr, OP *repl)
 {
     dVAR;
@@ -5350,7 +5350,7 @@ Perl_newSLICEOP(pTHX_ I32 flags, OP *subscript, OP *listval)
 	    list(force_list(listval)) );
 }
 
-STATIC I32
+PERL_STATIC_INLINE I32
 S_is_list_assignment(pTHX_ const OP *o)
 {
     unsigned type;
@@ -5771,7 +5771,7 @@ Perl_newLOGOP(pTHX_ I32 type, I32 flags, OP *first, OP *other)
     return new_logop(type, flags, &first, &other);
 }
 
-STATIC OP *
+PERL_STATIC_INLINE OP *
 S_search_const(pTHX_ OP *o)
 {
     PERL_ARGS_ASSERT_SEARCH_CONST;
@@ -5814,7 +5814,7 @@ last:
     return NULL;
 }
 
-STATIC OP *
+PERL_STATIC_INLINE OP *
 S_new_logop(pTHX_ I32 type, I32 flags, OP** firstp, OP** otherp)
 {
     dVAR;
@@ -6562,7 +6562,7 @@ Perl_newLOOPEX(pTHX_ I32 type, OP *label)
 /* if the condition is a literal array or hash
    (or @{ ... } etc), make a reference to it.
  */
-STATIC OP *
+PERL_STATIC_INLINE OP *
 S_ref_array_or_hash(pTHX_ OP *cond)
 {
     if (cond
@@ -6599,7 +6599,7 @@ S_ref_array_or_hash(pTHX_ OP *cond)
    op_other if the match fails.)
  */
 
-STATIC OP *
+PERL_STATIC_INLINE OP *
 S_newGIVWHENOP(pTHX_ OP *cond, OP *block,
 		   I32 enter_opcode, I32 leave_opcode,
 		   PADOFFSET entertarg)
@@ -6656,7 +6656,7 @@ S_newGIVWHENOP(pTHX_ OP *cond, OP *block,
    
    [*] possibly surprising
  */
-STATIC bool
+PERL_STATIC_INLINE bool
 S_looks_like_bool(pTHX_ const OP *o)
 {
     dVAR;
@@ -6834,7 +6834,7 @@ Perl_cv_ckproto_len_flags(pTHX_ const CV *cv, const GV *gv, const char *p,
     }
 }
 
-static void const_sv_xsub(pTHX_ CV* cv);
+PERL_STATIC_INLINE void const_sv_xsub(pTHX_ CV* cv);
 
 /*
 
@@ -6944,7 +6944,7 @@ Perl_op_const_sv(pTHX_ const OP *o, CV *cv)
     return sv;
 }
 
-static bool
+PERL_STATIC_INLINE bool
 S_already_defined(pTHX_ CV *const cv, OP * const block, OP * const o,
 			PADNAME * const name, SV ** const const_svp)
 {
@@ -7692,7 +7692,7 @@ Perl_newATTRSUB_flags(pTHX_ I32 floor, OP *o, OP *proto, OP *attrs,
     return cv;
 }
 
-STATIC void
+PERL_STATIC_INLINE void
 S_process_special_blocks(pTHX_ I32 floor, const char *const fullname,
 			 GV *const gv,
 			 CV *const cv)
@@ -9666,7 +9666,7 @@ Perl_ck_sort(pTHX_ OP *o)
     return o;
 }
 
-STATIC void
+PERL_STATIC_INLINE void
 S_simplify_sort(pTHX_ OP *o)
 {
     dVAR;
@@ -10706,7 +10706,7 @@ Perl_ck_length(pTHX_ OP *o)
 /* Check for in place reverse and sort assignments like "@a = reverse @a"
    and modify the optree to make them work inplace */
 
-STATIC void
+PERL_STATIC_INLINE void
 S_inplace_aassign(pTHX_ OP *o) {
 
     OP *modop, *modop_pushmark;
@@ -11913,7 +11913,7 @@ Perl_wrap_op_checker(pTHX_ Optype opcode,
 #include "XSUB.h"
 
 /* Efficient sub that returns a constant scalar value. */
-static void
+PERL_STATIC_INLINE void
 const_sv_xsub(pTHX_ CV* cv)
 {
     dVAR;

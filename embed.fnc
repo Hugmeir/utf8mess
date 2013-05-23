@@ -227,7 +227,7 @@ Apd	|void	|av_unshift	|NN AV *av|I32 num
 Apo	|SV**	|av_arylen_p	|NN AV *av
 Apo	|IV*	|av_iter_p	|NN AV *av
 #if defined(PERL_IN_AV_C)
-s	|MAGIC*	|get_aux_mg	|NN AV *av
+i	|MAGIC*	|get_aux_mg	|NN AV *av
 #endif
 : Used in perly.y
 pR	|OP*	|bind_match	|I32 type|NN OP *left|NN OP *right
@@ -358,7 +358,7 @@ p	|bool	|do_exec3	|NN const char *incmd|int fd|int do_report
 #endif
 p	|void	|do_execfree
 #if defined(PERL_IN_DOIO_C)
-s	|void	|exec_failed	|NN const char *cmd|int fd|int do_report
+i	|void	|exec_failed	|NN const char *cmd|int fd|int do_report
 #endif
 #if defined(HAS_MSG) || defined(HAS_SEM) || defined(HAS_SHM)
 : Defined in doio.c, used only in pp_sys.c
@@ -431,17 +431,17 @@ ApdR	|char*	|fbm_instr	|NN unsigned char* big|NN unsigned char* bigend \
 p	|char*	|find_script	|NN const char *scriptname|bool dosearch \
 				|NULLOK const char *const *const search_ext|I32 flags
 #if defined(PERL_IN_OP_C)
-s	|OP*	|force_list	|NULLOK OP* arg
+i	|OP*	|force_list	|NULLOK OP* arg
 i	|OP*	|op_integerize	|NN OP *o
 i	|OP*	|op_std_init	|NN OP *o
 : FIXME
-s	|OP*	|fold_constants	|NN OP *o
+i	|OP*	|fold_constants	|NN OP *o
 #endif
 Afpd	|char*	|form		|NN const char* pat|...
 Ap	|char*	|vform		|NN const char* pat|NULLOK va_list* args
 Ap	|void	|free_tmps
 #if defined(PERL_IN_OP_C)
-s	|OP*	|gen_constant_list|NULLOK OP* o
+i	|OP*	|gen_constant_list|NULLOK OP* o
 #endif
 #if !defined(HAS_GETENV_LEN)
 : Used in hv.c
@@ -542,7 +542,7 @@ ApdR	|SV*	|hv_iterval	|NN HV *hv|NN HE *entry
 Ap	|void	|hv_ksplit	|NN HV *hv|IV newmax
 Apdbm	|void	|hv_magic	|NN HV *hv|NULLOK GV *gv|int how
 #if defined(PERL_IN_HV_C)
-s	|SV *	|refcounted_he_value	|NN const struct refcounted_he *he
+i	|SV *	|refcounted_he_value	|NN const struct refcounted_he *he
 #endif
 Xpd	|HV *	|refcounted_he_chain_2hv|NULLOK const struct refcounted_he *c|U32 flags
 Xpd	|SV *	|refcounted_he_fetch_pvn|NULLOK const struct refcounted_he *chain \
@@ -588,7 +588,7 @@ AMp	|I32	|foldEQ_utf8_flags |NN const char *s1|NULLOK char **pe1|UV l1 \
 				|UV l2|bool u2|U32 flags
 AnpP	|I32	|foldEQ_latin1	|NN const char* a|NN const char* b|I32 len
 #if defined(PERL_IN_DOIO_C)
-sR	|bool	|ingroup	|Gid_t testgid|bool effective
+iR	|bool	|ingroup	|Gid_t testgid|bool effective
 #endif
 : Used in toke.c
 p	|void	|init_argv_symbols|int argc|NN char **argv
@@ -630,7 +630,7 @@ AMp	|UV	|to_uni_title	|UV c|NN U8 *p|NN STRLEN *lenp
 iDMPR	|bool	|isIDFIRST_lazy	|NN const char* p
 iDMPR	|bool	|isALNUM_lazy	|NN const char* p
 #ifdef PERL_IN_UTF8_C
-sR	|U8	|to_lower_latin1|const U8 c|NULLOK U8 *p|NULLOK STRLEN *lenp
+iR	|U8	|to_lower_latin1|const U8 c|NULLOK U8 *p|NULLOK STRLEN *lenp
 #endif
 #if defined(PERL_IN_UTF8_C) || defined(PERL_IN_REGCOMP_C) || defined(PERL_IN_REGEXEC_C)
 EXp        |UV        |_to_fold_latin1|const U8 c|NN U8 *p|NN STRLEN *lenp|const unsigned int flags
@@ -696,7 +696,7 @@ p	|OP*	|jmaybe		|NN OP *o
 : Used in pp.c 
 pP	|I32	|keyword	|NN const char *name|I32 len|bool all_keywords
 #if defined(PERL_IN_OP_C)
-s	|void	|inplace_aassign	|NN OP* o
+i	|void	|inplace_aassign	|NN OP* o
 #endif
 Ap	|void	|leave_scope	|I32 base
 : Public lexer API
@@ -730,7 +730,7 @@ EXp	|void	|op_clear	|NN OP* o
 Ap	|void	|op_refcnt_lock
 Ap	|void	|op_refcnt_unlock
 #if defined(PERL_IN_OP_C)
-s	|OP*	|listkids	|NULLOK OP* o
+i	|OP*	|listkids	|NULLOK OP* o
 #endif
 : Used in S_doeval in pp_ctl.c
 p	|OP*	|list		|NULLOK OP* o
@@ -741,8 +741,8 @@ p	|OP*	|localize	|NN OP *o|I32 lex
 ApdR	|I32	|looks_like_number|NN SV *const sv
 Apd	|UV	|grok_bin	|NN const char* start|NN STRLEN* len_p|NN I32* flags|NULLOK NV *result
 #if defined(PERL_IN_REGCOMP_C) || defined(PERL_IN_TOKE_C)
-EMsR	|char	|grok_bslash_c	|const char source|const bool utf8|const bool output_warning
-EMsR	|bool	|grok_bslash_o	|NN char** s|NN UV* uv           \
+EMiR	|char	|grok_bslash_c	|const char source|const bool utf8|const bool output_warning
+EMiR	|bool	|grok_bslash_o	|NN char** s|NN UV* uv           \
 				|NN const char** error_msg       \
 				|const bool output_warning       \
 				|const bool strict               \
@@ -754,7 +754,7 @@ EMiR	|bool	|grok_bslash_x	|NN char** s|NN UV* uv           \
 				|const bool strict               \
 				|const bool silence_non_portable \
 				|const bool utf8
-EMsPR	|char*|form_short_octal_warning|NN const char * const s  \
+EMiPR	|char*|form_short_octal_warning|NN const char * const s  \
 				|const STRLEN len
 #endif
 Apd	|UV	|grok_hex	|NN const char* start|NN STRLEN* len_p|NN I32* flags|NULLOK NV *result
@@ -853,7 +853,7 @@ AMmd	|OP*	|op_lvalue	|NULLOK OP* o|I32 type
 poX	|OP*	|op_lvalue_flags|NULLOK OP* o|I32 type|U32 flags
 p	|void	|finalize_optree		|NN OP* o
 #if defined(PERL_IN_OP_C)
-s	|void	|finalize_op	|NN OP* o
+i	|void	|finalize_op	|NN OP* o
 #endif
 : Used in op.c and pp_sys.c
 p	|int	|mode_from_discipline|NULLOK const char* s|STRLEN len
@@ -1065,25 +1065,25 @@ Apd	|void	|pack_cat	|NN SV *cat|NN const char *pat|NN const char *patend \
 				|NN SV **beglist|NN SV **endlist|NN SV ***next_in_list|U32 flags
 Apd	|void	|packlist 	|NN SV *cat|NN const char *pat|NN const char *patend|NN SV **beglist|NN SV **endlist
 #if defined(PERL_USES_PL_PIDSTATUS) && defined(PERL_IN_UTIL_C)
-s	|void	|pidgone	|Pid_t pid|int status
+i	|void	|pidgone	|Pid_t pid|int status
 #endif
 : Used in perly.y
 p	|OP*	|pmruntime	|NN OP *o|NN OP *expr|bool isreg|I32 floor
 #if defined(PERL_IN_OP_C)
-s	|OP*	|pmtrans	|NN OP* o|NN OP* expr|NN OP* repl
+i	|OP*	|pmtrans	|NN OP* o|NN OP* expr|NN OP* repl
 #endif
 Ap	|void	|pop_scope
 Ap	|void	|push_scope
 Amb	|OP*	|ref		|NULLOK OP* o|I32 type
 #if defined(PERL_IN_OP_C)
-s	|OP*	|refkids	|NULLOK OP* o|I32 type
+i	|OP*	|refkids	|NULLOK OP* o|I32 type
 #endif
 Ap	|void	|regdump	|NN const regexp* r
 Ap	|SV*	|regclass_swash	|NULLOK const regexp *prog \
 				|NN const struct regnode *node|bool doinit \
 				|NULLOK SV **listsvp|NULLOK SV **altsvp
 #ifdef PERL_IN_REGCOMP_C
-EMsR	|SV*	|_new_invlist_C_array|NN UV* list
+EMiR	|SV*	|_new_invlist_C_array|NN UV* list
 : Not used currently: EXMs	|bool	|_invlistEQ	|NN SV* const a|NN SV* const b|bool complement_b
 #endif
 Ap	|I32	|pregexec	|NN REGEXP * const prog|NN char* stringarg \
@@ -1152,8 +1152,8 @@ p	|int	|rsignal_restore|int i|NULLOK Sigsave_t* t
 p	|int	|rsignal_save	|int i|Sighandler_t t1|NN Sigsave_t* save
 Ap	|Sighandler_t|rsignal_state|int i
 #if defined(PERL_IN_PP_CTL_C)
-s	|void	|rxres_free	|NN void** rsp
-s	|void	|rxres_restore	|NN void **rsp|NN REGEXP *rx
+i	|void	|rxres_free	|NN void** rsp
+i	|void	|rxres_restore	|NN void **rsp|NN REGEXP *rx
 #endif
 : Used in pp_hot.c
 p	|void	|rxres_save	|NN void **rsp|NN REGEXP *rx
@@ -1222,7 +1222,7 @@ Ap	|void	|save_pushi32ptr|const I32 i|NULLOK void *const ptr|const int type
 Ap	|void	|save_pushptrptr|NULLOK void *const ptr1 \
 				|NULLOK void *const ptr2|const int type
 #if defined(PERL_IN_SCOPE_C)
-s	|void	|save_pushptri32ptr|NULLOK void *const ptr1|const I32 i \
+i	|void	|save_pushptri32ptr|NULLOK void *const ptr1|const I32 i \
 				|NULLOK void *const ptr2|const int type
 #endif
 : Used in perly.y
@@ -1231,8 +1231,8 @@ Apd	|OP*	|op_contextualize|NN OP* o|I32 context
 : Used in perly.y
 p	|OP*	|scalar		|NULLOK OP* o
 #if defined(PERL_IN_OP_C)
-s	|OP*	|scalarkids	|NULLOK OP* o
-s	|OP*	|scalarseq	|NULLOK OP* o
+i	|OP*	|scalarkids	|NULLOK OP* o
+i	|OP*	|scalarseq	|NULLOK OP* o
 #endif
 : Used in pp_ctl.c
 p	|OP*	|scalarvoid	|NN OP* o
@@ -1263,7 +1263,7 @@ Apd	|CV*	|sv_2cv		|NULLOK SV* sv|NN HV **const st|NN GV **const gvp \
 				|const I32 lref
 Apd	|IO*	|sv_2io		|NN SV *const sv
 #if defined(PERL_IN_SV_C)
-s	|bool	|glob_2number	|NN GV* const gv
+i	|bool	|glob_2number	|NN GV* const gv
 #endif
 Amb	|IV	|sv_2iv		|NULLOK SV *sv
 Apd	|IV	|sv_2iv_flags	|NULLOK SV *const sv|const I32 flags
@@ -1286,7 +1286,7 @@ Apd	|char*	|sv_pvutf8n	|NN SV *sv|NN STRLEN *lp
 Apd	|char*	|sv_pvbyten	|NN SV *sv|NN STRLEN *lp
 Apd	|I32	|sv_true	|NULLOK SV *const sv
 #if defined(PERL_IN_SV_C)
-sd	|void	|sv_add_arena	|NN char *const ptr|const U32 size \
+id	|void	|sv_add_arena	|NN char *const ptr|const U32 size \
 				|const U32 flags
 #endif
 Apd	|int	|sv_backoff	|NN SV *const sv
@@ -1304,7 +1304,7 @@ pd	|I32	|sv_clean_all
 pd	|void	|sv_clean_objs
 Apd	|void	|sv_clear	|NN SV *const orig_sv
 #if defined(PERL_IN_SV_C)
-s	|bool	|curse		|NN SV * const sv|const bool check_refcnt
+i	|bool	|curse		|NN SV * const sv|const bool check_refcnt
 #endif
 Aopd	|I32	|sv_cmp		|NULLOK SV *const sv1|NULLOK SV *const sv2
 Apd	|I32	|sv_cmp_flags	|NULLOK SV *const sv1|NULLOK SV *const sv2 \
@@ -1419,10 +1419,10 @@ ApR	|SV*	|swash_init	|NN const char* pkg|NN const char* name|NN SV* listsv|I32 m
 Ap	|UV	|swash_fetch	|NN SV *swash|NN const U8 *ptr|bool do_utf8
 #ifdef PERL_IN_REGCOMP_C
 EiMR	|SV*	|add_cp_to_invlist	|NULLOK SV* invlist|const UV cp
-EsM	|void	|_append_range_to_invlist   |NN SV* const invlist|const UV start|const UV end
+EiM	|void	|_append_range_to_invlist   |NN SV* const invlist|const UV start|const UV end
 EiMR	|UV*	|_invlist_array_init	|NN SV* const invlist|const bool will_have_0
 EiMR	|UV*	|invlist_array	|NN SV* const invlist
-EsM	|void	|invlist_extend    |NN SV* const invlist|const UV len
+EiM	|void	|invlist_extend    |NN SV* const invlist|const UV len
 EiMR	|UV*	|get_invlist_zero_addr	|NN SV* invlist
 EiMR	|UV	|invlist_max	|NN SV* const invlist
 EiM	|void	|invlist_set_len|NN SV* const invlist|const UV len
@@ -1435,7 +1435,7 @@ EiMR	|bool	|invlist_is_iterating|NN SV* const invlist
 EiMR	|UV*	|get_invlist_iter_addr	|NN SV* invlist
 EiMR	|UV*	|get_invlist_version_id_addr	|NN SV* invlist
 EiM	|void	|invlist_iterinit|NN SV* invlist
-EsMR	|bool	|invlist_iternext|NN SV* invlist|NN UV* start|NN UV* end
+EiMR	|bool	|invlist_iternext|NN SV* invlist|NN UV* start|NN UV* end
 EiM	|void	|invlist_iterfinish|NN SV* invlist
 EiMR	|UV	|invlist_highest|NN SV* const invlist
 #endif
@@ -1594,7 +1594,7 @@ p	|void	|parser_free_nexttoke_ops|NN yy_parser *parser \
 					 |NN OPSLAB *slab
 #endif
 #if defined(PERL_IN_TOKE_C)
-s	|int	|yywarn		|NN const char *const s|U32 flags
+i	|int	|yywarn		|NN const char *const s|U32 flags
 #endif
 #if defined(MYMALLOC)
 Ap	|void	|dump_mstats	|NN const char* s
@@ -1698,9 +1698,9 @@ ApR	|DIR*	|dirp_dup	|NULLOK DIR *const dp|NN CLONE_PARAMS *const param
 ApR	|GP*	|gp_dup		|NULLOK GP *const gp|NN CLONE_PARAMS *const param
 ApR	|MAGIC*	|mg_dup		|NULLOK MAGIC *mg|NN CLONE_PARAMS *const param
 #if defined(PERL_IN_SV_C)
-s	|SV **	|sv_dup_inc_multiple|NN SV *const *source|NN SV **dest \
+i	|SV **	|sv_dup_inc_multiple|NN SV *const *source|NN SV **dest \
 				|SSize_t items|NN CLONE_PARAMS *const param
-sR	|SV*	|sv_dup_common	|NN const SV *const sstr \
+iR	|SV*	|sv_dup_common	|NN const SV *const sstr \
 				|NN CLONE_PARAMS *const param
 #endif
 ApR	|SV*	|sv_dup		|NULLOK const SV *const sstr|NN CLONE_PARAMS *const param
@@ -1744,18 +1744,18 @@ Adp	|int	|nothreadhook
 p	|void	|init_constants
 
 #if defined(PERL_IN_DOOP_C)
-sR	|I32	|do_trans_simple	|NN SV * const sv
-sR	|I32	|do_trans_count		|NN SV * const sv
-sR	|I32	|do_trans_complex	|NN SV * const sv
-sR	|I32	|do_trans_simple_utf8	|NN SV * const sv
-sR	|I32	|do_trans_count_utf8	|NN SV * const sv
-sR	|I32	|do_trans_complex_utf8	|NN SV * const sv
+iR	|I32	|do_trans_simple	|NN SV * const sv
+iR	|I32	|do_trans_count		|NN SV * const sv
+iR	|I32	|do_trans_complex	|NN SV * const sv
+iR	|I32	|do_trans_simple_utf8	|NN SV * const sv
+iR	|I32	|do_trans_count_utf8	|NN SV * const sv
+iR	|I32	|do_trans_complex_utf8	|NN SV * const sv
 #endif
 
 #if defined(PERL_IN_GV_C)
-s	|void	|gv_init_svtype	|NN GV *gv|const svtype sv_type
-s	|void	|gv_magicalize_isa	|NN GV *gv
-s	|HV*	|require_tie_mod|NN GV *gv|NN const char *varpv|NN SV* namesv \
+i	|void	|gv_init_svtype	|NN GV *gv|const svtype sv_type
+i	|void	|gv_magicalize_isa	|NN GV *gv
+i	|HV*	|require_tie_mod|NN GV *gv|NN const char *varpv|NN SV* namesv \
 				|NN const char *methpv|const U32 flags
 #endif
 
@@ -1764,66 +1764,66 @@ po	|SV*	|hfree_next_entry	|NN HV *hv|NN STRLEN *indexp
 #endif
 
 #if defined(PERL_IN_HV_C)
-s	|void	|hsplit		|NN HV *hv|STRLEN const oldsize|STRLEN newsize
-s	|void	|hfreeentries	|NN HV *hv
-s	|SV*	|hv_free_ent_ret|NN HV *hv|NN HE *entry
-sa	|HE*	|new_he
-sanR	|HEK*	|save_hek_flags	|NN const char *str|I32 len|U32 hash|int flags
-sn	|void	|hv_magic_check	|NN HV *hv|NN bool *needs_copy|NN bool *needs_store
-s	|void	|unshare_hek_or_pvn|NULLOK const HEK* hek|NULLOK const char* str|I32 len|U32 hash
-sR	|HEK*	|share_hek_flags|NN const char *str|I32 len|U32 hash|int flags
-rs	|void	|hv_notallowed	|int flags|NN const char *key|I32 klen|NN const char *msg
-sn      |U32|ptr_hash|PTRV u
-s	|struct xpvhv_aux*|hv_auxinit|NN HV *hv
-sM	|SV*	|hv_delete_common|NULLOK HV *hv|NULLOK SV *keysv \
+i	|void	|hsplit		|NN HV *hv|STRLEN const oldsize|STRLEN newsize
+i	|void	|hfreeentries	|NN HV *hv
+i	|SV*	|hv_free_ent_ret|NN HV *hv|NN HE *entry
+ia	|HE*	|new_he
+ianR	|HEK*	|save_hek_flags	|NN const char *str|I32 len|U32 hash|int flags
+in	|void	|hv_magic_check	|NN HV *hv|NN bool *needs_copy|NN bool *needs_store
+i	|void	|unshare_hek_or_pvn|NULLOK const HEK* hek|NULLOK const char* str|I32 len|U32 hash
+iR	|HEK*	|share_hek_flags|NN const char *str|I32 len|U32 hash|int flags
+ri	|void	|hv_notallowed	|int flags|NN const char *key|I32 klen|NN const char *msg
+in      |U32|ptr_hash|PTRV u
+i	|struct xpvhv_aux*|hv_auxinit|NN HV *hv
+iM	|SV*	|hv_delete_common|NULLOK HV *hv|NULLOK SV *keysv \
 		|NULLOK const char *key|STRLEN klen|int k_flags|I32 d_flags \
 		|U32 hash
-sM	|void	|clear_placeholders	|NN HV *hv|U32 items
+iM	|void	|clear_placeholders	|NN HV *hv|U32 items
 #endif
 
 #if defined(PERL_IN_MG_C)
-s	|void	|save_magic	|I32 mgs_ix|NN SV *sv
--s	|int	|magic_methpack	|NN SV *sv|NN const MAGIC *mg|NN const char *meth
-s	|SV*	|magic_methcall1|NN SV *sv|NN const MAGIC *mg \
+i	|void	|save_magic	|I32 mgs_ix|NN SV *sv
+-i	|int	|magic_methpack	|NN SV *sv|NN const MAGIC *mg|NN const char *meth
+i	|SV*	|magic_methcall1|NN SV *sv|NN const MAGIC *mg \
 				|NN const char *meth|U32 flags \
 				|int n|NULLOK SV *val
-s	|void	|restore_magic	|NULLOK const void *p
-s	|void	|unwind_handler_stack|NULLOK const void *p
+i	|void	|restore_magic	|NULLOK const void *p
+i	|void	|unwind_handler_stack|NULLOK const void *p
 
 #endif
 
 #if defined(PERL_IN_OP_C)
-sRn	|bool	|is_handle_constructor|NN const OP *o|I32 numargs
-sR	|I32	|is_list_assignment|NULLOK const OP *o
-s	|void	|forget_pmop	|NN PMOP *const o
-s	|void	|find_and_forget_pmops	|NN OP *o
-s	|void	|cop_free	|NN COP *cop
-s	|OP*	|modkids	|NULLOK OP *o|I32 type
-s	|OP*	|scalarboolean	|NN OP *o
-sR	|OP*	|newDEFSVOP
-sR	|OP*	|search_const	|NN OP *o
-sR	|OP*	|new_logop	|I32 type|I32 flags|NN OP **firstp|NN OP **otherp
-s	|void	|simplify_sort	|NN OP *o
-s	|SV*	|gv_ename	|NN GV *gv
-sRn	|bool	|scalar_mod_type|NULLOK const OP *o|I32 type
-s	|OP *	|my_kid		|NULLOK OP *o|NULLOK OP *attrs|NN OP **imopsp
-s	|OP *	|dup_attrlist	|NN OP *o
-s	|void	|apply_attrs	|NN HV *stash|NN SV *target|NULLOK OP *attrs
-s	|void	|apply_attrs_my	|NN HV *stash|NN OP *target|NULLOK OP *attrs|NN OP **imopsp
-s	|void	|bad_type_pv	|I32 n|NN const char *t|NN const char *name|U32 flags|NN const OP *kid
-s	|void	|bad_type_sv	|I32 n|NN const char *t|NN SV *namesv|U32 flags|NN const OP *kid
-s	|void	|no_bareword_allowed|NN OP *o
-sR	|OP*	|no_fh_allowed|NN OP *o
-sR	|OP*	|too_few_arguments_sv|NN OP *o|NN SV* namesv|U32 flags
-sR	|OP*	|too_few_arguments_pv|NN OP *o|NN const char* name|U32 flags
-s	|OP*	|too_many_arguments_pv|NN OP *o|NN const char* name|U32 flags
-sR	|OP*	|too_many_arguments_sv|NN OP *o|NN SV* namesv|U32 flags
-s	|bool	|looks_like_bool|NN const OP* o
-s	|OP*	|newGIVWHENOP	|NULLOK OP* cond|NN OP *block \
+iRn	|bool	|is_handle_constructor|NN const OP *o|I32 numargs
+iR	|I32	|is_list_assignment|NULLOK const OP *o
+i	|void	|forget_pmop	|NN PMOP *const o
+i	|void	|find_and_forget_pmops	|NN OP *o
+i	|void	|cop_free	|NN COP *cop
+i	|OP*	|modkids	|NULLOK OP *o|I32 type
+i	|OP*	|scalarboolean	|NN OP *o
+iR	|OP*	|newDEFSVOP
+iR	|OP*	|search_const	|NN OP *o
+iR	|OP*	|new_logop	|I32 type|I32 flags|NN OP **firstp|NN OP **otherp
+i	|void	|simplify_sort	|NN OP *o
+i	|SV*	|gv_ename	|NN GV *gv
+iRn	|bool	|scalar_mod_type|NULLOK const OP *o|I32 type
+i	|OP *	|my_kid		|NULLOK OP *o|NULLOK OP *attrs|NN OP **imopsp
+i	|OP *	|dup_attrlist	|NN OP *o
+i	|void	|apply_attrs	|NN HV *stash|NN SV *target|NULLOK OP *attrs
+i	|void	|apply_attrs_my	|NN HV *stash|NN OP *target|NULLOK OP *attrs|NN OP **imopsp
+i	|void	|bad_type_pv	|I32 n|NN const char *t|NN const char *name|U32 flags|NN const OP *kid
+i	|void	|bad_type_sv	|I32 n|NN const char *t|NN SV *namesv|U32 flags|NN const OP *kid
+i	|void	|no_bareword_allowed|NN OP *o
+iR	|OP*	|no_fh_allowed|NN OP *o
+iR	|OP*	|too_few_arguments_sv|NN OP *o|NN SV* namesv|U32 flags
+iR	|OP*	|too_few_arguments_pv|NN OP *o|NN const char* name|U32 flags
+i	|OP*	|too_many_arguments_pv|NN OP *o|NN const char* name|U32 flags
+iR	|OP*	|too_many_arguments_sv|NN OP *o|NN SV* namesv|U32 flags
+i	|bool	|looks_like_bool|NN const OP* o
+i	|OP*	|newGIVWHENOP	|NULLOK OP* cond|NN OP *block \
 				|I32 enter_opcode|I32 leave_opcode \
 				|PADOFFSET entertarg
-s	|OP*	|ref_array_or_hash|NULLOK OP* cond
-s	|void	|process_special_blocks	|I32 floor \
+i	|OP*	|ref_array_or_hash|NULLOK OP* cond
+i	|void	|process_special_blocks	|I32 floor \
 					|NN const char *const fullname\
 					|NN GV *const gv|NN CV *const cv
 #endif
@@ -1841,40 +1841,40 @@ poxM	|PADOFFSET	|op_refcnt_dec	|NN OP *o
 #endif
 
 #if defined(PERL_IN_PERL_C)
-s	|void	|find_beginning	|NN SV* linestr_sv|NN PerlIO *rsfp
-s	|void	|forbid_setid	|const char flag|const bool suidscript
-s	|void	|incpush	|NN const char *const dir|STRLEN len \
+i	|void	|find_beginning	|NN SV* linestr_sv|NN PerlIO *rsfp
+i	|void	|forbid_setid	|const char flag|const bool suidscript
+i	|void	|incpush	|NN const char *const dir|STRLEN len \
 				|U32 flags
-s	|SV*	|mayberelocate	|NN const char *const dir|STRLEN len \
+i	|SV*	|mayberelocate	|NN const char *const dir|STRLEN len \
 				|U32 flags
-s	|void	|incpush_use_sep|NN const char *p|STRLEN len|U32 flags
-s	|void	|init_interp
-s	|void	|init_ids
-s	|void	|init_main_stash
-s	|void	|init_perllib
-s	|void	|init_postdump_symbols|int argc|NN char **argv|NULLOK char **env
-s	|void	|init_predump_symbols
-rs	|void	|my_exit_jump
-s	|void	|nuke_stacks
-s	|PerlIO *|open_script	|NN const char *scriptname|bool dosearch \
+i	|void	|incpush_use_sep|NN const char *p|STRLEN len|U32 flags
+i	|void	|init_interp
+i	|void	|init_ids
+i	|void	|init_main_stash
+i	|void	|init_perllib
+i	|void	|init_postdump_symbols|int argc|NN char **argv|NULLOK char **env
+i	|void	|init_predump_symbols
+ri	|void	|my_exit_jump
+i	|void	|nuke_stacks
+i	|PerlIO *|open_script	|NN const char *scriptname|bool dosearch \
 				|NN bool *suidscript
-sr	|void	|usage
+ir	|void	|usage
 #ifndef SETUID_SCRIPTS_ARE_SECURE_NOW
-so	|void	|validate_suid	|NN PerlIO *rsfp
+io	|void	|validate_suid	|NN PerlIO *rsfp
 #endif
-sr	|void	|minus_v
+ir	|void	|minus_v
 
-s	|void*	|parse_body	|NULLOK char **env|XSINIT_t xsinit
-rs	|void	|run_body	|I32 oldscope
+i	|void*	|parse_body	|NULLOK char **env|XSINIT_t xsinit
+ri	|void	|run_body	|I32 oldscope
 #  ifndef PERL_IS_MINIPERL
-s	|SV *	|incpush_if_exists|NN AV *const av|NN SV *dir|NN SV *const stem
+i	|SV *	|incpush_if_exists|NN AV *const av|NN SV *dir|NN SV *const stem
 #  endif
 #endif
 
 #if defined(PERL_IN_PP_C)
-s	|void	|do_chomp	|NN SV *retval|NN SV *sv|bool chomping
-s	|OP*	|do_delete_local
-sR	|SV*	|refto		|NN SV* sv
+i	|void	|do_chomp	|NN SV *retval|NN SV *sv|bool chomping
+i	|OP*	|do_delete_local
+iR	|SV*	|refto		|NN SV* sv
 #endif
 #if defined(PERL_IN_PP_C) || defined(PERL_IN_PP_HOT_C)
 : Used in pp_hot.c
@@ -1883,235 +1883,235 @@ pRxo	|GV*	|softref2xv	|NN SV *const sv|NN const char *const what \
 #endif
 
 #if defined(PERL_IN_PP_PACK_C)
-s	|I32	|unpack_rec	|NN struct tempsym* symptr|NN const char *s \
+i	|I32	|unpack_rec	|NN struct tempsym* symptr|NN const char *s \
 				|NN const char *strbeg|NN const char *strend|NULLOK const char **new_s
-s	|SV **	|pack_rec	|NN SV *cat|NN struct tempsym* symptr|NN SV **beglist|NN SV **endlist
-s	|SV*	|mul128		|NN SV *sv|U8 m
-s	|I32	|measure_struct	|NN struct tempsym* symptr
-s	|bool	|next_symbol	|NN struct tempsym* symptr
-sR	|SV*	|is_an_int	|NN const char *s|STRLEN l
-s	|int	|div128		|NN SV *pnum|NN bool *done
-s	|const char *|group_end	|NN const char *patptr|NN const char *patend \
+i	|SV **	|pack_rec	|NN SV *cat|NN struct tempsym* symptr|NN SV **beglist|NN SV **endlist
+i	|SV*	|mul128		|NN SV *sv|U8 m
+i	|I32	|measure_struct	|NN struct tempsym* symptr
+i	|bool	|next_symbol	|NN struct tempsym* symptr
+iR	|SV*	|is_an_int	|NN const char *s|STRLEN l
+i	|int	|div128		|NN SV *pnum|NN bool *done
+i	|const char *|group_end	|NN const char *patptr|NN const char *patend \
 				|char ender
-sR	|const char *|get_num	|NN const char *patptr|NN I32 *lenptr
-ns	|bool	|need_utf8	|NN const char *pat|NN const char *patend
-ns	|char	|first_symbol	|NN const char *pat|NN const char *patend
-sR	|char *	|sv_exp_grow	|NN SV *sv|STRLEN needed
-snR	|char *	|bytes_to_uni	|NN const U8 *start|STRLEN len|NN char *dest \
+iR	|const char *|get_num	|NN const char *patptr|NN I32 *lenptr
+ni	|bool	|need_utf8	|NN const char *pat|NN const char *patend
+ni	|char	|first_symbol	|NN const char *pat|NN const char *patend
+iR	|char *	|sv_exp_grow	|NN SV *sv|STRLEN needed
+inR	|char *	|bytes_to_uni	|NN const U8 *start|STRLEN len|NN char *dest \
 	      			|const bool needs_swap
 #endif
 
 #if defined(PERL_IN_PP_CTL_C)
-sR	|OP*	|docatch	|NULLOK OP *o
-sR	|OP*	|dofindlabel	|NN OP *o|NN const char *label|STRLEN len \
+iR	|OP*	|docatch	|NULLOK OP *o
+iR	|OP*	|dofindlabel	|NN OP *o|NN const char *label|STRLEN len \
                                 |U32 flags|NN OP **opstack|NN OP **oplimit
-s	|MAGIC *|doparseform	|NN SV *sv
-snR	|bool	|num_overflow	|NV value|I32 fldsize|I32 frcsize
-sR	|I32	|dopoptoeval	|I32 startingblock
-sR	|I32	|dopoptogiven	|I32 startingblock
-sR	|I32	|dopoptolabel	|NN const char *label|STRLEN len|U32 flags
-sR	|I32	|dopoptoloop	|I32 startingblock
-sR	|I32	|dopoptosub_at	|NN const PERL_CONTEXT* cxstk|I32 startingblock
-sR	|I32	|dopoptowhen	|I32 startingblock
-s	|void	|save_lines	|NULLOK AV *array|NN SV *sv
-s	|bool	|doeval		|int gimme \
+i	|MAGIC *|doparseform	|NN SV *sv
+inR	|bool	|num_overflow	|NV value|I32 fldsize|I32 frcsize
+iR	|I32	|dopoptoeval	|I32 startingblock
+iR	|I32	|dopoptogiven	|I32 startingblock
+iR	|I32	|dopoptolabel	|NN const char *label|STRLEN len|U32 flags
+iR	|I32	|dopoptoloop	|I32 startingblock
+iR	|I32	|dopoptosub_at	|NN const PERL_CONTEXT* cxstk|I32 startingblock
+iR	|I32	|dopoptowhen	|I32 startingblock
+i	|void	|save_lines	|NULLOK AV *array|NN SV *sv
+i	|bool	|doeval		|int gimme \
 				|NULLOK CV* outside|U32 seq|NULLOK HV* hh
-sR	|PerlIO *|check_type_and_open|NN SV *name
+iR	|PerlIO *|check_type_and_open|NN SV *name
 #ifndef PERL_DISABLE_PMC
-sR	|PerlIO *|doopen_pm	|NN SV *name
+iR	|PerlIO *|doopen_pm	|NN SV *name
 #endif
-s	|SV **	|adjust_stack_on_leave|NN SV **newsp|NN SV **sp|NN SV **mark|I32 gimme|U32 flags
-sRn	|bool	|path_is_absolute|NN const char *name
-sR	|I32	|run_user_filter|int idx|NN SV *buf_sv|int maxlen
-sR	|PMOP*	|make_matcher	|NN REGEXP* re
-sR	|bool	|matcher_matches_sv|NN PMOP* matcher|NN SV* sv
-s	|void	|destroy_matcher|NN PMOP* matcher
-s	|OP*	|do_smartmatch	|NULLOK HV* seen_this \
+i	|SV **	|adjust_stack_on_leave|NN SV **newsp|NN SV **sp|NN SV **mark|I32 gimme|U32 flags
+iRn	|bool	|path_is_absolute|NN const char *name
+iR	|I32	|run_user_filter|int idx|NN SV *buf_sv|int maxlen
+iR	|PMOP*	|make_matcher	|NN REGEXP* re
+iR	|bool	|matcher_matches_sv|NN PMOP* matcher|NN SV* sv
+i	|void	|destroy_matcher|NN PMOP* matcher
+i	|OP*	|do_smartmatch	|NULLOK HV* seen_this \
 				|NULLOK HV* seen_other|const bool copied
 #endif
 
 #if defined(PERL_IN_PP_HOT_C)
-s	|void	|do_oddball	|NN SV **oddkey|NN SV **firstkey
-sR	|SV*	|method_common	|NN SV* meth|NULLOK U32* hashp
+i	|void	|do_oddball	|NN SV **oddkey|NN SV **firstkey
+iR	|SV*	|method_common	|NN SV* meth|NULLOK U32* hashp
 #endif
 
 #if defined(PERL_IN_PP_SORT_C)
-s	|I32	|sv_ncmp	|NN SV *const a|NN SV *const b
-s	|I32	|sv_i_ncmp	|NN SV *const a|NN SV *const b
-s	|I32	|amagic_ncmp	|NN SV *const a|NN SV *const b
-s	|I32	|amagic_i_ncmp	|NN SV *const a|NN SV *const b
-s	|I32	|amagic_cmp	|NN SV *const str1|NN SV *const str2
-s	|I32	|amagic_cmp_locale|NN SV *const str1|NN SV *const str2
-s	|I32	|sortcv		|NN SV *const a|NN SV *const b
-s	|I32	|sortcv_xsub	|NN SV *const a|NN SV *const b
-s	|I32	|sortcv_stacked	|NN SV *const a|NN SV *const b
-s	|void	|qsortsvu	|NULLOK SV** array|size_t num_elts|NN SVCOMPARE_t compare
+i	|I32	|sv_ncmp	|NN SV *const a|NN SV *const b
+i	|I32	|sv_i_ncmp	|NN SV *const a|NN SV *const b
+i	|I32	|amagic_ncmp	|NN SV *const a|NN SV *const b
+i	|I32	|amagic_i_ncmp	|NN SV *const a|NN SV *const b
+i	|I32	|amagic_cmp	|NN SV *const str1|NN SV *const str2
+i	|I32	|amagic_cmp_locale|NN SV *const str1|NN SV *const str2
+i	|I32	|sortcv		|NN SV *const a|NN SV *const b
+i	|I32	|sortcv_xsub	|NN SV *const a|NN SV *const b
+i	|I32	|sortcv_stacked	|NN SV *const a|NN SV *const b
+i	|void	|qsortsvu	|NULLOK SV** array|size_t num_elts|NN SVCOMPARE_t compare
 #endif
 
 #if defined(PERL_IN_PP_SYS_C)
-s	|OP*	|doform		|NN CV *cv|NN GV *gv|NN OP *retop
+i	|OP*	|doform		|NN CV *cv|NN GV *gv|NN OP *retop
 #  if !defined(HAS_MKDIR) || !defined(HAS_RMDIR)
-sR	|int	|dooneliner	|NN const char *cmd|NN const char *filename
+iR	|int	|dooneliner	|NN const char *cmd|NN const char *filename
 #  endif
-s	|SV *	|space_join_names_mortal|NN char *const *array
+i	|SV *	|space_join_names_mortal|NN char *const *array
 #endif
 p	|OP *	|tied_method|NN const char *const methname|NN SV **sp \
 				|NN SV *const sv|NN const MAGIC *const mg \
 				|const U32 flags|U32 argc|...
 
 #if defined(PERL_IN_REGCOMP_C)
-Es	|regnode*|reg		|NN struct RExC_state_t *pRExC_state \
+Ei	|regnode*|reg		|NN struct RExC_state_t *pRExC_state \
 				|I32 paren|NN I32 *flagp|U32 depth
-Es	|regnode*|reganode	|NN struct RExC_state_t *pRExC_state|U8 op \
+Ei	|regnode*|reganode	|NN struct RExC_state_t *pRExC_state|U8 op \
 				|U32 arg
-Es	|regnode*|regatom	|NN struct RExC_state_t *pRExC_state \
+Ei	|regnode*|regatom	|NN struct RExC_state_t *pRExC_state \
 				|NN I32 *flagp|U32 depth
-Es	|regnode*|regbranch	|NN struct RExC_state_t *pRExC_state \
+Ei	|regnode*|regbranch	|NN struct RExC_state_t *pRExC_state \
 				|NN I32 *flagp|I32 first|U32 depth
-Es	|STRLEN	|reguni		|NN const struct RExC_state_t *pRExC_state \
+Ei	|STRLEN	|reguni		|NN const struct RExC_state_t *pRExC_state \
 				|UV uv|NN char *s
-Es	|regnode*|regclass	|NN struct RExC_state_t *pRExC_state \
+Ei	|regnode*|regclass	|NN struct RExC_state_t *pRExC_state \
 				|NN I32 *flagp|U32 depth|const bool stop_at_1 \
 				|bool allow_multi_fold                        \
 				|const bool silence_non_portable	      \
 				|NULLOK SV** ret_invlist
-Es	|bool|could_it_be_a_POSIX_class|NN struct RExC_state_t *pRExC_state
-Es	|regnode*|handle_regex_sets|NN struct RExC_state_t *pRExC_state \
+Ei	|bool|could_it_be_a_POSIX_class|NN struct RExC_state_t *pRExC_state
+Ei	|regnode*|handle_regex_sets|NN struct RExC_state_t *pRExC_state \
 				|NULLOK SV ** return_invlist            \
 				|NN I32 *flagp|U32 depth                \
 				|NN char * const oregcomp_parse
-Es	|void|parse_lparen_question_flags|NN struct RExC_state_t *pRExC_state
-Es	|regnode*|reg_node	|NN struct RExC_state_t *pRExC_state|U8 op
-Es	|UV	|reg_recode	|const char value|NN SV **encp
-Es	|regnode*|regpiece	|NN struct RExC_state_t *pRExC_state \
+Ei	|void|parse_lparen_question_flags|NN struct RExC_state_t *pRExC_state
+Ei	|regnode*|reg_node	|NN struct RExC_state_t *pRExC_state|U8 op
+Ei	|UV	|reg_recode	|const char value|NN SV **encp
+Ei	|regnode*|regpiece	|NN struct RExC_state_t *pRExC_state \
 				|NN I32 *flagp|U32 depth
-Es	|bool	|grok_bslash_N	|NN struct RExC_state_t *pRExC_state        \
+Ei	|bool	|grok_bslash_N	|NN struct RExC_state_t *pRExC_state        \
 				|NULLOK regnode** nodep|NULLOK UV *valuep   \
 				|NN I32 *flagp|U32 depth|bool in_char_class \
 				|const bool strict
-Es	|void	|reginsert	|NN struct RExC_state_t *pRExC_state \
+Ei	|void	|reginsert	|NN struct RExC_state_t *pRExC_state \
 				|U8 op|NN regnode *opnd|U32 depth
-Es	|void	|regtail	|NN struct RExC_state_t *pRExC_state \
+Ei	|void	|regtail	|NN struct RExC_state_t *pRExC_state \
 				|NN regnode *p|NN const regnode *val|U32 depth
-Es	|SV *	|reg_scan_name	|NN struct RExC_state_t *pRExC_state \
+Ei	|SV *	|reg_scan_name	|NN struct RExC_state_t *pRExC_state \
 				|U32 flags
-Es	|U32	|join_exact	|NN struct RExC_state_t *pRExC_state \
+Ei	|U32	|join_exact	|NN struct RExC_state_t *pRExC_state \
 				|NN regnode *scan|NN UV *min_subtract  \
 				|NN bool *has_exactf_sharp_s  \
 				|U32 flags|NULLOK regnode *val|U32 depth
-EsRn	|char *	|regwhite	|NN struct RExC_state_t *pRExC_state \
+EiRn	|char *	|regwhite	|NN struct RExC_state_t *pRExC_state \
 				|NN char *p
-EsRn	|char *	|regpatws	|NN struct RExC_state_t *pRExC_state \
+EiRn	|char *	|regpatws	|NN struct RExC_state_t *pRExC_state \
 				|NN char *p|const bool recognize_comment
 Ei	|void   |alloc_maybe_populate_EXACT|NN struct RExC_state_t *pRExC_state \
 				|NN regnode *node|NN I32 *flagp|STRLEN len \
 				|UV code_point
 Ei	|U8   |compute_EXACTish|NN struct RExC_state_t *pRExC_state
-Es	|char *	|nextchar	|NN struct RExC_state_t *pRExC_state
-Es	|bool	|reg_skipcomment|NN struct RExC_state_t *pRExC_state
-Es	|void	|scan_commit	|NN const struct RExC_state_t *pRExC_state \
+Ei	|char *	|nextchar	|NN struct RExC_state_t *pRExC_state
+Ei	|bool	|reg_skipcomment|NN struct RExC_state_t *pRExC_state
+Ei	|void	|scan_commit	|NN const struct RExC_state_t *pRExC_state \
 				|NN struct scan_data_t *data|NN I32 *minlenp \
 				|int is_inf
-Esn	|void	|cl_anything	|NN const struct RExC_state_t *pRExC_state \
+Ein	|void	|cl_anything	|NN const struct RExC_state_t *pRExC_state \
 				|NN struct regnode_charclass_class *cl
-EsRn	|int	|cl_is_anything	|NN const struct regnode_charclass_class *cl
-Esn	|void	|cl_init	|NN const struct RExC_state_t *pRExC_state \
+EiRn	|int	|cl_is_anything	|NN const struct regnode_charclass_class *cl
+Ein	|void	|cl_init	|NN const struct RExC_state_t *pRExC_state \
 				|NN struct regnode_charclass_class *cl
-Esn	|void	|cl_and		|NN struct regnode_charclass_class *cl \
+Ein	|void	|cl_and		|NN struct regnode_charclass_class *cl \
 				|NN const struct regnode_charclass_class *and_with
-Esn	|void	|cl_or		|NN const struct RExC_state_t *pRExC_state \
+Ein	|void	|cl_or		|NN const struct RExC_state_t *pRExC_state \
 				|NN struct regnode_charclass_class *cl \
 				|NN const struct regnode_charclass_class *or_with
-Es	|I32	|study_chunk	|NN struct RExC_state_t *pRExC_state \
+Ei	|I32	|study_chunk	|NN struct RExC_state_t *pRExC_state \
 				|NN regnode **scanp|NN I32 *minlenp \
 				|NN I32 *deltap|NN regnode *last \
 				|NULLOK struct scan_data_t *data \
 				|I32 stopparen|NULLOK U8* recursed \
 				|NULLOK struct regnode_charclass_class *and_withp \
 				|U32 flags|U32 depth
-EsRn	|U32	|add_data	|NN struct RExC_state_t *pRExC_state|U32 n \
+EiRn	|U32	|add_data	|NN struct RExC_state_t *pRExC_state|U32 n \
 				|NN const char *s
-rs	|void	|re_croak2	|NN const char* pat1|NN const char* pat2|...
+ri	|void	|re_croak2	|NN const char* pat1|NN const char* pat2|...
 Ei	|I32	|regpposixcc	|NN struct RExC_state_t *pRExC_state \
 				|I32 value|const bool strict
-Es	|I32	|make_trie	|NN struct RExC_state_t *pRExC_state \
+Ei	|I32	|make_trie	|NN struct RExC_state_t *pRExC_state \
 				|NN regnode *startbranch|NN regnode *first \
 				|NN regnode *last|NN regnode *tail \
 				|U32 word_count|U32 flags|U32 depth
-Es	|void	|make_trie_failtable	|NN struct RExC_state_t *pRExC_state \
+Ei	|void	|make_trie_failtable	|NN struct RExC_state_t *pRExC_state \
                                 |NN regnode *source|NN regnode *stclass \
 				|U32 depth
 #  ifdef DEBUGGING
-Es	|void	|regdump_extflags|NULLOK const char *lead| const U32 flags
-Es	|const regnode*|dumpuntil|NN const regexp *r|NN const regnode *start \
+Ei	|void	|regdump_extflags|NULLOK const char *lead| const U32 flags
+Ei	|const regnode*|dumpuntil|NN const regexp *r|NN const regnode *start \
 				|NN const regnode *node \
 				|NULLOK const regnode *last \
 				|NULLOK const regnode *plast \
 				|NN SV* sv|I32 indent|U32 depth
-Es	|void	|put_byte	|NN SV* sv|int c
-Es	|void	|dump_trie	|NN const struct _reg_trie_data *trie\
+Ei	|void	|put_byte	|NN SV* sv|int c
+Ei	|void	|dump_trie	|NN const struct _reg_trie_data *trie\
 				|NULLOK HV* widecharmap|NN AV *revcharmap\
 				|U32 depth
-Es	|void	|dump_trie_interim_list|NN const struct _reg_trie_data *trie\
+Ei	|void	|dump_trie_interim_list|NN const struct _reg_trie_data *trie\
 				|NULLOK HV* widecharmap|NN AV *revcharmap\
 				|U32 next_alloc|U32 depth
-Es	|void	|dump_trie_interim_table|NN const struct _reg_trie_data *trie\
+Ei	|void	|dump_trie_interim_table|NN const struct _reg_trie_data *trie\
 				|NULLOK HV* widecharmap|NN AV *revcharmap\
 				|U32 next_alloc|U32 depth
-Es	|U8	|regtail_study	|NN struct RExC_state_t *pRExC_state \
+Ei	|U8	|regtail_study	|NN struct RExC_state_t *pRExC_state \
 				|NN regnode *p|NN const regnode *val|U32 depth
 #  endif
 #endif
 
 #if defined(PERL_IN_REGEXEC_C)
-ERs	|bool	|isFOO_lc	|const U8 classnum|const U8 character
-ERs	|bool	|isFOO_utf8_lc	|const U8 classnum|NN const U8* character
-ERs	|I32	|regmatch	|NN regmatch_info *reginfo|NN char *startpos|NN regnode *prog
-ERs	|I32	|regrepeat	|NN regexp *prog|NN char **startposp \
+ERi	|bool	|isFOO_lc	|const U8 classnum|const U8 character
+ERi	|bool	|isFOO_utf8_lc	|const U8 classnum|NN const U8* character
+ERi	|I32	|regmatch	|NN regmatch_info *reginfo|NN char *startpos|NN regnode *prog
+ERi	|I32	|regrepeat	|NN regexp *prog|NN char **startposp \
 				|NN const regnode *p|I32 max|int depth \
 				|bool is_utf8_pat
-ERs	|I32	|regtry		|NN regmatch_info *reginfo|NN char **startposp
-ERs	|bool	|reginclass	|NULLOK regexp * const prog|NN const regnode * const n|NN const U8 * const p\
+ERi	|I32	|regtry		|NN regmatch_info *reginfo|NN char **startposp
+ERi	|bool	|reginclass	|NULLOK regexp * const prog|NN const regnode * const n|NN const U8 * const p\
 				|bool const utf8_target
-Es	|CHECKPOINT|regcppush	|NN const regexp *rex|I32 parenfloor\
+Ei	|CHECKPOINT|regcppush	|NN const regexp *rex|I32 parenfloor\
 				|U32 maxopenparen
-Es	|void	|regcppop	|NN regexp *rex\
+Ei	|void	|regcppop	|NN regexp *rex\
 				|NN U32 *maxopenparen_p
-ERsn	|U8*	|reghop3	|NN U8 *s|I32 off|NN const U8 *lim
-ERsM	|SV*	|core_regclass_swash|NULLOK const regexp *prog \
+ERin	|U8*	|reghop3	|NN U8 *s|I32 off|NN const U8 *lim
+ERiM	|SV*	|core_regclass_swash|NULLOK const regexp *prog \
 				|NN const struct regnode *node|bool doinit \
 				|NULLOK SV **listsvp
 #ifdef XXX_dmq
-ERsn	|U8*	|reghop4	|NN U8 *s|I32 off|NN const U8 *llim \
+ERin	|U8*	|reghop4	|NN U8 *s|I32 off|NN const U8 *llim \
 				|NN const U8 *rlim
 #endif
-ERsn	|U8*	|reghopmaybe3	|NN U8 *s|I32 off|NN const U8 *lim
-ERs	|char*	|find_byclass	|NN regexp * prog|NN const regnode *c \
+ERin	|U8*	|reghopmaybe3	|NN U8 *s|I32 off|NN const U8 *lim
+ERi	|char*	|find_byclass	|NN regexp * prog|NN const regnode *c \
 				|NN char *s|NN const char *strend \
 				|NULLOK regmatch_info *reginfo \
 				|bool is_utf_pat
-Es	|void	|to_utf8_substr	|NN regexp * prog
-Es	|bool	|to_byte_substr	|NN regexp * prog
-ERs	|I32	|reg_check_named_buff_matched	|NN const regexp *rex \
+Ei	|void	|to_utf8_substr	|NN regexp * prog
+Ei	|bool	|to_byte_substr	|NN regexp * prog
+ERi	|I32	|reg_check_named_buff_matched	|NN const regexp *rex \
 						|NN const regnode *scan
 #  ifdef DEBUGGING
-Es	|void	|dump_exec_pos	|NN const char *locinput|NN const regnode *scan|NN const char *loc_regeol\
+Ei	|void	|dump_exec_pos	|NN const char *locinput|NN const regnode *scan|NN const char *loc_regeol\
 				|NN const char *loc_bostr|NN const char *loc_reg_starttry|const bool do_utf8
-Es	|void	|debug_start_match|NN const REGEXP *prog|const bool do_utf8\
+Ei	|void	|debug_start_match|NN const REGEXP *prog|const bool do_utf8\
 				|NN const char *start|NN const char *end\
 				|NN const char *blurb
 #  endif
 #endif
 
 #if defined(PERL_IN_DUMP_C)
-s	|CV*	|deb_curcv	|const I32 ix
-s	|void	|debprof	|NN const OP *o
-s	|UV	|sequence_num	|NULLOK const OP *o
-s	|SV*	|pm_description	|NN const PMOP *pm
+i	|CV*	|deb_curcv	|const I32 ix
+i	|void	|debprof	|NN const OP *o
+i	|UV	|sequence_num	|NULLOK const OP *o
+i	|SV*	|pm_description	|NN const PMOP *pm
 #endif
 
 #if defined(PERL_IN_SCOPE_C)
-s	|SV*	|save_scalar_at	|NN SV **sptr|const U32 flags
+i	|SV*	|save_scalar_at	|NN SV **sptr|const U32 flags
 #endif
 
 #if defined(PERL_IN_GV_C) || defined(PERL_IN_SV_C) || defined(PERL_IN_PAD_C) || defined(PERL_IN_OP_C)
@@ -2132,48 +2132,48 @@ pR	|SV *	|varname	|NULLOK const GV *const gv|const char gvtype \
 
 pX	|void	|sv_del_backref	|NN SV *const tsv|NN SV *const sv
 #if defined(PERL_IN_SV_C)
-nsR	|char *	|uiv_2buf	|NN char *const buf|const IV iv|UV uv|const int is_uv|NN char **const peob
+niR	|char *	|uiv_2buf	|NN char *const buf|const IV iv|UV uv|const int is_uv|NN char **const peob
 i	|void	|sv_unglob	|NN SV *const sv|U32 flags
-s	|void	|not_a_number	|NN SV *const sv
-s	|I32	|visit		|NN SVFUNC_t f|const U32 flags|const U32 mask
+i	|void	|not_a_number	|NN SV *const sv
+i	|I32	|visit		|NN SVFUNC_t f|const U32 flags|const U32 mask
 #  ifdef DEBUGGING
-s	|void	|del_sv	|NN SV *p
+i	|void	|del_sv	|NN SV *p
 #  endif
 #  if !defined(NV_PRESERVES_UV)
 #    ifdef DEBUGGING
-s	|int	|sv_2iuv_non_preserve	|NN SV *const sv|I32 numtype
+i	|int	|sv_2iuv_non_preserve	|NN SV *const sv|I32 numtype
 #    else
-s	|int	|sv_2iuv_non_preserve	|NN SV *const sv
+i	|int	|sv_2iuv_non_preserve	|NN SV *const sv
 #    endif
 #  endif
-sR	|I32	|expect_number	|NN char **const pattern
-sn	|STRLEN	|sv_pos_u2b_forwards|NN const U8 *const start \
+iR	|I32	|expect_number	|NN char **const pattern
+in	|STRLEN	|sv_pos_u2b_forwards|NN const U8 *const start \
 		|NN const U8 *const send|NN STRLEN *const uoffset \
 		|NN bool *const at_end
-sn	|STRLEN	|sv_pos_u2b_midway|NN const U8 *const start \
+in	|STRLEN	|sv_pos_u2b_midway|NN const U8 *const start \
 		|NN const U8 *send|STRLEN uoffset|const STRLEN uend
-s	|STRLEN	|sv_pos_u2b_cached|NN SV *const sv|NN MAGIC **const mgp \
+i	|STRLEN	|sv_pos_u2b_cached|NN SV *const sv|NN MAGIC **const mgp \
 		|NN const U8 *const start|NN const U8 *const send \
 		|STRLEN uoffset|STRLEN uoffset0|STRLEN boffset0
-s	|void	|utf8_mg_len_cache_update|NN SV *const sv|NN MAGIC **const mgp \
+i	|void	|utf8_mg_len_cache_update|NN SV *const sv|NN MAGIC **const mgp \
 		|const STRLEN ulen
-s	|void	|utf8_mg_pos_cache_update|NN SV *const sv|NN MAGIC **const mgp \
+i	|void	|utf8_mg_pos_cache_update|NN SV *const sv|NN MAGIC **const mgp \
 		|const STRLEN byte|const STRLEN utf8|const STRLEN blen
-s	|STRLEN	|sv_pos_b2u_midway|NN const U8 *const s|NN const U8 *const target \
+i	|STRLEN	|sv_pos_b2u_midway|NN const U8 *const s|NN const U8 *const target \
 		|NN const U8 *end|STRLEN endu
-s	|void	|assert_uft8_cache_coherent|NN const char *const func \
+i	|void	|assert_uft8_cache_coherent|NN const char *const func \
 		|STRLEN from_cache|STRLEN real|NN SV *const sv
-sn	|char *	|F0convert	|NV nv|NN char *const endbuf|NN STRLEN *const len
+in	|char *	|F0convert	|NV nv|NN char *const endbuf|NN STRLEN *const len
 #  if defined(PERL_OLD_COPY_ON_WRITE)
-sM	|void	|sv_release_COW	|NN SV *sv|NN const char *pvx|NN SV *after
+iM	|void	|sv_release_COW	|NN SV *sv|NN const char *pvx|NN SV *after
 #  endif
-s	|SV *	|more_sv
-s	|bool	|sv_2iuv_common	|NN SV *const sv
-s	|void	|glob_assign_glob|NN SV *const dstr|NN SV *const sstr \
+i	|SV *	|more_sv
+i	|bool	|sv_2iuv_common	|NN SV *const sv
+i	|void	|glob_assign_glob|NN SV *const dstr|NN SV *const sstr \
 		|const int dtype
-s	|void	|glob_assign_ref|NN SV *const dstr|NN SV *const sstr
-sRn	|PTR_TBL_ENT_t *|ptr_table_find|NN PTR_TBL_t *const tbl|NULLOK const void *const sv
-s	|void	|anonymise_cv_maybe	|NN GV *gv|NN CV *cv
+i	|void	|glob_assign_ref|NN SV *const dstr|NN SV *const sstr
+iRn	|PTR_TBL_ENT_t *|ptr_table_find|NN PTR_TBL_t *const tbl|NULLOK const void *const sv
+i	|void	|anonymise_cv_maybe	|NN GV *gv|NN CV *cv
 #endif
 
 : Used in sv.c and hv.c
@@ -2181,92 +2181,92 @@ po	|void *	|more_bodies	|const svtype sv_type|const size_t body_size \
 				|const size_t arena_size
 
 #if defined(PERL_IN_TOKE_C)
-s	|void	|check_uni
-s	|void	|force_next	|I32 type
-s	|char*	|force_version	|NN char *s|int guessing
-s	|char*	|force_strict_version	|NN char *s
-s	|char*	|force_word	|NN char *start|int token|int check_keyword \
+i	|void	|check_uni
+i	|void	|force_next	|I32 type
+i	|char*	|force_version	|NN char *s|int guessing
+i	|char*	|force_strict_version	|NN char *s
+i	|char*	|force_word	|NN char *start|int token|int check_keyword \
 				|int allow_pack|int allow_tick
-s	|SV*	|tokeq		|NN SV *sv
-s	|void	|readpipe_override|
-sR	|char*	|scan_const	|NN char *start
+i	|SV*	|tokeq		|NN SV *sv
+i	|void	|readpipe_override|
+iR	|char*	|scan_const	|NN char *start
 iR	|SV*	|get_and_check_backslash_N_name|NN const char* s \
 				|NN const char* const e
-sR	|char*	|scan_formline	|NN char *s
-sR	|char*	|scan_heredoc	|NN char *s
-s	|char*	|scan_ident	|NN char *s|NN const char *send|NN char *dest \
+iR	|char*	|scan_formline	|NN char *s
+iR	|char*	|scan_heredoc	|NN char *s
+i	|char*	|scan_ident	|NN char *s|NN const char *send|NN char *dest \
 				|STRLEN destlen|I32 ck_uni
-sR	|char*	|scan_inputsymbol|NN char *start
-sR	|char*	|scan_pat	|NN char *start|I32 type
-sR	|char*	|scan_str	|NN char *start|int keep_quoted \
+iR	|char*	|scan_inputsymbol|NN char *start
+iR	|char*	|scan_pat	|NN char *start|I32 type
+iR	|char*	|scan_str	|NN char *start|int keep_quoted \
 				|int keep_delims|int re_reparse \
 				|bool deprecate_escaped_matching
-sR	|char*	|scan_subst	|NN char *start
-sR	|char*	|scan_trans	|NN char *start
-s	|char*	|scan_word	|NN char *s|NN char *dest|STRLEN destlen \
+iR	|char*	|scan_subst	|NN char *start
+iR	|char*	|scan_trans	|NN char *start
+i	|char*	|scan_word	|NN char *s|NN char *dest|STRLEN destlen \
 				|int allow_package|NN STRLEN *slp
-s	|void	|update_debugger_info|NULLOK SV *orig_sv \
+i	|void	|update_debugger_info|NULLOK SV *orig_sv \
 				|NULLOK const char *const buf|STRLEN len
-sR	|char*	|skipspace	|NN char *s
-sR	|char*	|swallow_bom	|NN U8 *s
+iR	|char*	|skipspace	|NN char *s
+iR	|char*	|swallow_bom	|NN U8 *s
 #ifndef PERL_NO_UTF16_FILTER
-s	|I32	|utf16_textfilter|int idx|NN SV *sv|int maxlen
-s	|U8*	|add_utf16_textfilter|NN U8 *const s|bool reversed
+i	|I32	|utf16_textfilter|int idx|NN SV *sv|int maxlen
+i	|U8*	|add_utf16_textfilter|NN U8 *const s|bool reversed
 #endif
-s	|void	|checkcomma	|NN const char *s|NN const char *name \
+i	|void	|checkcomma	|NN const char *s|NN const char *name \
 				|NN const char *what
-s	|void	|force_ident	|NN const char *s|int kind
-s	|void	|force_ident_maybe_lex|char pit
-s	|void	|incline	|NN const char *s
-s	|int	|intuit_method	|NN char *s|NULLOK GV *gv|NULLOK CV *cv
-s	|int	|intuit_more	|NN char *s
-s	|I32	|lop		|I32 f|int x|NN char *s
-rs	|void	|missingterm	|NULLOK char *s
-s	|void	|no_op		|NN const char *const what|NULLOK char *s
-s	|int	|pending_ident
-sR	|I32	|sublex_done
-sR	|I32	|sublex_push
-sR	|I32	|sublex_start
-sR	|char *	|filter_gets	|NN SV *sv|STRLEN append
-sR	|HV *	|find_in_my_stash|NN const char *pkgname|STRLEN len
-sR	|char *	|tokenize_use	|int is_use|NN char *s
-so	|SV*	|new_constant	|NULLOK const char *s|STRLEN len \
+i	|void	|force_ident	|NN const char *s|int kind
+i	|void	|force_ident_maybe_lex|char pit
+i	|void	|incline	|NN const char *s
+i	|int	|intuit_method	|NN char *s|NULLOK GV *gv|NULLOK CV *cv
+i	|int	|intuit_more	|NN char *s
+i	|I32	|lop		|I32 f|int x|NN char *s
+ri	|void	|missingterm	|NULLOK char *s
+i	|void	|no_op		|NN const char *const what|NULLOK char *s
+i	|int	|pending_ident
+iR	|I32	|sublex_done
+iR	|I32	|sublex_push
+iR	|I32	|sublex_start
+iR	|char *	|filter_gets	|NN SV *sv|STRLEN append
+iR	|HV *	|find_in_my_stash|NN const char *pkgname|STRLEN len
+iR	|char *	|tokenize_use	|int is_use|NN char *s
+io	|SV*	|new_constant	|NULLOK const char *s|STRLEN len \
 				|NN const char *key|STRLEN keylen|NN SV *sv \
 				|NULLOK SV *pv|NULLOK const char *type \
 				|STRLEN typelen
-s	|int	|deprecate_commaless_var_list
-s	|int	|ao		|int toketype
-s  |void|parse_ident|NN char **s|NN char **d \
+i	|int	|deprecate_commaless_var_list
+i	|int	|ao		|int toketype
+i  |void|parse_ident|NN char **s|NN char **d \
                      |NN char * const e|int allow_package \
                      |bool is_utf8
 #  if defined(PERL_CR_FILTER)
-s	|I32	|cr_textfilter	|int idx|NULLOK SV *sv|int maxlen
-s	|void	|strip_return	|NN SV *sv
+i	|I32	|cr_textfilter	|int idx|NULLOK SV *sv|int maxlen
+i	|void	|strip_return	|NN SV *sv
 #  endif
 #  if defined(DEBUGGING)
-s	|int	|tokereport	|I32 rv|NN const YYSTYPE* lvalp
-s	|void	|printbuf	|NN const char *const fmt|NN const char *const s
+i	|int	|tokereport	|I32 rv|NN const YYSTYPE* lvalp
+i	|void	|printbuf	|NN const char *const fmt|NN const char *const s
 #  endif
 #endif
 
 #if defined(PERL_IN_UNIVERSAL_C)
-s	|bool|isa_lookup	|NN HV *stash|NN const char * const name \
+i	|bool|isa_lookup	|NN HV *stash|NN const char * const name \
                                         |STRLEN len|U32 flags
 #endif
 
 #if defined(PERL_IN_LOCALE_C)
 #if defined(USE_LOCALE_NUMERIC) || defined(USE_LOCALE_COLLATE)
-s	|char*	|stdize_locale	|NN char* locs
+i	|char*	|stdize_locale	|NN char* locs
 #endif
 #endif
 
 #if defined(PERL_IN_UTIL_C)
-s	|const COP*|closest_cop	|NN const COP *cop|NULLOK const OP *o
-s	|SV*	|mess_alloc
-s	|SV *|with_queued_errors|NN SV *ex
-s	|bool	|invoke_exception_hook|NULLOK SV *ex|bool warn
+i	|const COP*|closest_cop	|NN const COP *cop|NULLOK const OP *o
+i	|SV*	|mess_alloc
+i	|SV *|with_queued_errors|NN SV *ex
+i	|bool	|invoke_exception_hook|NULLOK SV *ex|bool warn
 #if defined(PERL_MEM_LOG) && !defined(PERL_MEM_LOG_NOIMPL)
-sn	|void	|mem_log_common	|enum mem_log_type mlt|const UV n|const UV typesize \
+in	|void	|mem_log_common	|enum mem_log_type mlt|const UV n|const UV typesize \
 				|NN const char *type_name|NULLOK const SV *sv \
 				|Malloc_t oldalloc|Malloc_t newalloc \
 				|NN const char *filename|const int linenumber \
@@ -2275,14 +2275,14 @@ sn	|void	|mem_log_common	|enum mem_log_type mlt|const UV n|const UV typesize \
 #endif
 
 #if defined(PERL_IN_NUMERIC_C)
-sn	|NV|mulexp10	|NV value|I32 exponent
+in	|NV|mulexp10	|NV value|I32 exponent
 #endif
 
 #if defined(PERL_IN_UTF8_C)
 iRn	|STRLEN	|is_utf8_char_slow|NN const U8 *s|const STRLEN len
-sRM	|UV	|check_locale_boundary_crossing|NN const U8* const p|const UV result|NN U8* const ustrp|NN STRLEN *lenp
+iRM	|UV	|check_locale_boundary_crossing|NN const U8* const p|const UV result|NN U8* const ustrp|NN STRLEN *lenp
 iR	|bool	|is_utf8_common	|NN const U8 *const p|NN SV **swash|NN const char * const swashname
-sR	|SV*	|swatch_get	|NN SV* swash|UV start|UV span
+iR	|SV*	|swatch_get	|NN SV* swash|UV start|UV span
 #endif
 
 Apd	|void	|sv_setsv_flags	|NN SV *dstr|NULLOK SV *sstr|const I32 flags
@@ -2341,7 +2341,7 @@ ApR	|PerlIO *|PerlIO_stderr
 : Only used in dump.c
 p	|void	|deb_stack_all
 #if defined(PERL_IN_DEB_C)
-s	|void	|deb_stack_n	|NN SV** stack_base|I32 stack_min \
+i	|void	|deb_stack_n	|NN SV** stack_base|I32 stack_min \
 				|I32 stack_max|I32 mark_min|I32 mark_max
 #endif
 
@@ -2351,7 +2351,7 @@ Mnpd	|void	|pad_peg	|NN const char* s
 #endif
 Apda	|PADLIST*|pad_new	|int flags
 #if defined(PERL_IN_PAD_C)
-s	|PADOFFSET|pad_alloc_name|NN SV *namesv|U32 flags \
+i	|PADOFFSET|pad_alloc_name|NN SV *namesv|U32 flags \
 				|NULLOK HV *typestash|NULLOK HV *ourstash
 #endif
 Apd	|PADOFFSET|pad_add_name_pvn|NN const char *namepv|STRLEN namelen\
@@ -2366,7 +2366,7 @@ Apd	|PADOFFSET|pad_add_name_sv|NN SV *name\
 AMpd	|PADOFFSET|pad_alloc	|I32 optype|U32 tmptype
 Apd	|PADOFFSET|pad_add_anon	|NN CV* func|I32 optype
 #if defined(PERL_IN_PAD_C)
-sd	|void	|pad_check_dup	|NN SV *name|U32 flags|NULLOK const HV *ourstash
+id	|void	|pad_check_dup	|NN SV *name|U32 flags|NULLOK const HV *ourstash
 #endif
 Apd	|PADOFFSET|pad_findmy_pvn|NN const char* namepv|STRLEN namelen|U32 flags
 Apd	|PADOFFSET|pad_findmy_pv|NN const char* name|U32 flags
@@ -2376,7 +2376,7 @@ Apd	|SV*	|find_rundefsv	|
 : Used in pp.c
 p	|SV*	|find_rundefsv2	|NN CV *cv|U32 seq
 #if defined(PERL_IN_PAD_C)
-sd	|PADOFFSET|pad_findlex	|NN const char *namepv|STRLEN namelen|U32 flags \
+id	|PADOFFSET|pad_findlex	|NN const char *namepv|STRLEN namelen|U32 flags \
 				|NN const CV* cv|U32 seq|int warn \
 				|NULLOK SV** out_capture|NN SV** out_name_sv \
 				|NN int *out_flags
@@ -2390,14 +2390,14 @@ pd	|U32	|intro_my
 pd	|OP *	|pad_leavemy
 pd	|void	|pad_swipe	|PADOFFSET po|bool refadjust
 #if defined(PERL_IN_PAD_C)
-sd	|void	|pad_reset
+id	|void	|pad_reset
 #endif
 AMpd	|void	|pad_tidy	|padtidy_type type
 pd	|void	|pad_free	|PADOFFSET po
 pd 	|void	|do_dump_pad	|I32 level|NN PerlIO *file|NULLOK PADLIST *padlist|int full
 #if defined(PERL_IN_PAD_C)
 #  if defined(DEBUGGING)
-sd	|void	|cv_dump	|NN const CV *cv|NN const char *title
+id	|void	|cv_dump	|NN const CV *cv|NN const char *title
 #  endif
 #endif
 Apd	|CV*	|cv_clone	|NN CV* proto
@@ -2451,11 +2451,11 @@ Apo	|void	|hv_placeholders_set	|NN HV *hv|I32 ph
 p	|SV*	|magic_scalarpack|NN HV *hv|NN MAGIC *mg
 
 #if defined(PERL_IN_SV_C)
-s	|SV *	|find_hash_subscript|NULLOK const HV *const hv \
+i	|SV *	|find_hash_subscript|NULLOK const HV *const hv \
 		|NN const SV *const val
-s	|I32	|find_array_subscript|NULLOK const AV *const av \
+i	|I32	|find_array_subscript|NULLOK const AV *const av \
 		|NN const SV *const val
-sMd	|SV*	|find_uninit_var|NULLOK const OP *const obase \
+iMd	|SV*	|find_uninit_var|NULLOK const OP *const obase \
 		|NULLOK const SV *const uninit_sv|bool top
 #endif
 
@@ -2471,7 +2471,7 @@ p	|void	|dump_sv_child	|NN SV *sv
 Apbm	|GV*	|gv_SVadd	|NULLOK GV *gv
 #endif
 #if defined(PERL_IN_UTIL_C)
-s	|bool	|ckwarn_common	|U32 w
+i	|bool	|ckwarn_common	|U32 w
 #endif
 Apo	|bool	|ckwarn		|U32 w
 Apo	|bool	|ckwarn_d	|U32 w
@@ -2517,7 +2517,7 @@ Apno     |Size_t |my_strlcpy     |NULLOK char *dst|NULLOK const char *src|Size_t
 
 #ifdef PERL_MAD
 #if defined(PERL_IN_DUMP_C)
-sf	|void	|xmldump_attr	|I32 level|NN PerlIO *file|NN const char* pat \
+if	|void	|xmldump_attr	|I32 level|NN PerlIO *file|NN const char* pat \
 				|...
 #endif
 Mfp	|void	|xmldump_indent	|I32 level|NN PerlIO *file|NN const char* pat \
@@ -2558,11 +2558,11 @@ Mp	|MADPROP*|newMADPROP	|char key|char type|NULLOK void* val \
 Mp	|void	|mad_free	|NULLOK MADPROP* mp
 
 #  if defined(PERL_IN_TOKE_C)
-s	|char*	|skipspace0	|NN char *s
-s	|char*	|skipspace1	|NN char *s
-s	|char*	|skipspace2	|NN char *s|NULLOK SV **sv
-s	|void	|start_force	|int where
-s	|void	|curmad		|char slot|NULLOK SV *sv
+i	|char*	|skipspace0	|NN char *s
+i	|char*	|skipspace1	|NN char *s
+i	|char*	|skipspace2	|NN char *s|NULLOK SV **sv
+i	|void	|start_force	|int where
+i	|void	|curmad		|char slot|NULLOK SV *sv
 #  endif
 Mp	|int	|madlex
 Mp	|int	|madparse	|int gramtype
@@ -2593,12 +2593,12 @@ p	|struct mro_meta*	|mro_meta_dup	|NN struct mro_meta* smeta|NN CLONE_PARAMS* pa
 #endif
 Apd	|AV*	|mro_get_linear_isa|NN HV* stash
 #if defined(PERL_IN_MRO_C)
-sd	|AV*	|mro_get_linear_isa_dfs|NN HV* stash|U32 level
-s	|void	|mro_clean_isarev|NN HV * const isa   \
+id	|AV*	|mro_get_linear_isa_dfs|NN HV* stash|U32 level
+i	|void	|mro_clean_isarev|NN HV * const isa   \
 				 |NN const char * const name \
 				 |const STRLEN len \
 				 |NULLOK HV * const exceptions|U32 flags
-s	|void	|mro_gather_and_rename|NN HV * const stashes \
+i	|void	|mro_gather_and_rename|NN HV * const stashes \
 				      |NN HV * const seen_stashes \
 				      |NULLOK HV *stash \
 				      |NULLOK HV *oldstash \
@@ -2623,7 +2623,7 @@ xpo	|int	|keyword_plugin_standard|NN char* keyword_ptr|STRLEN keyword_len|NN OP*
 
 #if defined(USE_ITHREADS)
 #  if defined(PERL_IN_SV_C)
-s	|void	|unreferenced_to_tmp_stack|NN AV *const unreferenced
+i	|void	|unreferenced_to_tmp_stack|NN AV *const unreferenced
 #  endif
 Aanop	|CLONE_PARAMS *|clone_params_new|NN PerlInterpreter *const from \
 		|NN PerlInterpreter *const to

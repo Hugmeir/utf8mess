@@ -322,7 +322,7 @@ PP(pp_concat)
  * I suspect that the mg_get is no longer needed, but while padav
  * differs, it can't share this function */
 
-STATIC void
+PERL_STATIC_INLINE void
 S_pushav(pTHX_ AV* const av)
 {
     dSP;
@@ -949,7 +949,7 @@ PP(pp_rv2av)
     RETURN;
 }
 
-STATIC void
+PERL_STATIC_INLINE void
 S_do_oddball(pTHX_ SV **oddkey, SV **firstkey)
 {
     dVAR;
@@ -3043,7 +3043,7 @@ PP(pp_method_named)
     RETURN;
 }
 
-STATIC SV *
+PERL_STATIC_INLINE SV *
 S_method_common(pTHX_ SV* meth, U32* hashp)
 {
     dVAR;

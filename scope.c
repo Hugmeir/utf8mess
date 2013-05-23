@@ -171,7 +171,7 @@ Perl_free_tmps(pTHX)
     }
 }
 
-STATIC SV *
+PERL_STATIC_INLINE SV *
 S_save_scalar_at(pTHX_ SV **sptr, const U32 flags)
 {
     dVAR;
@@ -634,7 +634,7 @@ Perl_save_hints(pTHX)
     }
 }
 
-static void
+PERL_STATIC_INLINE void
 S_save_pushptri32ptr(pTHX_ void *const ptr1, const I32 i, void *const ptr2,
 			const int type)
 {

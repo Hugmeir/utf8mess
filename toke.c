@@ -404,7 +404,7 @@ static struct debug_tokens {
 
 /* dump the returned token in rv, plus any optional arg in pl_yylval */
 
-STATIC int
+PERL_STATIC_INLINE int
 S_tokereport(pTHX_ I32 rv, const YYSTYPE* lvalp)
 {
     dVAR;
@@ -467,7 +467,7 @@ S_tokereport(pTHX_ I32 rv, const YYSTYPE* lvalp)
 
 /* print the buffer with suitable escapes */
 
-STATIC void
+PERL_STATIC_INLINE void
 S_printbuf(pTHX_ const char *const fmt, const char *const s)
 {
     SV* const tmp = newSVpvs("");
@@ -480,7 +480,7 @@ S_printbuf(pTHX_ const char *const fmt, const char *const s)
 
 #endif
 
-static int
+PERL_STATIC_INLINE int
 S_deprecate_commaless_var_list(pTHX) {
     PL_expect = XTERM;
     deprecate("comma-less variable list");
@@ -494,7 +494,7 @@ S_deprecate_commaless_var_list(pTHX) {
  * into an OP_ANDASSIGN, OP_ORASSIGN, or OP_DORASSIGN
  */
 
-STATIC int
+PERL_STATIC_INLINE int
 S_ao(pTHX_ int toketype)
 {
     dVAR;
@@ -524,7 +524,7 @@ S_ao(pTHX_ int toketype)
  * after the missing operator.
  */
 
-STATIC void
+PERL_STATIC_INLINE void
 S_no_op(pTHX_ const char *const what, char *s)
 {
     dVAR;
@@ -573,7 +573,7 @@ S_no_op(pTHX_ const char *const what, char *s)
  * This is fatal.
  */
 
-STATIC void
+PERL_STATIC_INLINE void
 S_missingterm(pTHX_ char *s)
 {
     dVAR;
@@ -628,7 +628,7 @@ Perl_feature_is_enabled(pTHX_ const char *const name, STRLEN namelen)
  */
 
 #ifdef PERL_CR_FILTER
-static void
+PERL_STATIC_INLINE void
 strip_return(SV *sv)
 {
     const char *s = SvPVX_const(sv);
@@ -653,7 +653,7 @@ strip_return(SV *sv)
     }
 }
 
-STATIC I32
+PERL_STATIC_INLINE I32
 S_cr_textfilter(pTHX_ int idx, SV *sv, int maxlen)
 {
     const I32 count = FILTER_READ(idx+1, sv, maxlen);
@@ -1585,7 +1585,7 @@ Perl_lex_read_space(pTHX_ U32 flags)
  * If so, it sets the current line number and file to the values in the comment.
  */
 
-STATIC void
+PERL_STATIC_INLINE void
 S_incline(pTHX_ const char *s)
 {
     dVAR;
@@ -1734,7 +1734,7 @@ S_incline(pTHX_ const char *s)
 #ifdef PERL_MAD
 /* skip space before PL_thistoken */
 
-STATIC char *
+PERL_STATIC_INLINE char *
 S_skipspace0(pTHX_ char *s)
 {
     PERL_ARGS_ASSERT_SKIPSPACE0;
@@ -1755,7 +1755,7 @@ S_skipspace0(pTHX_ char *s)
 
 /* skip space after PL_thistoken */
 
-STATIC char *
+PERL_STATIC_INLINE char *
 S_skipspace1(pTHX_ char *s)
 {
     const char *start = s;
@@ -1782,7 +1782,7 @@ S_skipspace1(pTHX_ char *s)
     return s;
 }
 
-STATIC char *
+PERL_STATIC_INLINE char *
 S_skipspace2(pTHX_ char *s, SV **svp)
 {
     char *start;
@@ -1813,7 +1813,7 @@ S_skipspace2(pTHX_ char *s, SV **svp)
 }
 #endif
 
-STATIC void
+PERL_STATIC_INLINE void
 S_update_debugger_info(pTHX_ SV *orig_sv, const char *const buf, STRLEN len)
 {
     AV *av = CopFILEAVx(PL_curcop);
@@ -1835,7 +1835,7 @@ S_update_debugger_info(pTHX_ SV *orig_sv, const char *const buf, STRLEN len)
  * Skips comments as well.
  */
 
-STATIC char *
+PERL_STATIC_INLINE char *
 S_skipspace(pTHX_ char *s)
 {
 #ifdef PERL_MAD
@@ -1879,7 +1879,7 @@ S_skipspace(pTHX_ char *s)
  * the +5 is its argument.
  */
 
-STATIC void
+PERL_STATIC_INLINE void
 S_check_uni(pTHX)
 {
     dVAR;
@@ -1916,7 +1916,7 @@ S_check_uni(pTHX)
  *  - else it's a list operator
  */
 
-STATIC I32
+PERL_STATIC_INLINE I32
 S_lop(pTHX_ I32 f, int x, char *s)
 {
     dVAR;
@@ -1957,7 +1957,7 @@ S_lop(pTHX_ I32 f, int x, char *s)
  * on the "pop" end.
  */
 
-STATIC void
+PERL_STATIC_INLINE void
 S_start_force(pTHX_ int where)
 {
     int i;
@@ -1981,7 +1981,7 @@ S_start_force(pTHX_ int where)
     }
 }
 
-STATIC void
+PERL_STATIC_INLINE void
 S_curmad(pTHX_ char slot, SV *sv)
 {
     MADPROP **where;
@@ -2028,7 +2028,7 @@ S_curmad(pTHX_ char slot, SV *sv)
  * and possibly PL_expect to ensure the lexer handles the token correctly.
  */
 
-STATIC void
+PERL_STATIC_INLINE void
 S_force_next(pTHX_ I32 type)
 {
     dVAR;
@@ -2080,7 +2080,7 @@ Perl_yyunlex(pTHX)
     }
 }
 
-STATIC SV *
+PERL_STATIC_INLINE SV *
 S_newSV_maybe_utf8(pTHX_ const char *const start, STRLEN len)
 {
     dVAR;
@@ -2109,7 +2109,7 @@ S_newSV_maybe_utf8(pTHX_ const char *const start, STRLEN len)
  *   int allow_initial_tick : used by the "sub" lexer only.
  */
 
-STATIC char *
+PERL_STATIC_INLINE char *
 S_force_word(pTHX_ char *start, int token, int check_keyword, int allow_pack, int allow_initial_tick)
 {
     dVAR;
@@ -2158,7 +2158,7 @@ S_force_word(pTHX_ char *start, int token, int check_keyword, int allow_pack, in
  * Creates the symbol if it didn't already exist (via gv_fetchpv()).
  */
 
-STATIC void
+PERL_STATIC_INLINE void
 S_force_ident(pTHX_ const char *s, int kind)
 {
     dVAR;
@@ -2189,7 +2189,7 @@ S_force_ident(pTHX_ const char *s, int kind)
     }
 }
 
-static void
+PERL_STATIC_INLINE void
 S_force_ident_maybe_lex(pTHX_ char pit)
 {
     start_force(PL_curforce);
@@ -2233,7 +2233,7 @@ Perl_str_to_version(pTHX_ SV *sv)
  * must use an alternative parsing method).
  */
 
-STATIC char *
+PERL_STATIC_INLINE char *
 S_force_version(pTHX_ char *s, int guessing)
 {
     dVAR;
@@ -2310,7 +2310,7 @@ S_force_version(pTHX_ char *s, int guessing)
  * Forces the next token to be a version number using strict syntax rules.
  */
 
-STATIC char *
+PERL_STATIC_INLINE char *
 S_force_strict_version(pTHX_ char *s)
 {
     dVAR;
@@ -2362,7 +2362,7 @@ S_force_strict_version(pTHX_ char *s)
  * turns \\ into \.
  */
 
-STATIC SV *
+PERL_STATIC_INLINE SV *
 S_tokeq(pTHX_ SV *sv)
 {
     dVAR;
@@ -2433,7 +2433,7 @@ S_tokeq(pTHX_ SV *sv)
  * call to S_sublex_push().
  */
 
-STATIC I32
+PERL_STATIC_INLINE I32
 S_sublex_start(pTHX)
 {
     dVAR;
@@ -2494,7 +2494,7 @@ S_sublex_start(pTHX)
  * Sets PL_lex_state to LEX_INTERPCONCAT.
  */
 
-STATIC I32
+PERL_STATIC_INLINE I32
 S_sublex_push(pTHX)
 {
     dVAR;
@@ -2580,7 +2580,7 @@ S_sublex_push(pTHX)
  * Restores lexer state after a S_sublex_push.
  */
 
-STATIC I32
+PERL_STATIC_INLINE I32
 S_sublex_done(pTHX)
 {
     dVAR;
@@ -2935,7 +2935,7 @@ S_get_and_check_backslash_N_name(pTHX_ const char* s, const char* const e)
 		
 */
 
-STATIC char *
+PERL_STATIC_INLINE char *
 S_scan_const(pTHX_ char *start)
 {
     dVAR;
@@ -3807,7 +3807,7 @@ S_scan_const(pTHX_ char *start)
 
 /* This is the one truly awful dwimmer necessary to conflate C and sed. */
 
-STATIC int
+PERL_STATIC_INLINE int
 S_intuit_more(pTHX_ char *s)
 {
     dVAR;
@@ -3961,7 +3961,7 @@ S_intuit_more(pTHX_ char *s)
  *   =>
  */
 
-STATIC int
+PERL_STATIC_INLINE int
 S_intuit_method(pTHX_ char *start, GV *gv, CV *cv)
 {
     dVAR;
@@ -4260,7 +4260,7 @@ Perl_filter_read(pTHX_ int idx, SV *buf_sv, int maxlen)
     return (*funcp)(aTHX_ idx, buf_sv, correct_length);
 }
 
-STATIC char *
+PERL_STATIC_INLINE char *
 S_filter_gets(pTHX_ SV *sv, STRLEN append)
 {
     dVAR;
@@ -4284,7 +4284,7 @@ S_filter_gets(pTHX_ SV *sv, STRLEN append)
         return (sv_gets(sv, PL_rsfp, append));
 }
 
-STATIC HV *
+PERL_STATIC_INLINE HV *
 S_find_in_my_stash(pTHX_ const char *pkgname, STRLEN len)
 {
     dVAR;
@@ -4318,7 +4318,7 @@ S_find_in_my_stash(pTHX_ const char *pkgname, STRLEN len)
  * Check whether readpipe() is overridden, and generates the appropriate
  * optree, provided sublex_start() is called afterwards.
  */
-STATIC void
+PERL_STATIC_INLINE void
 S_readpipe_override(pTHX)
 {
     GV **gvp;
@@ -4519,7 +4519,7 @@ Perl_madlex(pTHX)
 }
 #endif
 
-STATIC char *
+PERL_STATIC_INLINE char *
 S_tokenize_use(pTHX_ int is_use, char *s) {
     dVAR;
 
@@ -4558,7 +4558,7 @@ S_tokenize_use(pTHX_ int is_use, char *s) {
 #endif
 
 #define word_takes_any_delimeter(p,l) S_word_takes_any_delimeter(p,l)
-STATIC bool
+PERL_STATIC_INLINE bool
 S_word_takes_any_delimeter(char *p, STRLEN len)
 {
     return (len == 1 && strchr("msyq", p[0])) ||
@@ -8890,7 +8890,7 @@ Perl_yylex(pTHX)
       build ops for a bareword
 */
 
-static int
+PERL_STATIC_INLINE int
 S_pending_ident(pTHX)
 {
     dVAR;
@@ -9006,7 +9006,7 @@ S_pending_ident(pTHX)
     return WORD;
 }
 
-STATIC void
+PERL_STATIC_INLINE void
 S_checkcomma(pTHX_ const char *s, const char *name, const char *what)
 {
     dVAR;
@@ -9068,7 +9068,7 @@ S_checkcomma(pTHX_ const char *s, const char *name, const char *what)
    and <type> is used with error messages only.
    <type> is assumed to be well formed UTF-8 */
 
-STATIC SV *
+PERL_STATIC_INLINE SV *
 S_new_constant(pTHX_ const char *s, STRLEN len, const char *key, STRLEN keylen,
 	       SV *sv, SV *pv, const char *type, STRLEN typelen)
 {
@@ -9257,7 +9257,7 @@ S_parse_ident(pTHX_ char **s, char **d, char * const e, int allow_package, bool 
 /* Returns a NUL terminated string, with the length of the string written to
    *slp
    */
-STATIC char *
+PERL_STATIC_INLINE char *
 S_scan_word(pTHX_ char *s, char *dest, STRLEN destlen, int allow_package, STRLEN *slp)
 {
     dVAR;
@@ -9273,7 +9273,7 @@ S_scan_word(pTHX_ char *s, char *dest, STRLEN destlen, int allow_package, STRLEN
     return s;
 }
 
-STATIC char *
+PERL_STATIC_INLINE char *
 S_scan_ident(pTHX_ char *s, const char *send, char *dest, STRLEN destlen, I32 ck_uni)
 {
     dVAR;
@@ -9435,7 +9435,7 @@ S_scan_ident(pTHX_ char *s, const char *send, char *dest, STRLEN destlen, I32 ck
     return s;
 }
 
-static bool
+PERL_STATIC_INLINE bool
 S_pmflag(pTHX_ const char* const valid_flags, U32 * pmfl, char** s, char* charset) {
 
     /* Adds, subtracts to/from 'pmfl' based on regex modifier flags found in
@@ -9531,7 +9531,7 @@ S_pmflag(pTHX_ const char* const valid_flags, U32 * pmfl, char** s, char* charse
 	return TRUE;
 }
 
-STATIC char *
+PERL_STATIC_INLINE char *
 S_scan_pat(pTHX_ char *start, I32 type)
 {
     dVAR;
@@ -9622,7 +9622,7 @@ S_scan_pat(pTHX_ char *start, I32 type)
     return s;
 }
 
-STATIC char *
+PERL_STATIC_INLINE char *
 S_scan_subst(pTHX_ char *start)
 {
     dVAR;
@@ -9726,7 +9726,7 @@ S_scan_subst(pTHX_ char *start)
     return s;
 }
 
-STATIC char *
+PERL_STATIC_INLINE char *
 S_scan_trans(pTHX_ char *start)
 {
     dVAR;
@@ -9844,7 +9844,7 @@ S_scan_trans(pTHX_ char *start)
    Otherwise it is treated as an eval.
 */
 
-STATIC char *
+PERL_STATIC_INLINE char *
 S_scan_heredoc(pTHX_ char *s)
 {
     dVAR;
@@ -10160,7 +10160,7 @@ S_scan_heredoc(pTHX_ char *s)
 
 */
 
-STATIC char *
+PERL_STATIC_INLINE char *
 S_scan_inputsymbol(pTHX_ char *start)
 {
     dVAR;
@@ -10350,7 +10350,7 @@ intro_sym:
    SvIVX of the SV.
 */
 
-STATIC char *
+PERL_STATIC_INLINE char *
 S_scan_str(pTHX_ char *start, int keep_quoted, int keep_delims, int re_reparse,
         bool deprecate_escaped_meta /* Should we issue a deprecation warning
                                        for certain paired metacharacters that
@@ -11125,7 +11125,7 @@ vstring:
     return (char *)s;
 }
 
-STATIC char *
+PERL_STATIC_INLINE char *
 S_scan_formline(pTHX_ char *s)
 {
     dVAR;
@@ -11277,7 +11277,7 @@ Perl_start_subparse(pTHX_ I32 is_format, U32 flags)
 #ifdef __SC__
 #pragma segment Perl_yylex
 #endif
-static int
+PERL_STATIC_INLINE int
 S_yywarn(pTHX_ const char *const s, U32 flags)
 {
     dVAR;
@@ -11410,7 +11410,7 @@ Perl_yyerror_pvn(pTHX_ const char *const s, STRLEN len, U32 flags)
 #pragma segment Main
 #endif
 
-STATIC char*
+PERL_STATIC_INLINE char*
 S_swallow_bom(pTHX_ U8 *s)
 {
     dVAR;
@@ -11507,7 +11507,7 @@ S_swallow_bom(pTHX_ U8 *s)
 
 
 #ifndef PERL_NO_UTF16_FILTER
-static I32
+PERL_STATIC_INLINE I32
 S_utf16_textfilter(pTHX_ int idx, SV *sv, int maxlen)
 {
     dVAR;
@@ -11630,7 +11630,7 @@ S_utf16_textfilter(pTHX_ int idx, SV *sv, int maxlen)
     return retval;
 }
 
-static U8 *
+PERL_STATIC_INLINE U8 *
 S_add_utf16_textfilter(pTHX_ U8 *const s, bool reversed)
 {
     SV *filter = filter_add(S_utf16_textfilter, NULL);
@@ -11762,7 +11762,7 @@ Perl_keyword_plugin_standard(pTHX_
 }
 
 #define parse_recdescent(g,p) S_parse_recdescent(aTHX_ g,p)
-static void
+PERL_STATIC_INLINE void
 S_parse_recdescent(pTHX_ int gramtype, I32 fakeeof)
 {
     SAVEI32(PL_lex_brackets);
@@ -11778,7 +11778,7 @@ S_parse_recdescent(pTHX_ int gramtype, I32 fakeeof)
 }
 
 #define parse_recdescent_for_op(g,p) S_parse_recdescent_for_op(aTHX_ g,p)
-static OP *
+PERL_STATIC_INLINE OP *
 S_parse_recdescent_for_op(pTHX_ int gramtype, I32 fakeeof)
 {
     OP *o;
@@ -11792,7 +11792,7 @@ S_parse_recdescent_for_op(pTHX_ int gramtype, I32 fakeeof)
 }
 
 #define parse_expr(p,f) S_parse_expr(aTHX_ p,f)
-static OP *
+PERL_STATIC_INLINE OP *
 S_parse_expr(pTHX_ I32 fakeeof, U32 flags)
 {
     OP *exprop;

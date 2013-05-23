@@ -240,7 +240,7 @@ Public API:
 
 /* make some more SVs by adding another arena */
 
-STATIC SV*
+PERL_STATIC_INLINE SV*
 S_more_sv(pTHX)
 {
     dVAR;
@@ -316,7 +316,7 @@ S_new_SV(pTHX_ const char *file, int line, const char *func)
 	    plant_SV(p);				\
     } STMT_END
 
-STATIC void
+PERL_STATIC_INLINE void
 S_del_sv(pTHX_ SV *p)
 {
     dVAR;
@@ -362,7 +362,7 @@ and split it into a list of free SVs.
 =cut
 */
 
-static void
+PERL_STATIC_INLINE void
 S_sv_add_arena(pTHX_ char *const ptr, const U32 size, const U32 flags)
 {
     dVAR;
@@ -402,7 +402,7 @@ S_sv_add_arena(pTHX_ char *const ptr, const U32 size, const U32 flags)
 /* visit(): call the named function for each non-free SV in the arenas
  * whose flags field matches the flags/mask args. */
 
-STATIC I32
+PERL_STATIC_INLINE I32
 S_visit(pTHX_ SVFUNC_t f, const U32 flags, const U32 mask)
 {
     dVAR;
@@ -431,7 +431,7 @@ S_visit(pTHX_ SVFUNC_t f, const U32 flags, const U32 mask)
 
 /* called by sv_report_used() for each live SV */
 
-static void
+PERL_STATIC_INLINE void
 do_report_used(pTHX_ SV *const sv)
 {
     if (SvTYPE(sv) != (svtype)SVTYPEMASK) {
@@ -461,7 +461,7 @@ Perl_sv_report_used(pTHX)
 
 /* called by sv_clean_objs() for each live SV */
 
-static void
+PERL_STATIC_INLINE void
 do_clean_objs(pTHX_ SV *const ref)
 {
     dVAR;
@@ -487,7 +487,7 @@ do_clean_objs(pTHX_ SV *const ref)
 /* clear any slots in a GV which hold objects - except IO;
  * called by sv_clean_objs() for each live GV */
 
-static void
+PERL_STATIC_INLINE void
 do_clean_named_objs(pTHX_ SV *const sv)
 {
     dVAR;
@@ -531,7 +531,7 @@ do_clean_named_objs(pTHX_ SV *const sv)
 /* clear any IO slots in a GV which hold objects (except stderr, defout);
  * called by sv_clean_objs() for each live GV */
 
-static void
+PERL_STATIC_INLINE void
 do_clean_named_io_objs(pTHX_ SV *const sv)
 {
     dVAR;
@@ -552,7 +552,7 @@ do_clean_named_io_objs(pTHX_ SV *const sv)
 }
 
 /* Void wrapper to pass to visit() */
-static void
+PERL_STATIC_INLINE void
 do_curse(pTHX_ SV * const sv) {
     if ((PL_stderrgv && GvGP(PL_stderrgv) && (SV*)GvIO(PL_stderrgv) == sv)
      || (PL_defoutgv && GvGP(PL_defoutgv) && (SV*)GvIO(PL_defoutgv) == sv))
@@ -597,7 +597,7 @@ Perl_sv_clean_objs(pTHX)
 
 /* called by sv_clean_all() for each live SV */
 
-static void
+PERL_STATIC_INLINE void
 do_clean_all(pTHX_ SV *const sv)
 {
     dVAR;
@@ -1108,7 +1108,7 @@ Perl_more_bodies (pTHX_ const svtype sv_type, const size_t body_size,
 
 #ifndef PURIFY
 
-STATIC void *
+PERL_STATIC_INLINE void *
 S_new_body(pTHX_ const svtype sv_type)
 {
     dVAR;
@@ -1715,7 +1715,7 @@ Perl_sv_setnv_mg(pTHX_ SV *const sv, const NV num)
  * printable version of the offending string
  */
 
-STATIC void
+PERL_STATIC_INLINE void
 S_not_a_number(pTHX_ SV *const sv)
 {
      dVAR;
@@ -1817,7 +1817,7 @@ Perl_looks_like_number(pTHX_ SV *const sv)
     return grok_number(sbegin, len, NULL);
 }
 
-STATIC bool
+PERL_STATIC_INLINE bool
 S_glob_2number(pTHX_ GV * const gv)
 {
     PERL_ARGS_ASSERT_GLOB_2NUMBER;
@@ -1919,7 +1919,7 @@ S_glob_2number(pTHX_ GV * const gv)
 /* sv_2iuv_non_preserve(): private routine for use by sv_2iv() and sv_2uv() */
 
 /* For sv_2nv these three cases are "SvNOK and don't bother casting"  */
-STATIC int
+PERL_STATIC_INLINE int
 S_sv_2iuv_non_preserve(pTHX_ SV *const sv
 #  ifdef DEBUGGING
 		       , I32 numtype
@@ -1974,7 +1974,7 @@ S_sv_2iuv_non_preserve(pTHX_ SV *const sv
 }
 #endif /* !NV_PRESERVES_UV*/
 
-STATIC bool
+PERL_STATIC_INLINE bool
 S_sv_2iuv_common(pTHX_ SV *const sv)
 {
     dVAR;
@@ -2692,7 +2692,7 @@ Perl_sv_2num(pTHX_ SV *const sv)
  * We assume that buf is at least TYPE_CHARS(UV) long.
  */
 
-static char *
+PERL_STATIC_INLINE char *
 S_uiv_2buf(char *const buf, const IV iv, UV uv, const int is_uv, char **const peob)
 {
     char *ptr = buf + TYPE_CHARS(UV);
@@ -3611,7 +3611,7 @@ copy-ish functions and macros use this underneath.
 =cut
 */
 
-static void
+PERL_STATIC_INLINE void
 S_glob_assign_glob(pTHX_ SV *const dstr, SV *const sstr, const int dtype)
 {
     I32 mro_changes = 0; /* 1 = method, 2 = isa, 3 = recursive isa */
@@ -3737,7 +3737,7 @@ S_glob_assign_glob(pTHX_ SV *const dstr, SV *const sstr, const int dtype)
     return;
 }
 
-static void
+PERL_STATIC_INLINE void
 S_glob_assign_ref(pTHX_ SV *const dstr, SV *const sstr)
 {
     SV * const sref = SvRV(sstr);
@@ -4758,7 +4758,7 @@ Perl_sv_usepvn_flags(pTHX_ SV *const sv, char *ptr, const STRLEN len, const U32 
    another thread could invalidate it by unsharing last of the same hash key
    (which it can do by means other than releasing copy-on-write Svs)
    or by changing the other copy-on-write SVs in the loop.  */
-STATIC void
+PERL_STATIC_INLINE void
 S_sv_release_COW(pTHX_ SV *sv, const char *pvx, SV *after)
 {
     PERL_ARGS_ASSERT_SV_RELEASE_COW;
@@ -5435,7 +5435,7 @@ Perl_sv_magic(pTHX_ SV *const sv, SV *const obj, const int how,
     }
 }
 
-static int
+PERL_STATIC_INLINE int
 S_sv_unmagicext_flags(pTHX_ SV *const sv, const int type, MGVTBL *vtbl, const U32 flags)
 {
     MAGIC* mg;
@@ -6024,7 +6024,7 @@ Perl_sv_replace(pTHX_ SV *const sv, SV *const nsv)
  * If that CV will outlive us, make it anonymous (i.e. fix up its CvGV
  * field) */
 
-STATIC void
+PERL_STATIC_INLINE void
 S_anonymise_cv_maybe(pTHX_ GV *gv, CV* cv)
 {
     SV *gvname;
@@ -6425,7 +6425,7 @@ Perl_sv_clear(pTHX_ SV *const orig_sv)
 /* This routine curses the sv itself, not the object referenced by sv. So
    sv does not have to be ROK. */
 
-static bool
+PERL_STATIC_INLINE bool
 S_curse(pTHX_ SV * const sv, const bool check_refcnt) {
     dVAR;
 
@@ -6719,7 +6719,7 @@ Perl_sv_len_utf8_nomg(pTHX_ SV * const sv)
 
 /* Walk forwards to find the byte corresponding to the passed in UTF-8
    offset.  */
-static STRLEN
+PERL_STATIC_INLINE STRLEN
 S_sv_pos_u2b_forwards(const U8 *const start, const U8 *const send,
 		      STRLEN *const uoffset_p, bool *const at_end)
 {
@@ -6748,7 +6748,7 @@ S_sv_pos_u2b_forwards(const U8 *const start, const U8 *const send,
 /* Given the length of the string in both bytes and UTF-8 characters, decide
    whether to walk forwards or backwards to find the byte corresponding to
    the passed in UTF-8 offset.  */
-static STRLEN
+PERL_STATIC_INLINE STRLEN
 S_sv_pos_u2b_midway(const U8 *const start, const U8 *send,
 		    STRLEN uoffset, const STRLEN uend)
 {
@@ -6786,7 +6786,7 @@ S_sv_pos_u2b_midway(const U8 *const start, const U8 *send,
    If *mgp is non-NULL, it should point to the UTF-8 cache magic, which
    will be used to reduce the amount of linear searching. The cache will be
    created if necessary, and the found value offered to it for update.  */
-static STRLEN
+PERL_STATIC_INLINE STRLEN
 S_sv_pos_u2b_cached(pTHX_ SV *const sv, MAGIC **const mgp, const U8 *const start,
 		    const U8 *const send, STRLEN uoffset,
 		    STRLEN uoffset0, STRLEN boffset0)
@@ -6992,7 +6992,7 @@ Perl_sv_pos_u2b(pTHX_ SV *const sv, I32 *const offsetp, I32 *const lenp)
     }
 }
 
-static void
+PERL_STATIC_INLINE void
 S_utf8_mg_len_cache_update(pTHX_ SV *const sv, MAGIC **const mgp,
 			   const STRLEN ulen)
 {
@@ -7035,7 +7035,7 @@ S_utf8_mg_len_cache_update(pTHX_ SV *const sv, MAGIC **const mgp,
    cache" logic much simpler, as the first slot is always the one to start
    from.   
 */
-static void
+PERL_STATIC_INLINE void
 S_utf8_mg_pos_cache_update(pTHX_ SV *const sv, MAGIC **const mgp, const STRLEN byte,
                            const STRLEN utf8, const STRLEN blen)
 {
@@ -7163,7 +7163,7 @@ S_utf8_mg_pos_cache_update(pTHX_ SV *const sv, MAGIC **const mgp, const STRLEN b
 /* We already know all of the way, now we may be able to walk back.  The same
    assumption is made as in S_sv_pos_u2b_midway(), namely that walking
    backward is half the speed of walking forward. */
-static STRLEN
+PERL_STATIC_INLINE STRLEN
 S_sv_pos_b2u_midway(pTHX_ const U8 *const s, const U8 *const target,
                     const U8 *end, STRLEN endu)
 {
@@ -7294,7 +7294,7 @@ Perl_sv_pos_b2u(pTHX_ SV *const sv, I32 *const offsetp)
     }
 }
 
-static void
+PERL_STATIC_INLINE void
 S_assert_uft8_cache_coherent(pTHX_ const char *const func, STRLEN from_cache,
 			     STRLEN real, SV *const sv)
 {
@@ -7647,7 +7647,7 @@ Perl_sv_collxfrm_flags(pTHX_ SV *const sv, STRLEN *const nxp, const I32 flags)
 
 #endif /* USE_LOCALE_COLLATE */
 
-static char *
+PERL_STATIC_INLINE char *
 S_sv_gets_append_to_utf8(pTHX_ SV *const sv, PerlIO *const fp, I32 append)
 {
     SV * const tsv = newSV(0);
@@ -7661,7 +7661,7 @@ S_sv_gets_append_to_utf8(pTHX_ SV *const sv, PerlIO *const fp, I32 append)
     return (SvCUR(sv) - append) ? SvPVX(sv) : NULL;
 }
 
-static char *
+PERL_STATIC_INLINE char *
 S_sv_gets_read_record(pTHX_ SV *const sv, PerlIO *const fp, I32 append)
 {
     SSize_t bytesread;
@@ -10148,7 +10148,7 @@ Perl_sv_vsetpvfn(pTHX_ SV *const sv, const char *const pat, const STRLEN patlen,
  * to avoid inappropriate "use of uninit" warnings [perl #71000].
  */
 #define WARN_MISSING WARN_UNINITIALIZED /* Not sure we want a new category */
-STATIC SV*
+PERL_STATIC_INLINE SV*
 S_vcatpvfn_missing_argument(pTHX) {
     if (ckWARN(WARN_MISSING)) {
 	Perl_warner(aTHX_ packWARN(WARN_MISSING), "Missing argument in %s",
@@ -10158,7 +10158,7 @@ S_vcatpvfn_missing_argument(pTHX) {
 }
 
 
-STATIC I32
+PERL_STATIC_INLINE I32
 S_expect_number(pTHX_ char **const pattern)
 {
     dVAR;
@@ -10181,7 +10181,7 @@ S_expect_number(pTHX_ char **const pattern)
     return var;
 }
 
-STATIC char *
+PERL_STATIC_INLINE char *
 S_F0convert(NV nv, char *const endbuf, STRLEN *const len)
 {
     const int neg = nv < 0;
@@ -11812,7 +11812,7 @@ Perl_ptr_table_new(pTHX)
 
 /* map an existing pointer using a table */
 
-STATIC PTR_TBL_ENT_t *
+PERL_STATIC_INLINE PTR_TBL_ENT_t *
 S_ptr_table_find(PTR_TBL_t *const tbl, const void *const sv)
 {
     PTR_TBL_ENT_t *tblent;
@@ -12016,7 +12016,7 @@ Perl_rvpv_dup(pTHX_ SV *const dstr, const SV *const sstr, CLONE_PARAMS *const pa
 }
 
 /* duplicate a list of SVs. source and dest may point to the same memory.  */
-static SV **
+PERL_STATIC_INLINE SV **
 S_sv_dup_inc_multiple(pTHX_ SV *const *source, SV **dest,
 		      SSize_t items, CLONE_PARAMS *const param)
 {
@@ -12031,7 +12031,7 @@ S_sv_dup_inc_multiple(pTHX_ SV *const *source, SV **dest,
 
 /* duplicate an SV of any type (including AV, HV etc) */
 
-static SV *
+PERL_STATIC_INLINE SV *
 S_sv_dup_common(pTHX_ const SV *const sstr, CLONE_PARAMS *const param)
 {
     dVAR;
@@ -12947,7 +12947,7 @@ Perl_ss_dup(pTHX_ PerlInterpreter *proto_perl, CLONE_PARAMS* param)
  * flag to the result. This is done for each stash before cloning starts,
  * so we know which stashes want their objects cloned */
 
-static void
+PERL_STATIC_INLINE void
 do_mark_cloneable_stash(pTHX_ SV *const sv)
 {
     const HEK * const hvname = HvNAME_HEK((const HV *)sv);
@@ -13749,7 +13749,7 @@ perl_clone_using(PerlInterpreter *proto_perl, UV flags,
     return my_perl;
 }
 
-static void
+PERL_STATIC_INLINE void
 S_unreferenced_to_tmp_stack(pTHX_ AV *const unreferenced)
 {
     PERL_ARGS_ASSERT_UNREFERENCED_TO_TMP_STACK;
@@ -14026,7 +14026,7 @@ Perl_sv_cat_decode(pTHX_ SV *dsv, SV *encoding,
 /* Look for an entry in the hash whose value has the same SV as val;
  * If so, return a mortal copy of the key. */
 
-STATIC SV*
+PERL_STATIC_INLINE SV*
 S_find_hash_subscript(pTHX_ const HV *const hv, const SV *const val)
 {
     dVAR;
@@ -14062,7 +14062,7 @@ S_find_hash_subscript(pTHX_ const HV *const hv, const SV *const val)
 /* Look for an entry in the array whose value has the same SV as val;
  * If so, return the index, otherwise return -1. */
 
-STATIC I32
+PERL_STATIC_INLINE I32
 S_find_array_subscript(pTHX_ const AV *const av, const SV *const val)
 {
     dVAR;
@@ -14174,7 +14174,7 @@ PL_comppad/PL_curpad points to the currently executing pad.
 =cut
 */
 
-STATIC SV *
+PERL_STATIC_INLINE SV *
 S_find_uninit_var(pTHX_ const OP *const obase, const SV *const uninit_sv,
 		  bool match)
 {

@@ -89,7 +89,7 @@ do {								\
 | Print this symbol on YYOUTPUT.  |
 `--------------------------------*/
 
-static void
+PERL_STATIC_INLINE void
 yysymprint(pTHX_ PerlIO * const yyoutput, int yytype, const YYSTYPE * const yyvaluep)
 {
     if (yytype < YYNTOKENS) {
@@ -111,7 +111,7 @@ yysymprint(pTHX_ PerlIO * const yyoutput, int yytype, const YYSTYPE * const yyva
  *  print the top 8 items on the parse stack.
  */
 
-static void
+PERL_STATIC_INLINE void
 yy_stack_print (pTHX_ const yy_parser *parser)
 {
     const yy_stack_frame *ps, *min;
@@ -166,7 +166,7 @@ do {					\
 | Report that the YYRULE is going to be reduced.  |
 `------------------------------------------------*/
 
-static void
+PERL_STATIC_INLINE void
 yy_reduce_print (pTHX_ int yyrule)
 {
     int yyi;
@@ -195,7 +195,7 @@ do {					\
 /* called during cleanup (via SAVEDESTRUCTOR_X) to free any items on the
  * parse stack, thus avoiding leaks if we die  */
 
-static void
+PERL_STATIC_INLINE void
 S_clear_yystack(pTHX_  const yy_parser *parser)
 {
     yy_stack_frame *ps     = parser->ps;

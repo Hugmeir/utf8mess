@@ -89,7 +89,7 @@ struct magic_state {
 };
 /* MGS is typedef'ed to struct magic_state in perl.h */
 
-STATIC void
+PERL_STATIC_INLINE void
 S_save_magic(pTHX_ I32 mgs_ix, SV *sv)
 {
     dVAR;
@@ -385,7 +385,7 @@ Perl_mg_clear(pTHX_ SV *sv)
     return 0;
 }
 
-static MAGIC*
+PERL_STATIC_INLINE MAGIC*
 S_mg_findext_flags(pTHX_ const SV *sv, int type, const MGVTBL *vtbl, U32 flags)
 {
     PERL_UNUSED_CONTEXT;
@@ -523,7 +523,7 @@ Perl_mg_localize(pTHX_ SV *sv, SV *nsv, bool setmagic)
 }
 
 #define mg_free_struct(sv, mg) S_mg_free_struct(aTHX_ sv, mg)
-static void
+PERL_STATIC_INLINE void
 S_mg_free_struct(pTHX_ SV *sv, MAGIC *mg)
 {
     const MGVTBL* const vtbl = mg->mg_virtual;
@@ -1242,7 +1242,7 @@ Perl_magic_clear_all_env(pTHX_ SV *sv, MAGIC *mg)
 
 #ifndef PERL_MICRO
 #ifdef HAS_SIGPROCMASK
-static void
+PERL_STATIC_INLINE void
 restore_sigmask(pTHX_ SV *save_sv)
 {
     const sigset_t * const ossetp = (const sigset_t *) SvPV_nolen_const( save_sv );
@@ -1377,7 +1377,7 @@ Perl_csighandler_init(void)
 #endif
 
 #if defined HAS_SIGPROCMASK
-static void
+PERL_STATIC_INLINE void
 unblock_sigmask(pTHX_ void* newset)
 {
     sigprocmask(SIG_UNBLOCK, (sigset_t*)newset, NULL);
@@ -1761,7 +1761,7 @@ Perl_magic_methcall(pTHX_ SV *sv, const MAGIC *mg, const char *meth, U32 flags,
 
 /* wrapper for magic_methcall that creates the first arg */
 
-STATIC SV*
+PERL_STATIC_INLINE SV*
 S_magic_methcall1(pTHX_ SV *sv, const MAGIC *mg, const char *meth, U32 flags,
     int n, SV *val)
 {
@@ -1787,7 +1787,7 @@ S_magic_methcall1(pTHX_ SV *sv, const MAGIC *mg, const char *meth, U32 flags,
     return Perl_magic_methcall(aTHX_ sv, mg, meth, flags, n, arg1, val);
 }
 
-STATIC int
+PERL_STATIC_INLINE int
 S_magic_methpack(pTHX_ SV *sv, const MAGIC *mg, const char *meth)
 {
     dVAR;
@@ -3190,7 +3190,7 @@ cleanup:
 }
 
 
-static void
+PERL_STATIC_INLINE void
 S_restore_magic(pTHX_ const void *p)
 {
     dVAR;
@@ -3256,7 +3256,7 @@ S_restore_magic(pTHX_ const void *p)
  * a die is trapped by the call_sv() and the SAVEDESTRUCTOR_X manually
  * skipped over. */
 
-static void
+PERL_STATIC_INLINE void
 S_unwind_handler_stack(pTHX_ const void *p)
 {
     dVAR;

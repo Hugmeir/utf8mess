@@ -132,7 +132,7 @@ while (<$tmph_fh>) {
     if (!$endcore_done and /YYSTYPE_IS_DECLARED/) {
 	print $h_fh <<h;
 #ifdef PERL_IN_TOKE_C
-static bool
+PERL_STATIC_INLINE bool
 S_is_opval_token(int type) {
     switch (type) {
 h

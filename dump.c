@@ -72,7 +72,7 @@ struct flag_to_name {
     const char *name;
 };
 
-static void
+PERL_STATIC_INLINE void
 S_append_flags(pTHX_ SV *sv, U32 flags, const struct flag_to_name *start,
 	       const struct flag_to_name *const end)
 {
@@ -644,7 +644,7 @@ const struct flag_to_name pmflags_flags_names[] = {
     {PMf_IS_QR, ",IS_QR"}
 };
 
-static SV *
+PERL_STATIC_INLINE SV *
 S_pm_description(pTHX_ const PMOP *pm)
 {
     SV * const desc = newSVpvs("");
@@ -691,7 +691,7 @@ Perl_pmop_dump(pTHX_ PMOP *pm)
  * otherwise add it.
  *  *** Note that this isn't thread-safe */
 
-STATIC UV
+PERL_STATIC_INLINE UV
 S_sequence_num(pTHX_ const OP *o)
 {
     dVAR;
@@ -821,7 +821,7 @@ const struct op_private_by_op op_private_names[] = {
     {OP_BACKTICK, C_ARRAY_LENGTH(op_open_names), op_open_names }
 };
 
-static bool
+PERL_STATIC_INLINE bool
 S_op_private_to_names(pTHX_ SV *tmpsv, U32 optype, U32 op_private) {
     const struct op_private_by_op *start = op_private_names;
     const struct op_private_by_op *const end
@@ -2303,7 +2303,7 @@ Perl_debop(pTHX_ const OP *o)
     return 0;
 }
 
-STATIC CV*
+PERL_STATIC_INLINE CV*
 S_deb_curcv(pTHX_ const I32 ix)
 {
     dVAR;
@@ -2333,7 +2333,7 @@ Perl_watch(pTHX_ char **addr)
 	PTR2UV(PL_watchaddr), PTR2UV(PL_watchok));
 }
 
-STATIC void
+PERL_STATIC_INLINE void
 S_debprof(pTHX_ const OP *o)
 {
     dVAR;
@@ -2367,7 +2367,7 @@ Perl_debprofdump(pTHX)
  *    XML variants of most of the above routines
  */
 
-STATIC void
+PERL_STATIC_INLINE void
 S_xmldump_attr(pTHX_ I32 level, PerlIO *file, const char* pat, ...)
 {
     va_list args;

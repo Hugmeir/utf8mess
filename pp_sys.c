@@ -229,7 +229,7 @@ void endservent(void);
     && (defined(HAS_SETREUID) || defined(HAS_SETRESUID)		\
 	|| defined(HAS_SETREGID) || defined(HAS_SETRESGID))
 /* The Hard Way. */
-STATIC int
+PERL_STATIC_INLINE int
 S_emulate_eaccess(pTHX_ const char* path, Mode_t mode)
 {
     const Uid_t ruid = getuid();
@@ -1329,7 +1329,7 @@ PP(pp_getc)
     RETURN;
 }
 
-STATIC OP *
+PERL_STATIC_INLINE OP *
 S_doform(pTHX_ CV *cv, GV *gv, OP *retop)
 {
     dVAR;
@@ -2905,7 +2905,7 @@ PP(pp_stat)
    The next few macros/functions take care of this.
 */
 
-static OP *
+PERL_STATIC_INLINE OP *
 S_ft_return_false(pTHX_ SV *ret) {
     OP *next = NORMAL;
     dSP;
@@ -2945,7 +2945,7 @@ S_ft_return_true(pTHX_ SV *ret) {
 	}						   \
     } STMT_END
 
-STATIC OP *
+PERL_STATIC_INLINE OP *
 S_try_amagic_ftest(pTHX_ char chr) {
     dVAR;
     SV *const arg = *PL_stack_sp;
@@ -3644,7 +3644,7 @@ PP(pp_readlink)
 }
 
 #if !defined(HAS_MKDIR) || !defined(HAS_RMDIR)
-STATIC int
+PERL_STATIC_INLINE int
 S_dooneliner(pTHX_ const char *cmd, const char *filename)
 {
     char * const save_filename = filename;
@@ -4670,7 +4670,7 @@ PP(pp_semctl)
 
 /* I can't const this further without getting warnings about the types of
    various arrays passed in from structures.  */
-static SV *
+PERL_STATIC_INLINE SV *
 S_space_join_names_mortal(pTHX_ char *const *array)
 {
     SV *target;
@@ -5486,7 +5486,7 @@ PP(pp_syscall)
     What's really needed is a good file locking module.
 */
 
-static int
+PERL_STATIC_INLINE int
 fcntl_emulate_flock(int fd, int operation)
 {
     int res;
@@ -5547,7 +5547,7 @@ fcntl_emulate_flock(int fd, int operation)
 #  define F_TEST	3	/* Test a region for other processes locks */
 # endif
 
-static int
+PERL_STATIC_INLINE int
 lockf_emulate_flock(int fd, int operation)
 {
     int i;

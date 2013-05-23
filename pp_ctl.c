@@ -405,7 +405,7 @@ Perl_rxres_save(pTHX_ void **rsp, REGEXP *rx)
     }
 }
 
-static void
+PERL_STATIC_INLINE void
 S_rxres_restore(pTHX_ void **rsp, REGEXP *rx)
 {
     UV *p = (UV*)*rsp;
@@ -436,7 +436,7 @@ S_rxres_restore(pTHX_ void **rsp, REGEXP *rx)
     }
 }
 
-static void
+PERL_STATIC_INLINE void
 S_rxres_free(pTHX_ void **rsp)
 {
     UV * const p = (UV*)*rsp;
@@ -1317,7 +1317,7 @@ static const char * const context_name[] = {
     "substitution",
 };
 
-STATIC I32
+PERL_STATIC_INLINE I32
 S_dopoptolabel(pTHX_ const char *label, STRLEN len, U32 flags)
 {
     dVAR;
@@ -1429,7 +1429,7 @@ Perl_was_lvalue_sub(pTHX)
 	return 0;
 }
 
-STATIC I32
+PERL_STATIC_INLINE I32
 S_dopoptosub_at(pTHX_ const PERL_CONTEXT *cxstk, I32 startingblock)
 {
     dVAR;
@@ -1458,7 +1458,7 @@ S_dopoptosub_at(pTHX_ const PERL_CONTEXT *cxstk, I32 startingblock)
     return i;
 }
 
-STATIC I32
+PERL_STATIC_INLINE I32
 S_dopoptoeval(pTHX_ I32 startingblock)
 {
     dVAR;
@@ -1476,7 +1476,7 @@ S_dopoptoeval(pTHX_ I32 startingblock)
     return i;
 }
 
-STATIC I32
+PERL_STATIC_INLINE I32
 S_dopoptoloop(pTHX_ I32 startingblock)
 {
     dVAR;
@@ -1506,7 +1506,7 @@ S_dopoptoloop(pTHX_ I32 startingblock)
     return i;
 }
 
-STATIC I32
+PERL_STATIC_INLINE I32
 S_dopoptogiven(pTHX_ I32 startingblock)
 {
     dVAR;
@@ -1534,7 +1534,7 @@ S_dopoptogiven(pTHX_ I32 startingblock)
     return i;
 }
 
-STATIC I32
+PERL_STATIC_INLINE I32
 S_dopoptowhen(pTHX_ I32 startingblock)
 {
     dVAR;
@@ -2038,7 +2038,7 @@ PP(pp_dbstate)
 	return NORMAL;
 }
 
-STATIC SV **
+PERL_STATIC_INLINE SV **
 S_adjust_stack_on_leave(pTHX_ SV **newsp, SV **sp, SV **mark, I32 gimme, U32 flags)
 {
     bool padtmp = 0;
@@ -2283,7 +2283,7 @@ PP(pp_leaveloop)
     return NORMAL;
 }
 
-STATIC void
+PERL_STATIC_INLINE void
 S_return_lvalues(pTHX_ SV **mark, SV **sp, SV **newsp, I32 gimme,
                        PERL_CONTEXT *cx, PMOP *newpm)
 {
@@ -2562,7 +2562,7 @@ PP(pp_leavesublv)
     return cx->blk_sub.retop;
 }
 
-static I32
+PERL_STATIC_INLINE I32
 S_unwind_loop(pTHX_ const char * const opname)
 {
     dVAR;
@@ -2714,7 +2714,7 @@ PP(pp_redo)
     return redo_op;
 }
 
-STATIC OP *
+PERL_STATIC_INLINE OP *
 S_dofindlabel(pTHX_ OP *o, const char *label, STRLEN len, U32 flags, OP **opstack, OP **oplimit)
 {
     dVAR;
@@ -3172,7 +3172,7 @@ PP(pp_exit)
 
 /* Eval. */
 
-STATIC void
+PERL_STATIC_INLINE void
 S_save_lines(pTHX_ AV *array, SV *sv)
 {
     const char *s = SvPVX_const(sv);
@@ -3211,7 +3211,7 @@ establish a local jmpenv to handle exception traps.
 
 =cut
 */
-STATIC OP *
+PERL_STATIC_INLINE OP *
 S_docatch(pTHX_ OP *o)
 {
     dVAR;
@@ -3324,7 +3324,7 @@ Perl_find_runcv_where(pTHX_ U8 cond, IV arg, U32 *db_seqp)
  *   1: yyparse() failed
  *   3: yyparse() died
  */
-STATIC int
+PERL_STATIC_INLINE int
 S_try_yyparse(pTHX_ int gramtype)
 {
     int ret;
@@ -3362,7 +3362,7 @@ S_try_yyparse(pTHX_ int gramtype)
  * These can be distinguished by whether PL_op is entereval.
  */
 
-STATIC bool
+PERL_STATIC_INLINE bool
 S_doeval(pTHX_ int gimme, CV* outside, U32 seq, HV *hh)
 {
     dVAR; dSP;
@@ -3580,7 +3580,7 @@ S_doeval(pTHX_ int gimme, CV* outside, U32 seq, HV *hh)
     return TRUE;
 }
 
-STATIC PerlIO *
+PERL_STATIC_INLINE PerlIO *
 S_check_type_and_open(pTHX_ SV *name)
 {
     Stat_t st;
@@ -3601,7 +3601,7 @@ S_check_type_and_open(pTHX_ SV *name)
 }
 
 #ifndef PERL_DISABLE_PMC
-STATIC PerlIO *
+PERL_STATIC_INLINE PerlIO *
 S_doopen_pm(pTHX_ SV *name)
 {
     STRLEN namelen;
@@ -4394,7 +4394,7 @@ PP(pp_leavegiven)
 }
 
 /* Helper routines used by pp_smartmatch */
-STATIC PMOP *
+PERL_STATIC_INLINE PMOP *
 S_make_matcher(pTHX_ REGEXP *re)
 {
     dVAR;
@@ -4410,7 +4410,7 @@ S_make_matcher(pTHX_ REGEXP *re)
     return matcher;
 }
 
-STATIC bool
+PERL_STATIC_INLINE bool
 S_matcher_matches_sv(pTHX_ PMOP *matcher, SV *sv)
 {
     dVAR;
@@ -4426,7 +4426,7 @@ S_matcher_matches_sv(pTHX_ PMOP *matcher, SV *sv)
     return (SvTRUEx(POPs));
 }
 
-STATIC void
+PERL_STATIC_INLINE void
 S_destroy_matcher(pTHX_ PMOP *matcher)
 {
     dVAR;
@@ -4448,7 +4448,7 @@ PP(pp_smartmatch)
 /* This version of do_smartmatch() implements the
  * table of smart matches that is found in perlsyn.
  */
-STATIC OP *
+PERL_STATIC_INLINE OP *
 S_do_smartmatch(pTHX_ HV *seen_this, HV *seen_other, const bool copied)
 {
     dVAR;
@@ -5043,7 +5043,7 @@ PP(pp_break)
     return cx->blk_givwhen.leave_op;
 }
 
-static MAGIC *
+PERL_STATIC_INLINE MAGIC *
 S_doparseform(pTHX_ SV *sv)
 {
     STRLEN len;
@@ -5295,7 +5295,7 @@ S_doparseform(pTHX_ SV *sv)
 }
 
 
-STATIC bool
+PERL_STATIC_INLINE bool
 S_num_overflow(NV value, I32 fldsize, I32 frcsize)
 {
     /* Can value be printed in fldsize chars, using %*.*f ? */
@@ -5322,7 +5322,7 @@ S_num_overflow(NV value, I32 fldsize, I32 frcsize)
     return res;
 }
 
-static I32
+PERL_STATIC_INLINE I32
 S_run_user_filter(pTHX_ int idx, SV *buf_sv, int maxlen)
 {
     dVAR;
@@ -5512,7 +5512,7 @@ S_run_user_filter(pTHX_ int idx, SV *buf_sv, int maxlen)
 
 /* perhaps someone can come up with a better name for
    this?  it is not really "absolute", per se ... */
-static bool
+PERL_STATIC_INLINE bool
 S_path_is_absolute(const char *name)
 {
     PERL_ARGS_ASSERT_PATH_IS_ABSOLUTE;

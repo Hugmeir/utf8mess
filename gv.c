@@ -409,7 +409,7 @@ Perl_gv_init_pvn(pTHX_ GV *gv, HV *stash, const char *name, STRLEN len, U32 flag
     }
 }
 
-STATIC void
+PERL_STATIC_INLINE void
 S_gv_init_svtype(pTHX_ GV *gv, const svtype sv_type)
 {
     PERL_ARGS_ASSERT_GV_INIT_SVTYPE;
@@ -440,9 +440,9 @@ S_gv_init_svtype(pTHX_ GV *gv, const svtype sv_type)
     }
 }
 
-static void core_xsub(pTHX_ CV* cv);
+PERL_STATIC_INLINE void core_xsub(pTHX_ CV* cv);
 
-static GV *
+PERL_STATIC_INLINE GV *
 S_maybe_add_coresub(pTHX_ HV * const stash, GV *gv,
                           const char * const name, const STRLEN len)
 {
@@ -1241,7 +1241,7 @@ Perl_gv_autoload_pvn(pTHX_ HV *stash, const char *name, STRLEN len, U32 flags)
  * For the protection of $! to work (it is set by this routine)
  * the sv slot must already be magicalized.
  */
-STATIC HV*
+PERL_STATIC_INLINE HV*
 S_require_tie_mod(pTHX_ GV *gv, const char *varpv, SV* namesv, const char *methpv,const U32 flags)
 {
     dVAR;
@@ -1389,7 +1389,7 @@ Perl_gv_fetchsv(pTHX_ SV *name, I32 flags, const svtype sv_type) {
     return gv_fetchpvn_flags(nambeg, len, flags | SvUTF8(name), sv_type);
 }
 
-STATIC void
+PERL_STATIC_INLINE void
 S_gv_magicalize_isa(pTHX_ GV *gv)
 {
     AV* av;
@@ -3186,7 +3186,7 @@ Perl_gv_try_downgrade(pTHX_ GV *gv)
 
 #include "XSUB.h"
 
-static void
+PERL_STATIC_INLINE void
 core_xsub(pTHX_ CV* cv)
 {
     Perl_croak(aTHX_

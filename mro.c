@@ -207,7 +207,7 @@ invalidated).
 
 =cut
 */
-static AV*
+PERL_STATIC_INLINE AV*
 S_mro_get_linear_isa_dfs(pTHX_ HV *stash, U32 level)
 {
     AV* retval;
@@ -686,7 +686,7 @@ Perl_mro_isa_changed_in(pTHX_ HV* stash)
 }
 
 /* Deletes name from all the isarev entries listed in isa */
-STATIC void
+PERL_STATIC_INLINE void
 S_mro_clean_isarev(pTHX_ HV * const isa, const char * const name,
                          const STRLEN len, HV * const exceptions, U32 flags)
 {
@@ -882,7 +882,7 @@ Perl_mro_package_moved(pTHX_ HV * const stash, HV * const oldstash,
     }
 }
 
-STATIC void
+PERL_STATIC_INLINE void
 S_mro_gather_and_rename(pTHX_ HV * const stashes, HV * const seen_stashes,
                               HV *stash, HV *oldstash, SV *namesv)
 {

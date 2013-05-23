@@ -38,7 +38,7 @@
  * The main guts of traverse_isa was actually copied from gv_fetchmeth
  */
 
-STATIC bool
+PERL_STATIC_INLINE bool
 S_isa_lookup(pTHX_ HV *stash, const char * const name, STRLEN len, U32 flags)
 {
     dVAR;

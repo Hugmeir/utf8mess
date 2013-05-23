@@ -177,7 +177,7 @@ This is basically sv_eq_flags() in sv.c, but we avoid the magic
 and bytes checking.
 */
 
-static bool
+PERL_STATIC_INLINE bool
 sv_eq_pvn_flags(pTHX_ const SV *sv, const char* pv, const STRLEN pvlen, const U32 flags) {
     if ( (SvUTF8(sv) & SVf_UTF8 ) != (flags & SVf_UTF8) ) {
         const char *pv1 = SvPVX_const(sv);
@@ -547,7 +547,7 @@ is done.  Returns the offset of the allocated pad slot.
 =cut
 */
 
-static PADOFFSET
+PERL_STATIC_INLINE PADOFFSET
 S_pad_alloc_name(pTHX_ SV *namesv, U32 flags, HV *typestash, HV *ourstash)
 {
     dVAR;
@@ -849,7 +849,7 @@ C<is_our> indicates that the name to check is an 'our' declaration.
 =cut
 */
 
-STATIC void
+PERL_STATIC_INLINE void
 S_pad_check_dup(pTHX_ SV *name, U32 flags, const HV *ourstash)
 {
     dVAR;
@@ -1121,7 +1121,7 @@ the parent pad.
 /* the CV does late binding of its lexicals */
 #define CvLATE(cv) (CvANON(cv) || CvCLONE(cv) || SvTYPE(cv) == SVt_PVFM)
 
-static void
+PERL_STATIC_INLINE void
 S_unavailable(pTHX_ SV *namesv)
 {
     /* diag_listed_as: Variable "%s" is not available */
@@ -1133,7 +1133,7 @@ S_unavailable(pTHX_ SV *namesv)
 			 namesv);
 }
 
-STATIC PADOFFSET
+PERL_STATIC_INLINE PADOFFSET
 S_pad_findlex(pTHX_ const char *namepv, STRLEN namelen, U32 flags, const CV* cv, U32 seq,
 	int warn, SV** out_capture, SV** out_name_sv, int *out_flags)
 {
@@ -1659,7 +1659,7 @@ Mark all the current temporaries for reuse
  * to  a shared TARG.  Such an alias will change randomly and unpredictably.
  * We avoid doing this until we can think of a Better Way.
  * GSAR 97-10-29 */
-static void
+PERL_STATIC_INLINE void
 S_pad_reset(pTHX)
 {
     dVAR;
@@ -1929,7 +1929,7 @@ dump the contents of a CV
 =cut
 */
 
-STATIC void
+PERL_STATIC_INLINE void
 S_cv_dump(pTHX_ const CV *cv, const char *title)
 {
     dVAR;
@@ -1973,9 +1973,9 @@ the immediately surrounding code.
 =cut
 */
 
-static CV *S_cv_clone(pTHX_ CV *proto, CV *cv, CV *outside);
+PERL_STATIC_INLINE CV *S_cv_clone(pTHX_ CV *proto, CV *cv, CV *outside);
 
-static void
+PERL_STATIC_INLINE void
 S_cv_clone_pad(pTHX_ CV *proto, CV *cv, CV *outside, bool newcv)
 {
     dVAR;
@@ -2125,7 +2125,7 @@ S_cv_clone_pad(pTHX_ CV *proto, CV *cv, CV *outside, bool newcv)
     LEAVE;
 }
 
-static CV *
+PERL_STATIC_INLINE CV *
 S_cv_clone(pTHX_ CV *proto, CV *cv, CV *outside)
 {
     dVAR;

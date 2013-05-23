@@ -245,7 +245,7 @@ static const char* const non_utf8_target_but_utf8_required
 #define SCount 11172    /* Length of block */
 #define TCount 28
 
-static void restore_pos(pTHX_ void *arg);
+PERL_STATIC_INLINE void restore_pos(pTHX_ void *arg);
 
 #define REGCP_PAREN_ELEMS 3
 #define REGCP_OTHER_ELEMS 3
@@ -253,7 +253,7 @@ static void restore_pos(pTHX_ void *arg);
 /* REGCP_FRAME_ELEMS are not part of the REGCP_OTHER_ELEMS and
  * are needed for the regexp context stack bookkeeping. */
 
-STATIC CHECKPOINT
+PERL_STATIC_INLINE CHECKPOINT
 S_regcppush(pTHX_ const regexp *rex, I32 parenfloor, U32 maxopenparen)
 {
     dVAR;
@@ -333,7 +333,7 @@ S_regcppush(pTHX_ const regexp *rex, I32 parenfloor, U32 maxopenparen)
     rex->lastcloseparen = lcp;
 
 
-STATIC void
+PERL_STATIC_INLINE void
 S_regcppop(pTHX_ regexp *rex, U32 *maxopenparen_p)
 {
     dVAR;
@@ -405,7 +405,7 @@ S_regcppop(pTHX_ regexp *rex, U32 *maxopenparen_p)
 /* restore the parens and associated vars at savestack position ix,
  * but without popping the stack */
 
-STATIC void
+PERL_STATIC_INLINE void
 S_regcp_restore(pTHX_ regexp *rex, I32 ix, U32 *maxopenparen_p)
 {
     I32 tmpix = PL_savestack_ix;
@@ -416,7 +416,7 @@ S_regcp_restore(pTHX_ regexp *rex, I32 ix, U32 *maxopenparen_p)
 
 #define regcpblow(cp) LEAVE_SCOPE(cp)	/* Ignores regcppush()ed data. */
 
-STATIC bool
+PERL_STATIC_INLINE bool
 S_isFOO_lc(pTHX_ const U8 classnum, const U8 character)
 {
     /* Returns a boolean as to whether or not 'character' is a member of the
@@ -458,7 +458,7 @@ S_isFOO_lc(pTHX_ const U8 classnum, const U8 character)
     return FALSE;
 }
 
-STATIC bool
+PERL_STATIC_INLINE bool
 S_isFOO_utf8_lc(pTHX_ const U8 classnum, const U8* character)
 {
     /* Returns a boolean as to whether or not the (well-formed) UTF-8-encoded
@@ -1430,7 +1430,7 @@ if ((!reginfo || regtry(reginfo, &s))) \
 /* annoyingly all the vars in this routine have different names from their counterparts
    in regmatch. /grrr */
 
-STATIC char *
+PERL_STATIC_INLINE char *
 S_find_byclass(pTHX_ regexp * prog, const regnode *c, char *s, 
     const char *strend, regmatch_info *reginfo, bool is_utf8_pat)
 {
@@ -2902,7 +2902,7 @@ S_regtry(pTHX_ regmatch_info *reginfo, char **startposp)
 
 /* grab a new slab and return the first slot in it */
 
-STATIC regmatch_state *
+PERL_STATIC_INLINE regmatch_state *
 S_push_slab(pTHX)
 {
 #if PERL_VERSION < 9 && !defined(PERL_CORE)
@@ -3092,7 +3092,7 @@ regmatch(), slabs allocated since entry are freed.
 
 #ifdef DEBUGGING
 
-STATIC void
+PERL_STATIC_INLINE void
 S_debug_start_match(pTHX_ const REGEXP *prog, const bool utf8_target,
     const char *start, const char *end, const char *blurb)
 {
@@ -3122,7 +3122,7 @@ S_debug_start_match(pTHX_ const REGEXP *prog, const bool utf8_target,
     }
 }
 
-STATIC void
+PERL_STATIC_INLINE void
 S_dump_exec_pos(pTHX_ const char *locinput, 
                       const regnode *scan, 
                       const char *loc_regeol, 
@@ -3194,7 +3194,7 @@ S_dump_exec_pos(pTHX_ const char *locinput,
  * Returns the index of the leftmost defined buffer with the given name
  * or 0 if non of the buffers matched.
  */
-STATIC I32
+PERL_STATIC_INLINE I32
 S_reg_check_named_buff_matched(pTHX_ const regexp *rex, const regnode *scan)
 {
     I32 n;
@@ -3217,7 +3217,7 @@ S_reg_check_named_buff_matched(pTHX_ const regexp *rex, const regnode *scan)
 
 /* free all slabs above current one  - called during LEAVE_SCOPE */
 
-STATIC void
+PERL_STATIC_INLINE void
 S_clear_backtrack_stack(pTHX_ void *p)
 {
     regmatch_slab *s = PL_regmatch_slab->next;
@@ -3232,7 +3232,7 @@ S_clear_backtrack_stack(pTHX_ void *p)
 	Safefree(osl);
     }
 }
-static bool
+PERL_STATIC_INLINE bool
 S_setup_EXACTISH_ST_c1_c2(pTHX_ const regnode * const text_node, int *c1p,
         U8* c1_utf8, int *c2p, U8* c2_utf8, bool is_utf8_pat)
 {
@@ -3489,7 +3489,7 @@ S_setup_EXACTISH_ST_c1_c2(pTHX_ const regnode * const text_node, int *c1p,
 }
 
 /* returns -1 on failure, $+[0] on success */
-STATIC I32
+PERL_STATIC_INLINE I32
 S_regmatch(pTHX_ regmatch_info *reginfo, char *startpos, regnode *prog)
 {
 #if PERL_VERSION < 9 && !defined(PERL_CORE)
@@ -6640,7 +6640,7 @@ no_silent:
  * max       - maximum number of things to match.
  * depth     - (for debugging) backtracking depth.
  */
-STATIC I32
+PERL_STATIC_INLINE I32
 S_regrepeat(pTHX_ regexp *prog, char **startposp, const regnode *p,
                 I32 max, int depth, bool is_utf8_pat)
 {
@@ -7167,7 +7167,7 @@ Perl_regclass_swash(pTHX_ const regexp *prog, const regnode* node, bool doinit, 
 }
 #endif
 
-STATIC SV *
+PERL_STATIC_INLINE SV *
 S_core_regclass_swash(pTHX_ const regexp *prog, const regnode* node, bool doinit, SV** listsvp)
 {
     /* Returns the swash for the input 'node' in the regex 'prog'.
@@ -7271,7 +7271,7 @@ S_core_regclass_swash(pTHX_ const regexp *prog, const regnode* node, bool doinit
 
  */
 
-STATIC bool
+PERL_STATIC_INLINE bool
 S_reginclass(pTHX_ regexp * const prog, const regnode * const n, const U8* const p, const bool utf8_target)
 {
     dVAR;
@@ -7412,7 +7412,7 @@ S_reginclass(pTHX_ regexp * const prog, const regnode * const n, const U8* const
     return cBOOL(flags & ANYOF_INVERT) ^ match;
 }
 
-STATIC U8 *
+PERL_STATIC_INLINE U8 *
 S_reghop3(U8 *s, I32 off, const U8* lim)
 {
     /* return the position 'off' UTF-8 characters away from 's', forward if
@@ -7447,7 +7447,7 @@ S_reghop3(U8 *s, I32 off, const U8* lim)
    be replaced with this routine. but since thats not done yet 
    we ifdef it out - dmq
 */
-STATIC U8 *
+PERL_STATIC_INLINE U8 *
 S_reghop4(U8 *s, I32 off, const U8* llim, const U8* rlim)
 {
     dVAR;
@@ -7474,7 +7474,7 @@ S_reghop4(U8 *s, I32 off, const U8* llim, const U8* rlim)
 }
 #endif
 
-STATIC U8 *
+PERL_STATIC_INLINE U8 *
 S_reghopmaybe3(U8* s, I32 off, const U8* lim)
 {
     dVAR;
@@ -7504,7 +7504,7 @@ S_reghopmaybe3(U8* s, I32 off, const U8* lim)
     return s;
 }
 
-static void
+PERL_STATIC_INLINE void
 restore_pos(pTHX_ void *arg)
 {
     dVAR;
@@ -7526,7 +7526,7 @@ restore_pos(pTHX_ void *arg)
     }	
 }
 
-STATIC void
+PERL_STATIC_INLINE void
 S_to_utf8_substr(pTHX_ regexp *prog)
 {
     /* Converts substr fields in prog from bytes to UTF-8, calling fbm_compile
@@ -7560,7 +7560,7 @@ S_to_utf8_substr(pTHX_ regexp *prog)
     } while (i--);
 }
 
-STATIC bool
+PERL_STATIC_INLINE bool
 S_to_byte_substr(pTHX_ regexp *prog)
 {
     /* Converts substr fields in prog from UTF-8 to bytes, calling fbm_compile

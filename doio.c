@@ -1372,7 +1372,7 @@ Perl_my_lstat_flags(pTHX_ const U32 flags)
     return PL_laststatval;
 }
 
-static void
+PERL_STATIC_INLINE void
 S_exec_failed(pTHX_ const char *cmd, int fd, int do_report)
 {
     const int e = errno;
@@ -1943,7 +1943,7 @@ Perl_cando(pTHX_ Mode_t mode, bool effective, const Stat_t *statbufp)
 }
 #endif /* ! VMS */
 
-static bool
+PERL_STATIC_INLINE bool
 S_ingroup(pTHX_ Gid_t testgid, bool effective)
 {
     dVAR;

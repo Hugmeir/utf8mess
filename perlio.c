@@ -498,7 +498,7 @@ PerlIO_debug(const char *fmt, ...)
 
 #ifdef DEBUGGING
 #  define VERIFY_HEAD(f) PerlIO_verify_head(aTHX_ f)
-static void
+PERL_STATIC_INLINE void
 PerlIO_verify_head(pTHX_ PerlIO *f)
 {
     PerlIOl *head, *p;
@@ -525,7 +525,7 @@ PerlIO_verify_head(pTHX_ PerlIO *f)
  */
 #define PERLIO_TABLE_SIZE 64
 
-static void
+PERL_STATIC_INLINE void
 PerlIO_init_table(pTHX)
 {
     if (PL_perlio)
@@ -847,7 +847,7 @@ PerlIO_find_layer(pTHX_ const char *name, STRLEN len, int load)
 
 #ifdef USE_ATTRIBUTES_FOR_PERLIO
 
-static int
+PERL_STATIC_INLINE int
 perlio_mg_set(pTHX_ SV *sv, MAGIC *mg)
 {
     if (SvROK(sv)) {
@@ -860,7 +860,7 @@ perlio_mg_set(pTHX_ SV *sv, MAGIC *mg)
     return 0;
 }
 
-static int
+PERL_STATIC_INLINE int
 perlio_mg_get(pTHX_ SV *sv, MAGIC *mg)
 {
     if (SvROK(sv)) {
@@ -873,14 +873,14 @@ perlio_mg_get(pTHX_ SV *sv, MAGIC *mg)
     return 0;
 }
 
-static int
+PERL_STATIC_INLINE int
 perlio_mg_clear(pTHX_ SV *sv, MAGIC *mg)
 {
     Perl_warn(aTHX_ "clear %" SVf, SVfARG(sv));
     return 0;
 }
 
-static int
+PERL_STATIC_INLINE int
 perlio_mg_free(pTHX_ SV *sv, MAGIC *mg)
 {
     Perl_warn(aTHX_ "free %" SVf, SVfARG(sv));
@@ -1494,7 +1494,7 @@ Perl_PerlIO_fileno(pTHX_ PerlIO *f)
 }
 
 
-static PerlIO_funcs *
+PERL_STATIC_INLINE PerlIO_funcs *
 PerlIO_layer_from_ref(pTHX_ SV *sv)
 {
     dVAR;
@@ -2313,7 +2313,7 @@ PerlIOBase_dup(pTHX_ PerlIO *f, PerlIO *o, CLONE_PARAMS *param, int flags)
 /* PL_perlio_fd_refcnt[] is in intrpvar.h */
 
 /* Must be called with PL_perlio_mutex locked. */
-static void
+PERL_STATIC_INLINE void
 S_more_refcounted_fds(pTHX_ const int new_fd) {
     dVAR;
     const int old_max = PL_perlio_fd_refcnt_size;
@@ -2531,7 +2531,7 @@ typedef struct {
     int oflags;                 /* open/fcntl flags */
 } PerlIOUnix;
 
-static void
+PERL_STATIC_INLINE void
 S_lockcnt_dec(pTHX_ const void* f)
 {
     PerlIO_lockcnt((PerlIO*)f)--;
@@ -2541,7 +2541,7 @@ S_lockcnt_dec(pTHX_ const void* f)
 /* call the signal handler, and if that handler happens to clear
  * this handle, free what we can and return true */
 
-static bool
+PERL_STATIC_INLINE bool
 S_perlio_async_run(pTHX_ PerlIO* f) {
     ENTER;
     SAVEDESTRUCTOR_X(S_lockcnt_dec, (void*)f);
@@ -2634,7 +2634,7 @@ PerlIOUnix_fileno(pTHX_ PerlIO *f)
     return PerlIOSelf(f, PerlIOUnix)->fd;
 }
 
-static void
+PERL_STATIC_INLINE void
 PerlIOUnix_setfd(pTHX_ PerlIO *f, int fd, int imode)
 {
     PerlIOUnix * const s = PerlIOSelf(f, PerlIOUnix);
@@ -3150,7 +3150,7 @@ PerlIOStdio_dup(pTHX_ PerlIO *f, PerlIO *o, CLONE_PARAMS *param, int flags)
     return f;
 }
 
-static int
+PERL_STATIC_INLINE int
 PerlIOStdio_invalidate_fileno(pTHX_ FILE *f)
 {
     PERL_UNUSED_CONTEXT;
@@ -4488,7 +4488,7 @@ typedef struct {
  * Otherwise the :crlf layer would always revert back to
  * raw mode.
  */
-static void
+PERL_STATIC_INLINE void
 S_inherit_utf8_flag(PerlIO *f)
 {
     PerlIO *g = PerlIONext(f);

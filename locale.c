@@ -48,7 +48,7 @@
  * which is harmful for further use of the string in setlocale().
  *
  */
-STATIC char *
+PERL_STATIC_INLINE char *
 S_stdize_locale(pTHX_ char *locs)
 {
     const char * const s = strchr(locs, '=');

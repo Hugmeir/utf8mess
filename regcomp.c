@@ -726,7 +726,7 @@ DEBUG_OPTIMISE_MORE_r(if(data){                                      \
    Update the longest found anchored substring and the longest found
    floating substrings if needed. */
 
-STATIC void
+PERL_STATIC_INLINE void
 S_scan_commit(pTHX_ const RExC_state_t *pRExC_state, scan_data_t *data, I32 *minlenp, int is_inf)
 {
     const STRLEN l = CHR_SVLEN(data->last_found);
@@ -789,7 +789,7 @@ S_scan_commit(pTHX_ const RExC_state_t *pRExC_state, scan_data_t *data, I32 *min
 #define TEST_SSC_EOS(node)  cBOOL((node)->next_off)
 
 /* Can match anything (initialization) */
-STATIC void
+PERL_STATIC_INLINE void
 S_cl_anything(const RExC_state_t *pRExC_state, struct regnode_charclass_class *cl)
 {
     PERL_ARGS_ASSERT_CL_ANYTHING;
@@ -815,7 +815,7 @@ S_cl_anything(const RExC_state_t *pRExC_state, struct regnode_charclass_class *c
 }
 
 /* Can match anything (initialization) */
-STATIC int
+PERL_STATIC_INLINE int
 S_cl_is_anything(const struct regnode_charclass_class *cl)
 {
     int value;
@@ -833,7 +833,7 @@ S_cl_is_anything(const struct regnode_charclass_class *cl)
 }
 
 /* Can match anything (initialization) */
-STATIC void
+PERL_STATIC_INLINE void
 S_cl_init(const RExC_state_t *pRExC_state, struct regnode_charclass_class *cl)
 {
     PERL_ARGS_ASSERT_CL_INIT;
@@ -850,7 +850,7 @@ S_cl_init(const RExC_state_t *pRExC_state, struct regnode_charclass_class *cl)
 /* 'AND' a given class with another one.  Can create false positives.  'cl'
  * should not be inverted.  'and_with->flags & ANYOF_CLASS' should be 0 if
  * 'and_with' is a regnode_charclass instead of a regnode_charclass_class. */
-STATIC void
+PERL_STATIC_INLINE void
 S_cl_and(struct regnode_charclass_class *cl,
 	const struct regnode_charclass_class *and_with)
 {
@@ -973,7 +973,7 @@ S_cl_and(struct regnode_charclass_class *cl,
 /* 'OR' a given class with another one.  Can create false positives.  'cl'
  * should not be inverted.  'or_with->flags & ANYOF_CLASS' should be 0 if
  * 'or_with' is a regnode_charclass instead of a regnode_charclass_class. */
-STATIC void
+PERL_STATIC_INLINE void
 S_cl_or(const RExC_state_t *pRExC_state, struct regnode_charclass_class *cl, const struct regnode_charclass_class *or_with)
 {
     PERL_ARGS_ASSERT_CL_OR;
@@ -1093,7 +1093,7 @@ S_cl_or(const RExC_state_t *pRExC_state, struct regnode_charclass_class *cl, con
   Used for debugging make_trie().
 */
 
-STATIC void
+PERL_STATIC_INLINE void
 S_dump_trie(pTHX_ const struct _reg_trie_data *trie, HV *widecharmap,
 	    AV *revcharmap, U32 depth)
 {
@@ -1184,7 +1184,7 @@ S_dump_trie(pTHX_ const struct _reg_trie_data *trie, HV *widecharmap,
   possible chars (trie->uniquecharcount) is very high.
   Used for debugging make_trie().
 */
-STATIC void
+PERL_STATIC_INLINE void
 S_dump_trie_interim_list(pTHX_ const struct _reg_trie_data *trie,
 			 HV *widecharmap, AV *revcharmap, U32 next_alloc,
 			 U32 depth)
@@ -1241,7 +1241,7 @@ S_dump_trie_interim_list(pTHX_ const struct _reg_trie_data *trie,
   twists to facilitate compression later. 
   Used for debugging make_trie().
 */
-STATIC void
+PERL_STATIC_INLINE void
 S_dump_trie_interim_table(pTHX_ const struct _reg_trie_data *trie,
 			  HV *widecharmap, AV *revcharmap, U32 next_alloc,
 			  U32 depth)
@@ -1542,7 +1542,7 @@ is the recommended Unicode-aware way of saying
 #define MADE_JUMP_TRIE  2
 #define MADE_EXACT_TRIE 4
 
-STATIC I32
+PERL_STATIC_INLINE I32
 S_make_trie(pTHX_ RExC_state_t *pRExC_state, regnode *startbranch, regnode *first, regnode *last, regnode *tail, U32 word_count, U32 flags, U32 depth)
 {
     dVAR;
@@ -2492,7 +2492,7 @@ S_make_trie(pTHX_ RExC_state_t *pRExC_state, regnode *startbranch, regnode *firs
              : MADE_TRIE;
 }
 
-STATIC void
+PERL_STATIC_INLINE void
 S_make_trie_failtable(pTHX_ RExC_state_t *pRExC_state, regnode *source,  regnode *stclass, U32 depth)
 {
 /* The Trie is constructed and compressed now so we can build a fail array if it's needed
@@ -2723,7 +2723,7 @@ S_make_trie_failtable(pTHX_ RExC_state_t *pRExC_state, regnode *source,  regnode
     if (PL_regkind[OP(scan)] == EXACT) \
         join_exact(pRExC_state,(scan),(min_subtract),has_exactf_sharp_s, (flags),NULL,depth+1)
 
-STATIC U32
+PERL_STATIC_INLINE U32
 S_join_exact(pTHX_ RExC_state_t *pRExC_state, regnode *scan, UV *min_subtract, bool *has_exactf_sharp_s, U32 flags,regnode *val, U32 depth) {
     /* Merge several consecutive EXACTish nodes into one. */
     regnode *n = regnext(scan);
@@ -3017,7 +3017,7 @@ typedef struct scan_frame {
 
 #define SCAN_COMMIT(s, data, m) scan_commit(s, data, m, is_inf)
 
-STATIC I32
+PERL_STATIC_INLINE I32
 S_study_chunk(pTHX_ RExC_state_t *pRExC_state, regnode **scanp,
                         I32 *minlenp, I32 *deltap,
 			regnode *last,
@@ -4759,7 +4759,7 @@ PerlIO_printf(Perl_debug_log, "LHS=%d RHS=%d\n", -counted * deltanext + (minnext
     return min < stopmin ? min : stopmin;
 }
 
-STATIC U32
+PERL_STATIC_INLINE U32
 S_add_data(RExC_state_t *pRExC_state, U32 n, const char *s)
 {
     U32 count = RExC_rxi->data ? RExC_rxi->data->count : 0;
@@ -4907,7 +4907,7 @@ Perl_re_compile(pTHX_ SV * const pattern, U32 rx_flags)
  * This is essentially a copy of Perl_bytes_to_utf8() with the code index
  * stuff added */
 
-static void
+PERL_STATIC_INLINE void
 S_pat_upgrade_to_utf8(pTHX_ RExC_state_t * const pRExC_state,
 		    char **pat_p, STRLEN *plen_p, int num_code_blocks)
 {
@@ -4969,7 +4969,7 @@ S_pat_upgrade_to_utf8(pTHX_ RExC_state_t * const pRExC_state,
  * delim, if non-null is an SV that will be inserted between each element
  */
 
-static SV*
+PERL_STATIC_INLINE SV*
 S_concat_pat(pTHX_ RExC_state_t * const pRExC_state,
                 SV *pat, SV ** const patternp, int pat_count,
                 OP *oplist, bool *recompile_p, SV *delim)
@@ -5182,7 +5182,7 @@ S_concat_pat(pTHX_ RExC_state_t * const pRExC_state,
 /* see if there are any run-time code blocks in the pattern.
  * False positives are allowed */
 
-static bool
+PERL_STATIC_INLINE bool
 S_has_runtime_code(pTHX_ RExC_state_t * const pRExC_state,
 		    char *pat, STRLEN plen)
 {
@@ -5231,7 +5231,7 @@ S_has_runtime_code(pTHX_ RExC_state_t * const pRExC_state,
  * the original pattern needs upgrading to utf8.
  */
 
-static bool
+PERL_STATIC_INLINE bool
 S_compile_runtime_code(pTHX_ RExC_state_t * const pRExC_state,
     char *pat, STRLEN plen)
 {
@@ -5406,7 +5406,7 @@ S_compile_runtime_code(pTHX_ RExC_state_t * const pRExC_state,
 }
 
 
-STATIC bool
+PERL_STATIC_INLINE bool
 S_setup_longest(pTHX_ RExC_state_t *pRExC_state, SV* sv_longest, SV** rx_utf8, SV** rx_substr, I32* rx_end_shift, I32 lookbehind, I32 offset, I32 *minlen, STRLEN longest_length, bool eol, bool meol)
 {
     /* This is the common code for setting up the floating and fixed length
@@ -6915,7 +6915,7 @@ Perl_reg_qr_package(pTHX_ REGEXP * const rx)
 #define REG_RSN_RETURN_NAME    1
 #define REG_RSN_RETURN_DATA    2
 
-STATIC SV*
+PERL_STATIC_INLINE SV*
 S_reg_scan_name(pTHX_ RExC_state_t *pRExC_state, U32 flags)
 {
     char *name_start = RExC_parse;
@@ -7224,7 +7224,7 @@ Perl__new_invlist(pTHX_ IV initial_size)
 }
 #endif
 
-STATIC SV*
+PERL_STATIC_INLINE SV*
 S__new_invlist_C_array(pTHX_ UV* list)
 {
     /* Return a pointer to a newly constructed inversion list, initialized to
@@ -7255,7 +7255,7 @@ S__new_invlist_C_array(pTHX_ UV* list)
     return invlist;
 }
 
-STATIC void
+PERL_STATIC_INLINE void
 S_invlist_extend(pTHX_ SV* const invlist, const UV new_max)
 {
     /* Grow the maximum size of an inversion list */
@@ -7278,7 +7278,7 @@ S_invlist_trim(pTHX_ SV* const invlist)
 
 #define _invlist_union_complement_2nd(a, b, output) _invlist_union_maybe_complement_2nd(a, b, TRUE, output)
 
-STATIC void
+PERL_STATIC_INLINE void
 S__append_range_to_invlist(pTHX_ SV* const invlist, const UV start, const UV end)
 {
    /* Subject to change or removal.  Append the range from 'start' to 'end' at
@@ -8187,7 +8187,7 @@ S_invlist_iterfinish(pTHX_ SV* invlist)
     *get_invlist_iter_addr(invlist) = UV_MAX;
 }
 
-STATIC bool
+PERL_STATIC_INLINE bool
 S_invlist_iternext(pTHX_ SV* invlist, UV* start, UV* end)
 {
     /* An C<invlist_iterinit> call on <invlist> must be used to set this up.
@@ -8411,7 +8411,7 @@ S__invlistEQ(pTHX_ SV* const a, SV* const b, bool complement_b)
 
 /* End of inversion list object */
 
-STATIC void
+PERL_STATIC_INLINE void
 S_parse_lparen_question_flags(pTHX_ struct RExC_state_t *pRExC_state)
 {
     /* This parses the flags that are in either the '(?foo)' or '(?foo:bar)'
@@ -8625,7 +8625,7 @@ S_parse_lparen_question_flags(pTHX_ struct RExC_state_t *pRExC_state)
    needs to be restarted.
    Otherwise would only return NULL if regbranch() returns NULL, which
    cannot happen.  */
-STATIC regnode *
+PERL_STATIC_INLINE regnode *
 S_reg(pTHX_ RExC_state_t *pRExC_state, I32 paren, I32 *flagp,U32 depth)
     /* paren: Parenthesized? 0=top; 1,2=inside '(': changed to letter.
      * 2 is like 1, but indicates that nextchar() has been called to advance
@@ -9515,7 +9515,7 @@ S_reg(pTHX_ RExC_state_t *pRExC_state, I32 paren, I32 *flagp,U32 depth)
  * Returns NULL, setting *flagp to RESTART_UTF8 if the sizing scan needs to be
  * restarted.
  */
-STATIC regnode *
+PERL_STATIC_INLINE regnode *
 S_regbranch(pTHX_ RExC_state_t *pRExC_state, I32 *flagp, I32 first, U32 depth)
 {
     dVAR;
@@ -9597,7 +9597,7 @@ S_regbranch(pTHX_ RExC_state_t *pRExC_state, I32 *flagp, I32 first, U32 depth)
  * Returns NULL, setting *flagp to RESTART_UTF8 if the sizing scan needs to be
  * restarted.
  */
-STATIC regnode *
+PERL_STATIC_INLINE regnode *
 S_regpiece(pTHX_ RExC_state_t *pRExC_state, I32 *flagp, U32 depth)
 {
     dVAR;
@@ -9825,7 +9825,7 @@ S_regpiece(pTHX_ RExC_state_t *pRExC_state, I32 *flagp, U32 depth)
     return(ret);
 }
 
-STATIC bool
+PERL_STATIC_INLINE bool
 S_grok_bslash_N(pTHX_ RExC_state_t *pRExC_state, regnode** node_p, UV *valuep, I32 *flagp, U32 depth, bool in_char_class,
         const bool strict   /* Apply stricter parsing rules? */
     )
@@ -10095,7 +10095,7 @@ S_grok_bslash_N(pTHX_ RExC_state_t *pRExC_state, regnode** node_p, UV *valuep, I
  * If the result from Encode is not a single character,
  * it returns U+FFFD (Replacement character) and sets *encp to NULL.
  */
-STATIC UV
+PERL_STATIC_INLINE UV
 S_reg_recode(pTHX_ const char value, SV **encp)
 {
     STRLEN numlen = 1;
@@ -10287,7 +10287,7 @@ S_alloc_maybe_populate_EXACT(pTHX_ RExC_state_t *pRExC_state, regnode *node, I32
    Otherwise does not return NULL.
 */
 
-STATIC regnode *
+PERL_STATIC_INLINE regnode *
 S_regatom(pTHX_ RExC_state_t *pRExC_state, I32 *flagp, U32 depth)
 {
     dVAR;
@@ -11359,7 +11359,7 @@ tryagain:
     return(ret);
 }
 
-STATIC char *
+PERL_STATIC_INLINE char *
 S_regwhite( RExC_state_t *pRExC_state, char *p )
 {
     const char *e = RExC_end;
@@ -11386,7 +11386,7 @@ S_regwhite( RExC_state_t *pRExC_state, char *p )
     return p;
 }
 
-STATIC char *
+PERL_STATIC_INLINE char *
 S_regpatws( RExC_state_t *pRExC_state, char *p , const bool recognize_comment )
 {
     /* Returns the next non-pattern-white space, non-comment character (the
@@ -11573,7 +11573,7 @@ S_regpposixcc(pTHX_ RExC_state_t *pRExC_state, I32 value, const bool strict)
     return namedclass;
 }
 
-STATIC bool
+PERL_STATIC_INLINE bool
 S_could_it_be_a_POSIX_class(pTHX_ RExC_state_t *pRExC_state)
 {
     /* This applies some heuristics at the current parse position (which should
@@ -11626,7 +11626,7 @@ S_could_it_be_a_POSIX_class(pTHX_ RExC_state_t *pRExC_state)
             && first_char == *(p - 1));
 }
 
-STATIC regnode *
+PERL_STATIC_INLINE regnode *
 S_handle_regex_sets(pTHX_ RExC_state_t *pRExC_state, SV** return_invlist, I32 *flagp, U32 depth,
                    char * const oregcomp_parse)
 {
@@ -12105,7 +12105,7 @@ S_handle_regex_sets(pTHX_ RExC_state_t *pRExC_state, SV** return_invlist, I32 *f
  * changed since initialization, then there is a run-time definition. */
 #define HAS_NONLOCALE_RUNTIME_PROPERTY_DEFINITION (SvCUR(listsv) != initial_listsv_len)
 
-STATIC regnode *
+PERL_STATIC_INLINE regnode *
 S_regclass(pTHX_ RExC_state_t *pRExC_state, I32 *flagp, U32 depth,
                  const bool stop_at_1,  /* Just parse the next thing, don't
                                            look for a full character class */
@@ -13994,7 +13994,7 @@ parseit:
 
 */
 
-STATIC bool
+PERL_STATIC_INLINE bool
 S_reg_skipcomment(pTHX_ RExC_state_t *pRExC_state)
 {
     bool ended = 0;
@@ -14028,7 +14028,7 @@ S_reg_skipcomment(pTHX_ RExC_state_t *pRExC_state)
    This is the /x friendly way of saying RExC_parse++.
 */
 
-STATIC char*
+PERL_STATIC_INLINE char*
 S_nextchar(pTHX_ RExC_state_t *pRExC_state)
 {
     char* const retval = RExC_parse++;
@@ -14165,7 +14165,7 @@ S_reganode(pTHX_ RExC_state_t *pRExC_state, U8 op, U32 arg)
 /*
 - reguni - emit (if appropriate) a Unicode character
 */
-STATIC STRLEN
+PERL_STATIC_INLINE STRLEN
 S_reguni(pTHX_ const RExC_state_t *pRExC_state, UV uv, char* s)
 {
     dVAR;
@@ -14180,7 +14180,7 @@ S_reguni(pTHX_ const RExC_state_t *pRExC_state, UV uv, char* s)
 *
 * Means relocating the operand.
 */
-STATIC void
+PERL_STATIC_INLINE void
 S_reginsert(pTHX_ RExC_state_t *pRExC_state, U8 op, regnode *opnd, U32 depth)
 {
     dVAR;
@@ -14268,7 +14268,7 @@ S_reginsert(pTHX_ RExC_state_t *pRExC_state, U8 op, regnode *opnd, U32 depth)
 - SEE ALSO: regtail_study
 */
 /* TODO: All three parms should be const */
-STATIC void
+PERL_STATIC_INLINE void
 S_regtail(pTHX_ RExC_state_t *pRExC_state, regnode *p, const regnode *val,U32 depth)
 {
     dVAR;
@@ -14327,7 +14327,7 @@ to control which is which.
 */
 /* TODO: All four parms should be const */
 
-STATIC U8
+PERL_STATIC_INLINE U8
 S_regtail_study(pTHX_ RExC_state_t *pRExC_state, regnode *p, const regnode *val,U32 depth)
 {
     dVAR;
@@ -15412,7 +15412,7 @@ Perl_regnext(pTHX_ regnode *p)
 }
 #endif
 
-STATIC void
+PERL_STATIC_INLINE void
 S_re_croak2(pTHX_ const char* pat1,const char* pat2,...)
 {
     va_list args;
@@ -15503,7 +15503,7 @@ Perl_save_re_context(pTHX)
 
 #ifdef DEBUGGING
 
-STATIC void
+PERL_STATIC_INLINE void
 S_put_byte(pTHX_ SV *sv, int c)
 {
     PERL_ARGS_ASSERT_PUT_BYTE;

@@ -961,7 +961,7 @@ static char *emergency_buffer_prepared;
 #    define emergency_sbrk_croak	croak2
 #  endif
 
-static char *
+PERL_STATIC_INLINE char *
 perl_get_emergency_buffer(IV *size)
 {
     dTHX;
@@ -993,7 +993,7 @@ perl_get_emergency_buffer(IV *size)
 #  define PERL_GET_EMERGENCY_BUFFER(p)	perl_get_emergency_buffer(p)
 
 #  ifndef NO_MALLOC_DYNAMIC_CFG
-static char *
+PERL_STATIC_INLINE char *
 get_emergency_buffer(IV *size)
 {
     char *pv = emergency_buffer_prepared;
@@ -1027,7 +1027,7 @@ set_emergency_buffer(char *b, IV size)
 }
 #  endif
 
-static Malloc_t
+PERL_STATIC_INLINE Malloc_t
 emergency_sbrk(MEM_SIZE size)
 {
     MEM_SIZE rsize = (((size - 1)>>LOG_OF_MIN_ARENA) + 1)<<LOG_OF_MIN_ARENA;
@@ -1098,7 +1098,7 @@ emergency_sbrk(MEM_SIZE size)
 #undef ASSERT
 #define	ASSERT(p,diag)   if (!(p)) botch(diag,STRINGIFY(p),__FILE__,__LINE__);
 
-static void
+PERL_STATIC_INLINE void
 botch(const char *diag, const char *s, const char *file, int line)
 {
     dVAR;
@@ -1138,7 +1138,7 @@ botch(const char *diag, const char *s, const char *file, int line)
 
 #ifdef MALLOC_FILL
 /* Fill should be long enough to cover long */
-static void
+PERL_STATIC_INLINE void
 fill_pat_4bytes(unsigned char *s, size_t nbytes, const unsigned char *fill)
 {
     unsigned char *e = s + nbytes;
@@ -1179,7 +1179,7 @@ static const unsigned char fill_deadbeef[] =
 #endif
 
 #ifdef MALLOC_FILL_CHECK
-static int
+PERL_STATIC_INLINE int
 cmp_pat_4bytes(unsigned char *s, size_t nbytes, const unsigned char *fill)
 {
     unsigned char *e = s + nbytes;
@@ -1398,7 +1398,7 @@ static int n_chunks;
 static char max_bucket;
 
 /* Cutoff a piece of one of the chunks in the chain.  Prefer smaller chunk. */
-static void *
+PERL_STATIC_INLINE void *
 get_from_chain(MEM_SIZE size)
 {
     struct chunk_chain_s *elt = chunk_chain, **oldp = &chunk_chain;
@@ -1436,7 +1436,7 @@ get_from_chain(MEM_SIZE size)
     }
 }
 
-static void
+PERL_STATIC_INLINE void
 add_to_chain(void *p, MEM_SIZE size, MEM_SIZE chip)
 {
     struct chunk_chain_s *next = chunk_chain;
@@ -1449,7 +1449,7 @@ add_to_chain(void *p, MEM_SIZE size, MEM_SIZE chip)
     n_chunks++;
 }
 
-static void *
+PERL_STATIC_INLINE void *
 get_from_bigger_buckets(int bucket, MEM_SIZE size)
 {
     int price = 1;
@@ -1630,7 +1630,7 @@ getpages(MEM_SIZE needed, int *nblksp, int bucket)
     return ovp;
 }
 
-static int
+PERL_STATIC_INLINE int
 getpages_adjacent(MEM_SIZE require)
 {	    
     if (require <= sbrked_remains) {
@@ -1674,7 +1674,7 @@ getpages_adjacent(MEM_SIZE require)
 /*
  * Allocate more memory to the indicated bucket.
  */
-static void
+PERL_STATIC_INLINE void
 morecore(int bucket)
 {
         dVAR;

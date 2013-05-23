@@ -190,7 +190,7 @@ The rough perl equivalent is C<$myarray[$idx]>.
 =cut
 */
 
-static bool
+PERL_STATIC_INLINE bool
 S_adjust_index(pTHX_ AV *av, const MAGIC *mg, I32 *keyp)
 {
     bool adjust_index = 1;
@@ -964,7 +964,7 @@ Perl_av_exists(pTHX_ AV *av, I32 key)
 	return FALSE;
 }
 
-static MAGIC *
+PERL_STATIC_INLINE MAGIC *
 S_get_aux_mg(pTHX_ AV *av) {
     dVAR;
     MAGIC *mg;

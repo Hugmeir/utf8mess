@@ -1056,7 +1056,7 @@ Perl_savesharedsvpv(pTHX_ SV *sv)
 
 /* the SV for Perl_form() and mess() is not kept in an arena */
 
-STATIC SV *
+PERL_STATIC_INLINE SV *
 S_mess_alloc(pTHX)
 {
     dVAR;
@@ -1178,7 +1178,7 @@ Perl_mess(pTHX_ const char *pat, ...)
     return retval;
 }
 
-STATIC const COP*
+PERL_STATIC_INLINE const COP*
 S_closest_cop(pTHX_ const COP *cop, const OP *o)
 {
     dVAR;
@@ -1363,7 +1363,7 @@ Perl_write_to_stderr(pTHX_ SV* msv)
 
 /* Common code used in dieing and warning */
 
-STATIC SV *
+PERL_STATIC_INLINE SV *
 S_with_queued_errors(pTHX_ SV *ex)
 {
     PERL_ARGS_ASSERT_WITH_QUEUED_ERRORS;
@@ -1375,7 +1375,7 @@ S_with_queued_errors(pTHX_ SV *ex)
     return ex;
 }
 
-STATIC bool
+PERL_STATIC_INLINE bool
 S_invoke_exception_hook(pTHX_ SV *ex, bool warn)
 {
     dVAR;
@@ -1819,7 +1819,7 @@ Perl_ckwarn_d(pTHX_ U32 w)
     return ckwarn_common(w);
 }
 
-static bool
+PERL_STATIC_INLINE bool
 S_ckwarn_common(pTHX_ U32 w)
 {
     if (PL_curcop->cop_warnings == pWARN_ALL)
@@ -2679,7 +2679,7 @@ Perl_rsignal(pTHX_ int signo, Sighandler_t handler)
     return PerlProc_signal(signo, handler);
 }
 
-static Signal_t
+PERL_STATIC_INLINE Signal_t
 sig_trap(int signo)
 {
     dVAR;
@@ -2885,7 +2885,7 @@ Perl_wait4pid(pTHX_ Pid_t pid, int *statusp, int flags)
 #endif /* !DOSISH || OS2 || WIN32 || NETWARE */
 
 #ifdef PERL_USES_PL_PIDSTATUS
-void
+PERL_STATIC_INLINE void
 S_pidgone(pTHX_ Pid_t pid, int status)
 {
     SV *sv;
@@ -4882,7 +4882,7 @@ Perl_vcmp(pTHX_ SV *lhv, SV *rhv)
 #endif
 
 #ifdef EMULATE_SOCKETPAIR_UDP
-static int
+PERL_STATIC_INLINE int
 S_socketpair_udp (int fd[2]) {
     dTHX;
     /* Fake a datagram socketpair using UDP to localhost.  */
@@ -5529,7 +5529,7 @@ Perl_free_global_struct(pTHX_ struct perl_vars *plvarsp)
 #   define _SV_LOG_SERIAL_ARG(sv)
 # endif
 
-static void
+PERL_STATIC_INLINE void
 S_mem_log_common(enum mem_log_type mlt, const UV n, 
 		 const UV typesize, const char *type_name, const SV *sv,
 		 Malloc_t oldalloc, Malloc_t newalloc,

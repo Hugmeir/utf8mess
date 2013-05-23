@@ -47,7 +47,7 @@ static const char S_strtab_error[]
 
 #else
 
-STATIC HE*
+PERL_STATIC_INLINE HE*
 S_new_he(pTHX)
 {
     dVAR;
@@ -73,7 +73,7 @@ S_new_he(pTHX)
 
 #endif
 
-STATIC HEK *
+PERL_STATIC_INLINE HEK *
 S_save_hek_flags(const char *str, I32 len, U32 hash, int flags)
 {
     const int flags_masked = flags & HVhek_MASK;
@@ -189,7 +189,7 @@ Perl_he_dup(pTHX_ const HE *e, bool shared, CLONE_PARAMS* param)
 }
 #endif	/* USE_ITHREADS */
 
-static void
+PERL_STATIC_INLINE void
 S_hv_notallowed(pTHX_ int flags, const char *key, I32 klen,
 		const char *msg)
 {
@@ -867,7 +867,7 @@ Perl_hv_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
     return (void *) entry;
 }
 
-STATIC void
+PERL_STATIC_INLINE void
 S_hv_magic_check(HV *hv, bool *needs_copy, bool *needs_store)
 {
     const MAGIC *mg = SvMAGIC(hv);
@@ -940,7 +940,7 @@ value, or 0 to ask for it to be computed.
 =cut
 */
 
-STATIC SV *
+PERL_STATIC_INLINE SV *
 S_hv_delete_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
 		   int k_flags, I32 d_flags, U32 hash)
 {
@@ -1146,7 +1146,7 @@ S_hv_delete_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
     return NULL;
 }
 
-STATIC void
+PERL_STATIC_INLINE void
 S_hsplit(pTHX_ HV *hv, STRLEN const oldsize, STRLEN newsize)
 {
     dVAR;
@@ -1428,7 +1428,7 @@ Perl_hv_copy_hints_hv(pTHX_ HV *const ohv)
 #undef HV_SET_MAX_ADJUSTED_FOR_KEYS
 
 /* like hv_free_ent, but returns the SV rather than freeing it */
-STATIC SV*
+PERL_STATIC_INLINE SV*
 S_hv_free_ent_ret(pTHX_ HV *hv, HE *entry)
 {
     dVAR;
@@ -1574,7 +1574,7 @@ Perl_hv_clear_placeholders(pTHX_ HV *hv)
 	clear_placeholders(hv, items);
 }
 
-static void
+PERL_STATIC_INLINE void
 S_clear_placeholders(pTHX_ HV *hv, U32 items)
 {
     dVAR;
@@ -1621,7 +1621,7 @@ S_clear_placeholders(pTHX_ HV *hv, U32 items)
     assert (0);
 }
 
-STATIC void
+PERL_STATIC_INLINE void
 S_hfreeentries(pTHX_ HV *hv)
 {
     STRLEN index = 0;
@@ -1890,7 +1890,7 @@ PERL_STATIC_INLINE U32 S_ptr_hash(PTRV u) {
 }
 
 
-static struct xpvhv_aux*
+PERL_STATIC_INLINE struct xpvhv_aux*
 S_hv_auxinit(pTHX_ HV *hv) {
     struct xpvhv_aux *iter;
     char *array;
@@ -2146,7 +2146,7 @@ This is basically sv_eq_flags() in sv.c, but we avoid the magic
 and bytes checking.
 */
 
-STATIC I32
+PERL_STATIC_INLINE I32
 hek_eq_pvn_flags(pTHX_ const HEK *hek, const char* pv, const I32 pvlen, const U32 flags) {
     if ( (HEK_UTF8(hek) ? 1 : 0) != (flags & SVf_UTF8 ? 1 : 0) ) {
         if (flags & SVf_UTF8)
@@ -2635,7 +2635,7 @@ Perl_unshare_hek(pTHX_ HEK *hek)
    hek if non-NULL takes priority over the other 3, else str, len and hash
    are used.  If so, len and hash must both be valid for str.
  */
-STATIC void
+PERL_STATIC_INLINE void
 S_unshare_hek_or_pvn(pTHX_ const HEK *hek, const char *str, I32 len, U32 hash)
 {
     dVAR;
@@ -2758,7 +2758,7 @@ Perl_share_hek(pTHX_ const char *str, I32 len, U32 hash)
     return share_hek_flags (str, len, hash, flags);
 }
 
-STATIC HEK *
+PERL_STATIC_INLINE HEK *
 S_share_hek_flags(pTHX_ const char *str, I32 len, U32 hash, int flags)
 {
     dVAR;
@@ -2890,7 +2890,7 @@ Perl_hv_placeholders_set(pTHX_ HV *hv, I32 ph)
     /* else we don't need to add magic to record 0 placeholders.  */
 }
 
-STATIC SV *
+PERL_STATIC_INLINE SV *
 S_refcounted_he_value(pTHX_ const struct refcounted_he *he)
 {
     dVAR;

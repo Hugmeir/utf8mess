@@ -181,7 +181,7 @@ typedef SV * gptr;		/* pointers in our lists */
 */
 
 
-static IV
+PERL_STATIC_INLINE IV
 dynprep(pTHX_ gptr *list1, gptr *list2, size_t nmemb, const SVCOMPARE_t cmp)
 {
     I32 sense;
@@ -341,14 +341,14 @@ typedef struct {
 } off_runs;		/* pseudo-stack element */
 
 
-static I32
+PERL_STATIC_INLINE I32
 cmp_desc(pTHX_ gptr const a, gptr const b)
 {
     dVAR;
     return -PL_sort_RealCmp(aTHX_ a, b);
 }
 
-STATIC void
+PERL_STATIC_INLINE void
 S_mergesortsv(pTHX_ gptr *base, size_t nmemb, SVCOMPARE_t cmp, U32 flags)
 {
     dVAR;
@@ -714,7 +714,7 @@ struct partition_stack_entry {
 
 #ifdef QSORT_DEBUG
 
-static void
+PERL_STATIC_INLINE void
 break_here()
 {
    return; /* good place to set a breakpoint */
@@ -722,7 +722,7 @@ break_here()
 
 #define qsort_assert(t) (void)( (t) || (break_here(), 0) )
 
-static void
+PERL_STATIC_INLINE void
 doqsort_all_asserts(
    void * array,
    size_t num_elts,
@@ -760,7 +760,7 @@ doqsort_all_asserts(
 
 /* ****************************************************************** qsort */
 
-STATIC void /* the standard unstable (u) quicksort (qsort) */
+PERL_STATIC_INLINE void /* the standard unstable (u) quicksort (qsort) */
 S_qsortsvu(pTHX_ SV ** array, size_t num_elts, SVCOMPARE_t compare)
 {
    SV * temp;
@@ -1316,7 +1316,7 @@ S_qsortsvu(pTHX_ SV ** array, size_t num_elts, SVCOMPARE_t compare)
  */
 
 
-static I32
+PERL_STATIC_INLINE I32
 cmpindir(pTHX_ gptr const a, gptr const b)
 {
     dVAR;
@@ -1329,7 +1329,7 @@ cmpindir(pTHX_ gptr const a, gptr const b)
     return (ap > bp) ? 1 : ((ap < bp) ? -1 : 0);
 }
 
-static I32
+PERL_STATIC_INLINE I32
 cmpindir_desc(pTHX_ gptr const a, gptr const b)
 {
     dVAR;
@@ -1345,7 +1345,7 @@ cmpindir_desc(pTHX_ gptr const a, gptr const b)
 
 }
 
-STATIC void
+PERL_STATIC_INLINE void
 S_qsortsv(pTHX_ gptr *list1, size_t nmemb, SVCOMPARE_t cmp, U32 flags)
 {
     dVAR;
@@ -1756,7 +1756,7 @@ PP(pp_sort)
     return nextop;
 }
 
-static I32
+PERL_STATIC_INLINE I32
 S_sortcv(pTHX_ SV *const a, SV *const b)
 {
     dVAR;
@@ -1798,7 +1798,7 @@ S_sortcv(pTHX_ SV *const a, SV *const b)
     return result;
 }
 
-static I32
+PERL_STATIC_INLINE I32
 S_sortcv_stacked(pTHX_ SV *const a, SV *const b)
 {
     dVAR;
@@ -1855,7 +1855,7 @@ S_sortcv_stacked(pTHX_ SV *const a, SV *const b)
     return result;
 }
 
-static I32
+PERL_STATIC_INLINE I32
 S_sortcv_xsub(pTHX_ SV *const a, SV *const b)
 {
     dVAR; dSP;
@@ -1886,7 +1886,7 @@ S_sortcv_xsub(pTHX_ SV *const a, SV *const b)
 }
 
 
-static I32
+PERL_STATIC_INLINE I32
 S_sv_ncmp(pTHX_ SV *const a, SV *const b)
 {
     const NV nv1 = SvNSIV(a);
@@ -1905,7 +1905,7 @@ S_sv_ncmp(pTHX_ SV *const a, SV *const b)
     return nv1 < nv2 ? -1 : nv1 > nv2 ? 1 : 0;
 }
 
-static I32
+PERL_STATIC_INLINE I32
 S_sv_i_ncmp(pTHX_ SV *const a, SV *const b)
 {
     const IV iv1 = SvIV(a);
@@ -1923,7 +1923,7 @@ S_sv_i_ncmp(pTHX_ SV *const a, SV *const b)
 
 #define SORT_NORMAL_RETURN_VALUE(val)  (((val) > 0) ? 1 : ((val) ? -1 : 0))
 
-static I32
+PERL_STATIC_INLINE I32
 S_amagic_ncmp(pTHX_ SV *const a, SV *const b)
 {
     dVAR;
@@ -1944,7 +1944,7 @@ S_amagic_ncmp(pTHX_ SV *const a, SV *const b)
      return S_sv_ncmp(aTHX_ a, b);
 }
 
-static I32
+PERL_STATIC_INLINE I32
 S_amagic_i_ncmp(pTHX_ SV *const a, SV *const b)
 {
     dVAR;
@@ -1965,7 +1965,7 @@ S_amagic_i_ncmp(pTHX_ SV *const a, SV *const b)
     return S_sv_i_ncmp(aTHX_ a, b);
 }
 
-static I32
+PERL_STATIC_INLINE I32
 S_amagic_cmp(pTHX_ SV *const str1, SV *const str2)
 {
     dVAR;
@@ -1986,7 +1986,7 @@ S_amagic_cmp(pTHX_ SV *const str1, SV *const str2)
     return sv_cmp(str1, str2);
 }
 
-static I32
+PERL_STATIC_INLINE I32
 S_amagic_cmp_locale(pTHX_ SV *const str1, SV *const str2)
 {
     dVAR;

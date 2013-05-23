@@ -203,7 +203,7 @@ static const char S_no_symref_sv[] =
    This is unrelated to the cv-to-gv assignment case.
 */
 
-static SV *
+PERL_STATIC_INLINE SV *
 S_rv2gv(pTHX_ SV *sv, const bool vivify_sv, const bool strict,
               const bool noinit)
 {
@@ -548,7 +548,7 @@ PP(pp_refgen)
     RETURN;
 }
 
-STATIC SV*
+PERL_STATIC_INLINE SV*
 S_refto(pTHX_ SV *sv)
 {
     dVAR;
@@ -750,7 +750,7 @@ PP(pp_trans)
 
 /* Lvalue operators. */
 
-static void
+PERL_STATIC_INLINE void
 S_do_chomp(pTHX_ SV *retval, SV *sv, bool chomping)
 {
     dVAR;
@@ -4475,7 +4475,7 @@ PP(pp_each)
     RETURN;
 }
 
-STATIC OP *
+PERL_STATIC_INLINE OP *
 S_do_delete_local(pTHX)
 {
     dVAR;
@@ -4848,7 +4848,7 @@ PP(pp_anonhash)
     RETURN;
 }
 
-static AV *
+PERL_STATIC_INLINE AV *
 S_deref_plain_array(pTHX_ AV *ary)
 {
     if (SvTYPE(ary) == SVt_PVAV) return ary;
