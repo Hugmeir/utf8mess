@@ -297,6 +297,7 @@ plan( tests => 58 );
     
     # [perl #88134] incorrect package structure
     {
+        no warnings 'deprecated';
         package Bèàr::;
         sub bàz{1}
         package main;

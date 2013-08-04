@@ -491,6 +491,32 @@ S_deprecate_commaless_var_list(pTHX) {
     return REPORT(','); /* grandfather non-comma-format format */
 }
 
+PERL_STATIC_INLINE void
+S_deprecate_empty_packages(pTHX_ char *s) {
+    if ( s && *s && instr(s, "::::") ) {
+        deprecate("empty package names");
+    }
+    return;
+}
+
+PERL_STATIC_INLINE void
+S_deprecate_trailing_colons(pTHX_ char *s, STRLEN len) {
+    if ( s && *s && len ) {
+        if ( len == 2 && strEQ(s, "::") ) {
+              /* 'sub ::;' or 'package ::;' */
+            deprecate("empty package names");
+        }
+        /* foo:: */
+        if ( len >= 3 && *(s+len-3) != ':'
+           && strnEQ(s + len - 2, "::", 2) )
+        {
+            deprecate("trailing double colons in sub or package declaration");
+        }
+
+    }
+    return;
+}
+
 /*
  * S_ao
  *
@@ -7167,7 +7193,7 @@ Perl_yylex(pTHX)
 		    len += morelen;
 		    pkgname = 1;
 		}
-
+		
 		if (PL_expect == XOPERATOR) {
 		    if (PL_bufptr == PL_linestart) {
 			CopLINE_dec(PL_curcop);
@@ -7538,6 +7564,7 @@ Perl_yylex(pTHX)
 		    pl_yylval.opval->op_private |= OPpCONST_STRICT;
 		else {
 		bareword:
+		    deprecate_trailing_colons(PL_tokenbuf, strlen(PL_tokenbuf));
 		    /* after "print" and similar functions (corresponding to
 		     * "F? L" in opcode.pl), whatever wasn't already parsed as
 		     * a filehandle should be subject to "strict subs".
@@ -8333,12 +8360,20 @@ Perl_yylex(pTHX)
 	    LOP(OP_PACK,XTERM);
 
 	case KEY_package:
+        {
+            STRLEN len;
 	    s = force_word(s,WORD,FALSE,TRUE);
+            /* This is wrong on so many levels, but it works.
+             * force_word() calls scan_word() using PL_tokenbuf, and
+             * that's still holding the package name for us.
+             */
+            len = strlen(PL_tokenbuf);
+            deprecate_trailing_colons(PL_tokenbuf, len);
 	    s = SKIPSPACE1(s);
 	    s = force_strict_version(s);
 	    PL_lex_expect = XBLOCK;
 	    OPERATOR(PACKAGE);
-
+        }
 	case KEY_pipe:
 	    LOP(OP_PIPE_OP,XTERM);
 
@@ -8668,6 +8703,8 @@ Perl_yylex(pTHX)
 		    attrful = XATTRBLOCK;
 		    d = scan_word(s, tmpbuf, sizeof PL_tokenbuf - 1, TRUE,
 				  &len);
+
+          deprecate_trailing_colons(tmpbuf, len);
 #ifdef PERL_MAD
 		    if (PL_madskills)
 			nametoke = newSVpvn_flags(s, d - s, SvUTF8(PL_linestr));
@@ -8689,7 +8726,6 @@ Perl_yylex(pTHX)
                     if (SvUTF8(PL_linestr))
                         SvUTF8_on(PL_subname);
 		    have_name = TRUE;
-
 
 #ifdef PERL_MAD
 		    start_force(0);
@@ -9360,6 +9396,8 @@ S_scan_word(pTHX_ char *s, char *dest, STRLEN destlen, int allow_package, STRLEN
     parse_ident(&s, &d, e, allow_package, is_utf8);
     *d = '\0';
     *slp = d - dest;
+    if ( allow_package && *slp && *slp >= 4 )
+            deprecate_empty_packages(dest);
     return s;
 }
 
@@ -9394,7 +9432,8 @@ S_scan_ident(pTHX_ char *s, const char *send, char *dest, STRLEN destlen, I32 ck
            (anything valid as a bareword), so job done and return.  */
 	if (PL_lex_state != LEX_NORMAL)
 	    PL_lex_state = LEX_INTERPENDMAYBE;
-	return s;
+        deprecate_empty_packages(d);
+        return s;
     }
     if (*s == '$' && s[1] &&
       (isIDFIRST_lazy_if(s+1,is_utf8)
@@ -9470,6 +9509,7 @@ S_scan_ident(pTHX_ char *s, const char *send, char *dest, STRLEN destlen, I32 ck
 		bracket++;
 		PL_lex_brackstack[PL_lex_brackets++] = (char)(XOPERATOR | XFAKEBRACK);
 		PL_lex_allbrackets++;
+      deprecate_empty_packages(dest);
 		return s;
 	    }
 	}
@@ -9522,6 +9562,7 @@ S_scan_ident(pTHX_ char *s, const char *send, char *dest, STRLEN destlen, I32 ck
     }
     else if (PL_lex_state == LEX_INTERPNORMAL && !PL_lex_brackets && !intuit_more(s))
 	PL_lex_state = LEX_INTERPEND;
+
     return s;
 }
 

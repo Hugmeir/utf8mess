@@ -1420,3 +1420,42 @@ q
 1
 1
 q
+########
+# toke.c
+package ::;
+package foo::::bar;
+sub ::;
+sub foo::::bar;
+
+EXPECT
+Use of empty package names is deprecated at - line 2.
+Use of empty package names is deprecated at - line 3.
+Use of empty package names is deprecated at - line 4.
+Use of empty package names is deprecated at - line 5.
+########
+# toke.c
+no warnings 'deprecated' ;
+package ::;
+package foo::::bar;
+
+sub ::;
+sub foo::::bar;
+
+EXPECT
+########
+# toke.c
+package foo::;
+sub foo::;
+
+IO::Handle::->can("can");
+$::{foo::};
+
+EXPECT
+Use of trailing double colons in sub or package declaration is deprecated at - line 2.
+Use of trailing double colons in sub or package declaration is deprecated at - line 3.
+########
+# toke.c
+no warnings 'deprecated';
+package foo::;
+sub foo::;
+EXPECT

@@ -109,7 +109,7 @@ like(
     'sub DB::sub { goto &$DB::sub }',
     'sub foo { goto &bar::baz; }',
     'sub bar::baz { print qq _ok\n_ }',
-    'delete $::{bar::::};',
+    'delete $::{bar::};',
     'foo();',
    ],
   ),

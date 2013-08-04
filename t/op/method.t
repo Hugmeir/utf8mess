@@ -479,7 +479,10 @@ sub SUPPER::foo { "supper" }
 is "SUPER"->foo, 'supper', 'SUPER->method';
 
 sub flomp { "flimp" }
+{
+no warnings 'deprecated';
 sub main::::flomp { "flump" }
+}
 is "::"->flomp, 'flump', 'method call on ::';
 is "::main"->flomp, 'flimp', 'method call on ::main';
 eval { ""->flomp };

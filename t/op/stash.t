@@ -319,6 +319,7 @@ fresh_perl_is(
 
 # [perl #88134] incorrect package structure
 {
+    no warnings 'deprecated';
     package Bear::;
     sub baz{1}
     package main;

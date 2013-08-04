@@ -176,6 +176,7 @@ EOFCODE
 # Exotic sub declarations
 $a = `$^X $path "-MO=Deparse" -e "sub ::::{}sub ::::::{}" 2>&1`;
 $a =~ s/-e syntax OK\n//g;
+$a =~ s/Use of empty package.+\n//g;
 is($a, <<'EOCODG', "sub :::: and sub ::::::");
 sub :::: {
     
@@ -458,6 +459,7 @@ my $f = sub {
 '::::'->();
 ####
 # bug #43010
+no warnings;
 &::::;
 ####
 # [perl #77172]

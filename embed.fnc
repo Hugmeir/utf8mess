@@ -2255,6 +2255,8 @@ so	|SV*	|new_constant	|NULLOK const char *s|STRLEN len \
 				|NULLOK SV *pv|NULLOK const char *type \
 				|STRLEN typelen
 s	|int	|deprecate_commaless_var_list
+s  |void  |deprecate_empty_packages|NULLOK char *s
+s  |void  |deprecate_trailing_colons|NULLOK char *s|STRLEN len
 s	|int	|ao		|int toketype
 s  |void|parse_ident|NN char **s|NN char **d \
                      |NN char * const e|int allow_package \
