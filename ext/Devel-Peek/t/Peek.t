@@ -1207,10 +1207,8 @@ EOP
     )
 }
 
-{
-   local $::TODO = "OUTSIDE currently broken in blead";
 sub get_outside {
-   eval "sub $_[0] { my \$x; \$x++; return sub { \$x } } $_[0]()";
+   eval "sub $_[0] { my \$x; \$x++; return sub { eval q{\$x} } } $_[0]()";
    
 }
 sub food { my $x; return sub { $x } }
@@ -1225,7 +1223,6 @@ like(
     qr/OUTSIDE = 0x[[:xdigit:]]+\s+\Q(\x{30ce})/,
     'OUTSIDE + UTF8 works'
 );
-}
 
 # TODO AUTOLOAD = stashname, which requires using a XS autoload
 # and calling Dump() on the cv
