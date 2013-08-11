@@ -286,7 +286,7 @@ $$ = $pid; # Tests below use $$
 	   $wd = Cygwin::win_to_posix_path(Cygwin::posix_to_win_path($wd, 1));
        }
     }
-    elsif($Is_os2 || $Is_Android) {
+    elsif($Is_os2) {
        $wd = Cwd::sys_cwd();
     }
     else {
