@@ -242,3 +242,7 @@ exit 0
 EOF
 $chmod a+rx $from
 
+hostosname=`$hostperl -le 'print $^O'`
+if $test "X$hostosname" == "Xdarwin"; then
+  firstmakefile=GNUmakefile;
+fi
