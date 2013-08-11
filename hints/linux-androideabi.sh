@@ -201,13 +201,13 @@ fi
 exit \$result_status
 
 EOF
-chmod a+rx $run
+$chmod a+rx $run
 
 $cat >$targetmkdir <<EOF
 #!/bin/sh
 adb -s $targethost shell "mkdir -p \$@"
 EOF
-chmod a+rx $targetmkdir
+$chmod a+rx $targetmkdir
 
 $cat >$to <<EOF
 #!/bin/sh
@@ -224,7 +224,7 @@ do
 done
 exit 0
 EOF
-chmod a+rx $to
+$chmod a+rx $to
 
 $cat >$from <<EOF
 #!/bin/sh
@@ -235,5 +235,5 @@ do
 done
 exit 0
 EOF
-chmod a+rx $from
+$chmod a+rx $from
 
