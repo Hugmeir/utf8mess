@@ -9302,6 +9302,7 @@ S_scan_ident(pTHX_ char *s, char *dest, STRLEN destlen, I32 ck_uni)
     char *d = dest;
     char * const e = d + destlen - 3;    /* two-character token, ending NUL */
     bool is_utf8 = cBOOL(UTF);
+    I32 orig_copline, tmp_copline = 0;
 
     PERL_ARGS_ASSERT_SCAN_IDENT;
 
@@ -9342,8 +9343,10 @@ S_scan_ident(pTHX_ char *s, char *dest, STRLEN destlen, I32 ck_uni)
     if (*s == '{') {
 	bracket = s;
 	s++;
-        while (s < PL_bufend && ( SPACE_OR_TAB(*s) || *s == '\n' ))
-	   s++;
+	orig_copline = CopLINE(PL_curcop);
+        while (s < PL_bufend && isSPACE(*s)) {
+            s = PEEKSPACE(s);
+        }
     }
 
 /*  \c?, \c\, \c^, \c_, and \cA..\cZ minus the ones that have traditionally
@@ -9395,18 +9398,23 @@ S_scan_ident(pTHX_ char *s, char *dest, STRLEN destlen, I32 ck_uni)
         d += is_utf8 ? UTF8SKIP(d) : 1;
         parse_ident(&s, &d, e, 1, is_utf8);
 	    *d = '\0';
-	    while (s < PL_bufend && SPACE_OR_TAB(*s))
-		s++;
+            tmp_copline = CopLINE(PL_curcop);
+            while (s < PL_bufend && isSPACE(*s)) {
+                s = PEEKSPACE(s);
+            }
 	    if ((*s == '[' || (*s == '{' && strNE(dest, "sub")))) {
                 /* ${foo[0]} and ${foo{bar}} notation.  */
 		if (ckWARN(WARN_AMBIGUOUS) && keyword(dest, d - dest, 0)) {
 		    const char * const brack =
 			(const char *)
 			((*s == '[') ? "[...]" : "{...}");
+                    orig_copline = CopLINE(PL_curcop);
+                    CopLINE_set(PL_curcop, tmp_copline);
    /* diag_listed_as: Ambiguous use of %c{%s[...]} resolved to %c%s[...] */
 		    Perl_warner(aTHX_ packWARN(WARN_AMBIGUOUS),
 			"Ambiguous use of %c{%s%s} resolved to %c%s%s",
 			funny, dest, brack, funny, dest, brack);
+                    CopLINE_set(PL_curcop, orig_copline);
 		}
 		bracket++;
 		PL_lex_brackstack[PL_lex_brackets++] = (char)(XOPERATOR | XFAKEBRACK);
@@ -9428,9 +9436,12 @@ S_scan_ident(pTHX_ char *s, char *dest, STRLEN destlen, I32 ck_uni)
 	    *d = '\0';
 	}
 
-        while (s < PL_bufend && ( SPACE_OR_TAB(*s) || *s == '\n' ))
-	    s++;
-
+        if ( !tmp_copline )
+            tmp_copline = CopLINE(PL_curcop);
+        while (s < PL_bufend && isSPACE(*s)) {
+            s = PEEKSPACE(s);
+        }
+	    
         /* Expect to find a closing } after consuming any trailing whitespace.
          */
 	if (*s == '}') {
@@ -9448,9 +9459,12 @@ S_scan_ident(pTHX_ char *s, char *dest, STRLEN destlen, I32 ck_uni)
                                             SVs_TEMP | (is_utf8 ? SVf_UTF8 : 0) );
 		    if (funny == '#')
 			funny = '@';
+                    orig_copline = CopLINE(PL_curcop);
+                    CopLINE_set(PL_curcop, tmp_copline);
 		    Perl_warner(aTHX_ packWARN(WARN_AMBIGUOUS),
 			"Ambiguous use of %c{%"SVf"} resolved to %c%"SVf,
 			funny, tmp, funny, tmp);
+                    CopLINE_set(PL_curcop, orig_copline);
 		}
 	    }
 	}
@@ -9458,6 +9472,7 @@ S_scan_ident(pTHX_ char *s, char *dest, STRLEN destlen, I32 ck_uni)
             /* Didn't find the closing } at the point we expected, so restore
                state such that the next thing to process is the opening { and */
 	    s = bracket;		/* let the parser handle it */
+            CopLINE_set(PL_curcop, orig_copline);
 	    *dest = '\0';
 	}
     }
