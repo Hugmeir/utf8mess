@@ -361,10 +361,8 @@ memread(addr, sv, pos, size)
     SvCUR_set(sv, size);
     *SvEND(sv) = '\0';
     SvSETMAGIC(sv);
-#ifndef INCOMPLETE_TAINTS
     /* who knows who has been playing with this memory? */
     SvTAINTED_on(sv);
-#endif
     XSRETURN_YES;
 
 void
