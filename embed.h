@@ -1297,12 +1297,6 @@
 #define incpush_if_exists(a,b,c)	S_incpush_if_exists(aTHX_ a,b,c)
 #    endif
 #  endif
-#  if !defined(PERL_NO_UTF16_FILTER)
-#    if defined(PERL_IN_TOKE_C)
-#define add_utf16_textfilter(a,b)	S_add_utf16_textfilter(aTHX_ a,b)
-#define utf16_textfilter(a,b,c)	S_utf16_textfilter(aTHX_ a,b,c)
-#    endif
-#  endif
 #  if !defined(WIN32)
 #define do_exec3(a,b,c)		Perl_do_exec3(aTHX_ a,b,c)
 #  endif

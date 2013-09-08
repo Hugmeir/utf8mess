@@ -11555,6 +11555,17 @@ Perl_yyerror_pvn(pTHX_ const char *const s, STRLEN len, U32 flags)
 #pragma segment Main
 #endif
 
+/* Like the name implies, it swallows the bom, if any. For UTF-8,
+ * that's all it does -- returns a pointer just after the BOM.
+ * For UTF-16 (and potentially UTF-32 if we begin supporting
+ * that), it's slightly more complicated: The function sets the layer 
+ * for the parser's filehandle, unreads the current buffer starting after
+ * the BOM, decreases the current CopLINE, and returns a pointer to
+ * PL_bufend, so that the lexer is forced to read the chunk again.
+ * 
+ * Note that for UTF-16 and 32, this happens regardless of
+ * whenever there's a BOM present.
+ */
 STATIC char*
 S_swallow_bom(pTHX_ U8 *s)
 {
@@ -11562,7 +11573,26 @@ S_swallow_bom(pTHX_ U8 *s)
     const STRLEN slen = SvCUR(PL_linestr);
 
     PERL_ARGS_ASSERT_SWALLOW_BOM;
-
+    
+#ifdef PERLIO_USING_CRLF
+#    define CRLF_LAYER ":crlf"
+#else
+#    define CRLF_LAYER
+#endif
+    
+/* clear eof, unread, apply the encoding, discard this line from
+ * the parser, and backtrack CopLINE
+ */
+#define apply_encoding_and_unread(l,skip)  STMT_START {     \
+    (void)PerlIO_seek(PL_rsfp, (Off_t)0, SEEK_CUR);         \
+    PerlIO_unread(PL_rsfp, PL_linestart + skip,             \
+                        PL_bufend - PL_linestart - skip);   \
+    PerlIO_apply_layers(aTHX_ PL_rsfp, NULL,                \
+                        ":raw:encoding(" l ")" CRLF_LAYER); \
+    lex_unstuff(PL_bufend);                                 \
+    CopLINE_dec(PL_curcop);                                 \
+} STMT_END
+    
     switch (s[0]) {
     case 0xFF:
 	if (s[1] == 0xFE) {
@@ -11570,30 +11600,16 @@ S_swallow_bom(pTHX_ U8 *s)
 	    if (s[2] == 0 && s[3] == 0)  /* UTF-32 little-endian */
 		/* diag_listed_as: Unsupported script encoding %s */
 		Perl_croak(aTHX_ "Unsupported script encoding UTF-32LE");
-#ifndef PERL_NO_UTF16_FILTER
 	    if (DEBUG_p_TEST || DEBUG_T_TEST) PerlIO_printf(Perl_debug_log, "UTF-16LE script encoding (BOM)\n");
-	    s += 2;
-	    if (PL_bufend > (char*)s) {
-		s = add_utf16_textfilter(s, TRUE);
-	    }
-#else
-	    /* diag_listed_as: Unsupported script encoding %s */
-	    Perl_croak(aTHX_ "Unsupported script encoding UTF-16LE");
-#endif
+            apply_encoding_and_unread("UTF-16LE", 2);
+            s = (U8*)PL_bufend;
 	}
 	break;
     case 0xFE:
 	if (s[1] == 0xFF) {   /* UTF-16 big-endian? */
-#ifndef PERL_NO_UTF16_FILTER
 	    if (DEBUG_p_TEST || DEBUG_T_TEST) PerlIO_printf(Perl_debug_log, "UTF-16BE script encoding (BOM)\n");
-	    s += 2;
-	    if (PL_bufend > (char *)s) {
-		s = add_utf16_textfilter(s, FALSE);
-	    }
-#else
-	    /* diag_listed_as: Unsupported script encoding %s */
-	    Perl_croak(aTHX_ "Unsupported script encoding UTF-16BE");
-#endif
+            apply_encoding_and_unread("UTF-16BE", 2);
+            s = (U8*)PL_bufend;
 	}
 	break;
     case BOM_UTF8_FIRST_BYTE: {
@@ -11617,13 +11633,9 @@ S_swallow_bom(pTHX_ U8 *s)
 		  /* Leading bytes
 		   * 00 xx 00 xx
 		   * are a good indicator of UTF-16BE. */
-#ifndef PERL_NO_UTF16_FILTER
 		  if (DEBUG_p_TEST || DEBUG_T_TEST) PerlIO_printf(Perl_debug_log, "UTF-16BE script encoding (no BOM)\n");
-		  s = add_utf16_textfilter(s, FALSE);
-#else
-		  /* diag_listed_as: Unsupported script encoding %s */
-		  Perl_croak(aTHX_ "Unsupported script encoding UTF-16BE");
-#endif
+                  apply_encoding_and_unread("UTF-16BE", 0);
+                  s = (U8*)PL_bufend;
 	     }
 	}
 
@@ -11632,167 +11644,13 @@ S_swallow_bom(pTHX_ U8 *s)
 		  /* Leading bytes
 		   * xx 00 xx 00
 		   * are a good indicator of UTF-16LE. */
-#ifndef PERL_NO_UTF16_FILTER
 	      if (DEBUG_p_TEST || DEBUG_T_TEST) PerlIO_printf(Perl_debug_log, "UTF-16LE script encoding (no BOM)\n");
-	      s = add_utf16_textfilter(s, TRUE);
-#else
-	      /* diag_listed_as: Unsupported script encoding %s */
-	      Perl_croak(aTHX_ "Unsupported script encoding UTF-16LE");
-#endif
+            apply_encoding_and_unread("UTF-16LE", 0);
+            s = (U8*)PL_bufend;
 	 }
     }
     return (char*)s;
 }
-
-
-#ifndef PERL_NO_UTF16_FILTER
-static I32
-S_utf16_textfilter(pTHX_ int idx, SV *sv, int maxlen)
-{
-    dVAR;
-    SV *const filter = FILTER_DATA(idx);
-    /* We re-use this each time round, throwing the contents away before we
-       return.  */
-    SV *const utf16_buffer = MUTABLE_SV(IoTOP_GV(filter));
-    SV *const utf8_buffer = filter;
-    IV status = IoPAGE(filter);
-    const bool reverse = cBOOL(IoLINES(filter));
-    I32 retval;
-
-    PERL_ARGS_ASSERT_UTF16_TEXTFILTER;
-
-    /* As we're automatically added, at the lowest level, and hence only called
-       from this file, we can be sure that we're not called in block mode. Hence
-       don't bother writing code to deal with block mode.  */
-    if (maxlen) {
-	Perl_croak(aTHX_ "panic: utf16_textfilter called in block mode (for %d characters)", maxlen);
-    }
-    if (status < 0) {
-	Perl_croak(aTHX_ "panic: utf16_textfilter called after error (status=%"IVdf")", status);
-    }
-    DEBUG_P(PerlIO_printf(Perl_debug_log,
-			  "utf16_textfilter(%p,%ce): idx=%d maxlen=%d status=%"IVdf" utf16=%"UVuf" utf8=%"UVuf"\n",
-			  FPTR2DPTR(void *, S_utf16_textfilter),
-			  reverse ? 'l' : 'b', idx, maxlen, status,
-			  (UV)SvCUR(utf16_buffer), (UV)SvCUR(utf8_buffer)));
-
-    while (1) {
-	STRLEN chars;
-	STRLEN have;
-	I32 newlen;
-	U8 *end;
-	/* First, look in our buffer of existing UTF-8 data:  */
-	char *nl = (char *)memchr(SvPVX(utf8_buffer), '\n', SvCUR(utf8_buffer));
-
-	if (nl) {
-	    ++nl;
-	} else if (status == 0) {
-	    /* EOF */
-	    IoPAGE(filter) = 0;
-	    nl = SvEND(utf8_buffer);
-	}
-	if (nl) {
-	    STRLEN got = nl - SvPVX(utf8_buffer);
-	    /* Did we have anything to append?  */
-	    retval = got != 0;
-	    sv_catpvn(sv, SvPVX(utf8_buffer), got);
-	    /* Everything else in this code works just fine if SVp_POK isn't
-	       set.  This, however, needs it, and we need it to work, else
-	       we loop infinitely because the buffer is never consumed.  */
-	    sv_chop(utf8_buffer, nl);
-	    break;
-	}
-
-	/* OK, not a complete line there, so need to read some more UTF-16.
-	   Read an extra octect if the buffer currently has an odd number. */
-	while (1) {
-	    if (status <= 0)
-		break;
-	    if (SvCUR(utf16_buffer) >= 2) {
-		/* Location of the high octet of the last complete code point.
-		   Gosh, UTF-16 is a pain. All the benefits of variable length,
-		   *coupled* with all the benefits of partial reads and
-		   endianness.  */
-		const U8 *const last_hi = (U8*)SvPVX(utf16_buffer)
-		    + ((SvCUR(utf16_buffer) & ~1) - (reverse ? 1 : 2));
-
-		if (*last_hi < 0xd8 || *last_hi > 0xdb) {
-		    break;
-		}
-
-		/* We have the first half of a surrogate. Read more.  */
-		DEBUG_P(PerlIO_printf(Perl_debug_log, "utf16_textfilter partial surrogate detected at %p\n", last_hi));
-	    }
-
-	    status = FILTER_READ(idx + 1, utf16_buffer,
-				 160 + (SvCUR(utf16_buffer) & 1));
-	    DEBUG_P(PerlIO_printf(Perl_debug_log, "utf16_textfilter status=%"IVdf" SvCUR(sv)=%"UVuf"\n", status, (UV)SvCUR(utf16_buffer)));
-	    DEBUG_P({ sv_dump(utf16_buffer); sv_dump(utf8_buffer);});
-	    if (status < 0) {
-		/* Error */
-		IoPAGE(filter) = status;
-		return status;
-	    }
-	}
-
-	chars = SvCUR(utf16_buffer) >> 1;
-	have = SvCUR(utf8_buffer);
-	SvGROW(utf8_buffer, have + chars * 3 + 1);
-
-	if (reverse) {
-	    end = utf16_to_utf8_reversed((U8*)SvPVX(utf16_buffer),
-					 (U8*)SvPVX_const(utf8_buffer) + have,
-					 chars * 2, &newlen);
-	} else {
-	    end = utf16_to_utf8((U8*)SvPVX(utf16_buffer),
-				(U8*)SvPVX_const(utf8_buffer) + have,
-				chars * 2, &newlen);
-	}
-	SvCUR_set(utf8_buffer, have + newlen);
-	*end = '\0';
-
-	/* No need to keep this SV "well-formed" with a '\0' after the end, as
-	   it's private to us, and utf16_to_utf8{,reversed} take a
-	   (pointer,length) pair, rather than a NUL-terminated string.  */
-	if(SvCUR(utf16_buffer) & 1) {
-	    *SvPVX(utf16_buffer) = SvEND(utf16_buffer)[-1];
-	    SvCUR_set(utf16_buffer, 1);
-	} else {
-	    SvCUR_set(utf16_buffer, 0);
-	}
-    }
-    DEBUG_P(PerlIO_printf(Perl_debug_log,
-			  "utf16_textfilter: returns, status=%"IVdf" utf16=%"UVuf" utf8=%"UVuf"\n",
-			  status,
-			  (UV)SvCUR(utf16_buffer), (UV)SvCUR(utf8_buffer)));
-    DEBUG_P({ sv_dump(utf8_buffer); sv_dump(sv);});
-    return retval;
-}
-
-static U8 *
-S_add_utf16_textfilter(pTHX_ U8 *const s, bool reversed)
-{
-    SV *filter = filter_add(S_utf16_textfilter, NULL);
-
-    PERL_ARGS_ASSERT_ADD_UTF16_TEXTFILTER;
-
-    IoTOP_GV(filter) = MUTABLE_GV(newSVpvn((char *)s, PL_bufend - (char*)s));
-    sv_setpvs(filter, "");
-    IoLINES(filter) = reversed;
-    IoPAGE(filter) = 1; /* Not EOF */
-
-    /* Sadly, we have to return a valid pointer, come what may, so we have to
-       ignore any error return from this.  */
-    SvCUR_set(PL_linestr, 0);
-    if (FILTER_READ(0, PL_linestr, 0)) {
-	SvUTF8_on(PL_linestr);
-    } else {
-	SvUTF8_on(PL_linestr);
-    }
-    PL_bufend = SvEND(PL_linestr);
-    return (U8*)SvPVX(PL_linestr);
-}
-#endif
 
 /*
 Returns a pointer to the next character after the parsed

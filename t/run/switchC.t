@@ -11,7 +11,7 @@ BEGIN {
     skip_all_if_miniperl('-C and $ENV{PERL_UNICODE} are disabled on miniperl');
 }
 
-plan(tests => 13);
+plan(tests => 23);
 
 my $r;
 
@@ -106,3 +106,69 @@ SKIP: {
     like( $r, qr/^Too late for "-CS" option at -e line 1\.$/s,
           '#!perl -C but not command line' );
 }
+
+SKIP: {
+    skip("Cannot test without Encode", 10) unless eval { require Encode };
+    
+    # Okay, this is pretty nasty. runperl basically does a
+    # perl -e 'print qq($stdin)', so we hijack that to print
+    # the contents of $scriptfile
+    my $stdin = <<"EOS";
+); binmode STDOUT; open S, q{<}, q{$scriptfile} or die "open $scriptfile: \$!"; print STDOUT <S>; close S; (
+EOS
+    
+    my $script_body = <<"EOS";
+        warn q{line 1};
+        binmode STDERR, q{:utf8};
+        warn q{\x{30cd}};
+        warn q{\x{1F42A}};
+        warn q{line 4};
+EOS
+
+    my $expect = <<"EOF";
+line 1 at - line 1.
+\x{30cd} at - line 3.
+\x{1F42A} at - line 4.
+line 4 at - line 5.
+EOF
+    
+    my $bom = "\x{FEFF}";
+    for my $endianness (qw(LE BE)) {
+        for my $BOM ( "", $bom ) {
+            for my $switch ( '', '-CS' ) {
+                my $script  = $BOM . $script_body;
+                
+                open(S, ">:raw", $scriptfile) or die("open $scriptfile: $!");
+                print S Encode::encode("UTF-16$endianness", $script);
+                close S;
+
+                $r = runperl(
+                    switches => [ $switch ],
+                    stdin    => $stdin,
+                    stderr   => 1,
+                );
+                
+                utf8::decode($r);
+                
+                is($r, $expect, "cat utf | perl $switch with UTF16-$endianness, " . ($BOM ? '' : 'no ') . "bom");
+            }
+        }
+    }
+    
+    open(S, ">:raw", $scriptfile) or die("open $scriptfile: $!");
+    print S Encode::encode("UTF-8", $bom . 'use utf8;' . $script_body);
+    close S;
+    
+    for my $switch ( '', '-CS' ) {
+        $r = runperl(
+            switches => [ $switch ],
+            stdin    => $stdin,
+            stderr   => 1,
+        );
+    
+        utf8::decode($r);
+
+        is($r, $expect, "cat utf | perl $switch with UTF-8, bom");
+    }
+}
+

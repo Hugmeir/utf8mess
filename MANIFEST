@@ -4973,7 +4973,6 @@ t/comp/retainedlines.t		See if the debugger can retain eval's lines
 t/comp/term.t			See if more terms work
 t/comp/uproto.t			See if the _ prototype works
 t/comp/use.t			See if pragmata work
-t/comp/utf.t			See if UTFs work
 TestInit.pm			Preamble library for tests
 t/harness			Finer diagnostics from test suite
 thread.h			Threading header
@@ -5514,6 +5513,7 @@ t/uni/tr_sjis.t			See if Unicode tr/// in sjis works
 t/uni/tr_utf8.t			See if Unicode tr/// in utf8 works
 t/uni/universal.t		See if Unicode in calls to UNIVERSAL works
 t/uni/upper.t			See if Unicode casing works
+t/uni/utf.t			See if UTF-16/32 and UTF-8+BOM are handled seamlessly
 t/uni/variables.t		See that the rules for variable names work
 t/uni/write.t			See if Unicode formats work
 t/win32/fs.t			Test Win32 link for compatibility

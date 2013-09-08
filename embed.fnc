@@ -2236,10 +2236,6 @@ s	|void	|update_debugger_info|NULLOK SV *orig_sv \
 				|NULLOK const char *const buf|STRLEN len
 sR	|char*	|skipspace_flags|NN char *s|U32 flags
 sR	|char*	|swallow_bom	|NN U8 *s
-#ifndef PERL_NO_UTF16_FILTER
-s	|I32	|utf16_textfilter|int idx|NN SV *sv|int maxlen
-s	|U8*	|add_utf16_textfilter|NN U8 *const s|bool reversed
-#endif
 s	|void	|checkcomma	|NN const char *s|NN const char *name \
 				|NN const char *what
 s	|void	|force_ident	|NN const char *s|int kind

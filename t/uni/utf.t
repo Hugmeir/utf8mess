@@ -1,5 +1,23 @@
 #!./perl -w
 
+# Checks if the parser automatically handles UTF-16
+# and UTF-32 (LE/BE, with and without a BOM), and
+# explicit-BOM UTF-8. 99% of the world rightfully
+# doesn't use an explicit UTF-8 BOM, so that case gets
+# handled by an explicit 'use utf8', which the rest of
+# the utf8 tests check for)
+
+# TODO doesn't actually check for UTF-32 yet.
+
+BEGIN {
+    chdir 't' if -d 't';
+    @INC = '../lib';
+    require './test.pl';
+    skip_all_without_perlio();
+    # FIXME - UTF-8 can be tested without Encode or full perl
+    skip_all_without_dynamic_extension('Encode');
+}
+
 print "1..4016\n";
 my $test = 0;
 
@@ -41,11 +59,7 @@ sub test {
     my $got = do "./utf$$.pl";
     $test = $test + 1;
     if (!defined $got) {
-	if ($@ =~ /^(Unsupported script encoding \Q$enc\E)/) {
-	    print "ok $test # skip $1\n";
-        } else {
-	    print "not ok $test # $enc $bom $nl $name; got undef\n";
-	}
+        print "not ok $test # $enc $bom $nl $name; got undef, \$@ is $@\n";
     } elsif ($got ne $expect) {
 	print "not ok $test # $enc $bom $nl $name; got '$got'\n";
     } else {
