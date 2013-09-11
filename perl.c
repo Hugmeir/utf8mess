@@ -3776,7 +3776,11 @@ S_open_script(pTHX_ const char *scriptname, bool dosearch, bool *suidscript)
     if (*PL_origfilename == '-' && PL_origfilename[1] == '\0')
 	scriptname = (char *)"";
     if (fdscript >= 0) {
-	rsfp = PerlIO_fdopen(fdscript,PERL_SCRIPT_MODE);
+        /* Same as
+         * PerlIO_fdopen(fdscript,PERL_SCRIPT_MODE);
+         * but doesn't set any layers
+         */
+        rsfp = PerlIO_openn(aTHX_ ":raw", PERL_SCRIPT_MODE, fdscript, 0, 0, NULL, 0, NULL);
     }
     else if (!*scriptname) {
 	forbid_setid(0, *suidscript);
@@ -3815,7 +3819,9 @@ S_open_script(pTHX_ const char *scriptname, bool dosearch, bool *suidscript)
 #endif
 	}
 #endif
-	rsfp = PerlIO_open(scriptname,PERL_SCRIPT_MODE);
+        /* Same as PerlIO_open(scriptname,PERL_SCRIPT_MODE); */
+        SV *name = sv_2mortal(newSVpv(scriptname,0));
+	rsfp = PerlIO_openn(aTHX_ ":raw", PERL_SCRIPT_MODE, -1, 0, 0, NULL, 1, &name);
 #ifdef FAKE_BIT_BUCKET
 	if (memEQ(scriptname, FAKE_BIT_BUCKET_PREFIX,
 		  sizeof(FAKE_BIT_BUCKET_PREFIX) - 1)

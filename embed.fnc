@@ -2235,7 +2235,6 @@ s	|char*	|scan_word	|NN char *s|NN char *dest|STRLEN destlen \
 s	|void	|update_debugger_info|NULLOK SV *orig_sv \
 				|NULLOK const char *const buf|STRLEN len
 sR	|char*	|skipspace_flags|NN char *s|U32 flags
-sR	|char*	|swallow_bom	|NN U8 *s
 s	|void	|checkcomma	|NN const char *s|NN const char *name \
 				|NN const char *what
 s	|void	|force_ident	|NN const char *s|int kind
@@ -2269,6 +2268,9 @@ s	|void	|strip_return	|NN SV *sv
 #  if defined(DEBUGGING)
 s	|int	|tokereport	|I32 rv|NN const YYSTYPE* lvalp
 s	|void	|printbuf	|NN const char *const fmt|NN const char *const s
+#  endif
+#  ifndef PERL_IS_MINIPERL
+sR      |bool  |swallow_bom    |NN PerlIO *rsfp|NN char *s|STRLEN slen
 #  endif
 #endif
 EXMp	|bool	|validate_proto	|NN SV *name|NULLOK SV *proto|bool warn

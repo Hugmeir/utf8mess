@@ -5150,6 +5150,15 @@ STATIC SV *	S_incpush_if_exists(pTHX_ AV *const av, SV *dir, SV *const stem)
 	assert(av); assert(dir); assert(stem)
 
 #  endif
+#  if defined(PERL_IN_TOKE_C)
+STATIC bool	S_swallow_bom(pTHX_ PerlIO *rsfp, char *s, STRLEN slen)
+			__attribute__warn_unused_result__
+			__attribute__nonnull__(pTHX_1)
+			__attribute__nonnull__(pTHX_2);
+#define PERL_ARGS_ASSERT_SWALLOW_BOM	\
+	assert(rsfp); assert(s)
+
+#  endif
 #endif
 #if !defined(SETUID_SCRIPTS_ARE_SECURE_NOW)
 #  if defined(PERL_IN_PERL_C)
@@ -7413,12 +7422,6 @@ STATIC I32	S_sublex_push(pTHX)
 
 STATIC I32	S_sublex_start(pTHX)
 			__attribute__warn_unused_result__;
-
-STATIC char*	S_swallow_bom(pTHX_ U8 *s)
-			__attribute__warn_unused_result__
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_SWALLOW_BOM	\
-	assert(s)
 
 STATIC char *	S_tokenize_use(pTHX_ int is_use, char *s)
 			__attribute__warn_unused_result__

@@ -4730,7 +4730,6 @@ Perl_yylex(pTHX)
     char *s = PL_bufptr;
     char *d;
     STRLEN len;
-    bool bof = FALSE;
     const bool saw_infix_sigil = PL_parser->saw_infix_sigil;
     U8 formbrack = 0;
     U32 fake_eof = 0;
@@ -4742,6 +4741,57 @@ Perl_yylex(pTHX)
     GV *gv = NULL;
     GV **gvp = NULL;
 
+#ifndef PERL_IS_MINIPERL
+    /* This must happen before we read anything else from
+     * the filehandle
+     */
+    if (PL_rsfp) {
+        SV *tmpsv = newSVpvs("");
+        bool default_layers = TRUE;
+        SvGROW(tmpsv, (STRLEN)5);
+        
+        /* Check for a BOM, or raw UTF-16. swallow_bom will eat
+         * the BOM, and for UTF-16, set the correct :encoding()
+         * layer.  If we didn't have a BOM, or if someone did
+         * a silly and passed us a UTF-8 BOM, then apply the
+         * default layers and carry on.
+         */
+        if ((len = PerlIO_read(PL_rsfp, SvPVX(tmpsv), 4)) > 0) {
+            SvCUR_set(tmpsv, len);
+            SvPVX(tmpsv)[len] = '\0';
+            s = SvPVX(tmpsv);
+            
+            /* If it looks like the start of a BOM or raw UTF-16,
+                * check if it in fact is. */
+            if (len > 1 && (*s == 0 ||
+                        *(U8*)s == BOM_UTF8_FIRST_BYTE ||
+                        *(U8*)s >= 0xFE ||
+                        s[1] == 0)) {
+                default_layers = swallow_bom(PL_rsfp, s, len);
+                len = 0;
+                s = PL_bufptr;
+            }
+            else {
+                (void)PerlIO_seek(PL_rsfp, (Off_t)0, SEEK_CUR);
+                PerlIO_unread(PL_rsfp, SvPVX(tmpsv), len);
+            }
+        }
+        else {
+            /* Either a short file (<4 bytes) or the filehandle threw an
+             * error. Let something else handle it, but clear eof
+             */
+            (void)PerlIO_seek(PL_rsfp, (Off_t)0, SEEK_CUR);
+        }
+        
+        /* Apply the default layers. This is for the benefit of :crlf */
+        if ( default_layers ) {
+            PerlIO_apply_layers(aTHX_ PL_rsfp, NULL, ":");
+        }
+        
+        SvREFCNT_dec(tmpsv);
+    }
+#endif
+    
     DEBUG_T( {
 	SV* tmp = newSVpvs("");
 	PerlIO_printf(Perl_debug_log, "### %"IVdf":LEX_%s/X%s %s\n",
@@ -4752,6 +4802,8 @@ Perl_yylex(pTHX)
 	SvREFCNT_dec(tmp);
     } );
 
+    
+    
     switch (PL_lex_state) {
 #ifdef COMMENTARY
     case LEX_NORMAL:		/* Some compilers will produce faster */
@@ -5273,7 +5325,6 @@ Perl_yylex(pTHX)
 	}
 	do {
 	    fake_eof = 0;
-	    bof = PL_rsfp ? TRUE : FALSE;
 	    if (0) {
 	      fake_eof:
 		fake_eof = LEX_FAKE_EOF;
@@ -5291,25 +5342,6 @@ Perl_yylex(pTHX)
 		PL_realtokenstart = -1;
 #endif
 	    s = PL_bufptr;
-	    /* If it looks like the start of a BOM or raw UTF-16,
-	     * check if it in fact is. */
-	    if (bof && PL_rsfp &&
-		     (*s == 0 ||
-		      *(U8*)s == BOM_UTF8_FIRST_BYTE ||
-		      *(U8*)s >= 0xFE ||
-		      s[1] == 0)) {
-		Off_t offset = (IV)PerlIO_tell(PL_rsfp);
-		bof = (offset == (Off_t)SvCUR(PL_linestr));
-#if defined(PERLIO_USING_CRLF) && defined(PERL_TEXTMODE_SCRIPTS)
-		/* offset may include swallowed CR */
-		if (!bof)
-		    bof = (offset == (Off_t)SvCUR(PL_linestr)+1);
-#endif
-		if (bof) {
-		    PL_bufend = SvPVX(PL_linestr) + SvCUR(PL_linestr);
-		    s = swallow_bom((U8*)s);
-		}
-	    }
 	    if (PL_parser->in_pod) {
 		/* Incest with pod. */
 #ifdef PERL_MAD
@@ -11555,6 +11587,7 @@ Perl_yyerror_pvn(pTHX_ const char *const s, STRLEN len, U32 flags)
 #pragma segment Main
 #endif
 
+#ifndef PERL_IS_MINIPERL
 /* Like the name implies, it swallows the bom, if any. For UTF-8,
  * that's all it does -- returns a pointer just after the BOM.
  * For UTF-16 (and potentially UTF-32 if we begin supporting
@@ -11566,11 +11599,10 @@ Perl_yyerror_pvn(pTHX_ const char *const s, STRLEN len, U32 flags)
  * Note that for UTF-16 and 32, this happens regardless of
  * whenever there's a BOM present.
  */
-STATIC char*
-S_swallow_bom(pTHX_ U8 *s)
+STATIC bool
+S_swallow_bom(pTHX_ PerlIO *rsfp, char *s, STRLEN slen)
 {
     dVAR;
-    const STRLEN slen = SvCUR(PL_linestr);
 
     PERL_ARGS_ASSERT_SWALLOW_BOM;
     
@@ -11580,80 +11612,75 @@ S_swallow_bom(pTHX_ U8 *s)
 #    define CRLF_LAYER
 #endif
     
-/* Quite a few things going on here.
- * First, we unset eof. Then we do a binmode() on the current
- * parser filehandle, which we need 
- * clear eof, unread, apply the encoding, discard this line fromthe parser, and backtrack CopLINE
- */
+/* clear eof, unread, apply the encoding */
 #define apply_encoding_and_unread(l,skip)  STMT_START {     \
-    (void)PerlIO_seek(PL_rsfp, (Off_t)0, SEEK_CUR);         \
-    PerlIO_apply_layers(aTHX_ PL_rsfp, NULL, ":raw");       \
-    PerlIO_unread(PL_rsfp, PL_linestart + skip,             \
-                        PL_bufend - PL_linestart - skip);   \
-    PerlIO_apply_layers(aTHX_ PL_rsfp, NULL,                \
+    (void)PerlIO_seek(rsfp, (Off_t)0, SEEK_CUR);         \
+    PerlIO_unread(rsfp, s + skip, slen - skip);          \
+    PerlIO_apply_layers(aTHX_ rsfp, NULL,                \
                         ":raw:encoding(" l ")" CRLF_LAYER); \
-    lex_unstuff(PL_bufend);                                 \
-    CopLINE_dec(PL_curcop);                                 \
 } STMT_END
     
-    switch (s[0]) {
+    switch ((U8)s[0]) {
     case 0xFF:
-	if (s[1] == 0xFE) {
-	    /* UTF-16 little-endian? (or UTF-32LE?) */
-	    if (s[2] == 0 && s[3] == 0)  /* UTF-32 little-endian */
-		/* diag_listed_as: Unsupported script encoding %s */
-		Perl_croak(aTHX_ "Unsupported script encoding UTF-32LE");
-	    if (DEBUG_p_TEST || DEBUG_T_TEST) PerlIO_printf(Perl_debug_log, "UTF-16LE script encoding (BOM)\n");
+        if ((U8)s[1] == 0xFE) {
+            /* UTF-16 little-endian? (or UTF-32LE?) */
+            if (s[2] == 0 && s[3] == 0)  /* UTF-32 little-endian */
+                /* diag_listed_as: Unsupported script encoding %s */
+                Perl_croak(aTHX_ "Unsupported script encoding UTF-32LE");
+            if (DEBUG_p_TEST || DEBUG_T_TEST) PerlIO_printf(Perl_debug_log, "UTF-16LE script encoding (BOM)\n");
             apply_encoding_and_unread("UTF-16LE", 2);
-            s = (U8*)PL_bufend;
-	}
-	break;
+            return FALSE;
+        }
+        break;
     case 0xFE:
-	if (s[1] == 0xFF) {   /* UTF-16 big-endian? */
-	    if (DEBUG_p_TEST || DEBUG_T_TEST) PerlIO_printf(Perl_debug_log, "UTF-16BE script encoding (BOM)\n");
+        if ((U8)s[1] == 0xFF) {   /* UTF-16 big-endian? */
+            if (DEBUG_p_TEST || DEBUG_T_TEST) PerlIO_printf(Perl_debug_log, "UTF-16BE script encoding (BOM)\n");
             apply_encoding_and_unread("UTF-16BE", 2);
-            s = (U8*)PL_bufend;
-	}
-	break;
+            return FALSE;
+        }
+        break;
     case BOM_UTF8_FIRST_BYTE: {
         const STRLEN len = sizeof(BOM_UTF8_TAIL) - 1; /* Exclude trailing NUL */
         if (slen > len && memEQ(s+1, BOM_UTF8_TAIL, len)) {
             if (DEBUG_p_TEST || DEBUG_T_TEST) PerlIO_printf(Perl_debug_log, "UTF-8 script encoding (BOM)\n");
-            s += len + 1;                      /* UTF-8 */
+            (void)PerlIO_seek(rsfp, (Off_t)0, SEEK_CUR);
+            PerlIO_unread(rsfp, s + len + 1, slen - len - 1);
+            return TRUE;
         }
         break;
     }
     case 0:
-	if (slen > 3) {
-	     if (s[1] == 0) {
-		  if (s[2] == 0xFE && s[3] == 0xFF) {
-		       /* UTF-32 big-endian */
-		       /* diag_listed_as: Unsupported script encoding %s */
-		       Perl_croak(aTHX_ "Unsupported script encoding UTF-32BE");
-		  }
-	     }
-	     else if (s[2] == 0 && s[3] != 0) {
-		  /* Leading bytes
-		   * 00 xx 00 xx
-		   * are a good indicator of UTF-16BE. */
-		  if (DEBUG_p_TEST || DEBUG_T_TEST) PerlIO_printf(Perl_debug_log, "UTF-16BE script encoding (no BOM)\n");
+        if (slen > 3) {
+             if (s[1] == 0) {
+                  if ((U8)s[2] == 0xFE && (U8)s[3] == 0xFF) {
+                       /* UTF-32 big-endian */
+                       /* diag_listed_as: Unsupported script encoding %s */
+                       Perl_croak(aTHX_ "Unsupported script encoding UTF-32BE");
+                  }
+             }
+             else if (s[2] == 0 && s[3] != 0) {
+                  /* Leading bytes
+                   * 00 xx 00 xx
+                   * are a good indicator of UTF-16BE. */
+                  if (DEBUG_p_TEST || DEBUG_T_TEST) PerlIO_printf(Perl_debug_log, "UTF-16BE script encoding (no BOM)\n");
                   apply_encoding_and_unread("UTF-16BE", 0);
-                  s = (U8*)PL_bufend;
-	     }
-	}
+                  return FALSE;
+             }
+        }
 
     default:
-	 if (slen > 3 && s[1] == 0 && s[2] != 0 && s[3] == 0) {
-		  /* Leading bytes
-		   * xx 00 xx 00
-		   * are a good indicator of UTF-16LE. */
-	      if (DEBUG_p_TEST || DEBUG_T_TEST) PerlIO_printf(Perl_debug_log, "UTF-16LE script encoding (no BOM)\n");
+         if (slen > 3 && s[1] == 0 && s[2] != 0 && s[3] == 0) {
+                  /* Leading bytes
+                   * xx 00 xx 00
+                   * are a good indicator of UTF-16LE. */
+              if (DEBUG_p_TEST || DEBUG_T_TEST) PerlIO_printf(Perl_debug_log, "UTF-16LE script encoding (no BOM)\n");
             apply_encoding_and_unread("UTF-16LE", 0);
-            s = (U8*)PL_bufend;
-	 }
+            return FALSE;
+         }
     }
-    return (char*)s;
+    return TRUE;
 }
+#endif
 
 /*
 Returns a pointer to the next character after the parsed

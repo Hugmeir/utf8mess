@@ -1296,6 +1296,9 @@
 #    if defined(PERL_IN_PERL_C)
 #define incpush_if_exists(a,b,c)	S_incpush_if_exists(aTHX_ a,b,c)
 #    endif
+#    if defined(PERL_IN_TOKE_C)
+#define swallow_bom(a,b,c)	S_swallow_bom(aTHX_ a,b,c)
+#    endif
 #  endif
 #  if !defined(WIN32)
 #define do_exec3(a,b,c)		Perl_do_exec3(aTHX_ a,b,c)
@@ -1635,7 +1638,6 @@
 #define sublex_done()		S_sublex_done(aTHX)
 #define sublex_push()		S_sublex_push(aTHX)
 #define sublex_start()		S_sublex_start(aTHX)
-#define swallow_bom(a)		S_swallow_bom(aTHX_ a)
 #define tokenize_use(a,b)	S_tokenize_use(aTHX_ a,b)
 #define tokeq(a)		S_tokeq(aTHX_ a)
 #define update_debugger_info(a,b,c)	S_update_debugger_info(aTHX_ a,b,c)
