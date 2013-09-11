@@ -11580,11 +11580,14 @@ S_swallow_bom(pTHX_ U8 *s)
 #    define CRLF_LAYER
 #endif
     
-/* clear eof, unread, apply the encoding, discard this line from
- * the parser, and backtrack CopLINE
+/* Quite a few things going on here.
+ * First, we unset eof. Then we do a binmode() on the current
+ * parser filehandle, which we need 
+ * clear eof, unread, apply the encoding, discard this line fromthe parser, and backtrack CopLINE
  */
 #define apply_encoding_and_unread(l,skip)  STMT_START {     \
     (void)PerlIO_seek(PL_rsfp, (Off_t)0, SEEK_CUR);         \
+    PerlIO_apply_layers(aTHX_ PL_rsfp, NULL, ":raw");       \
     PerlIO_unread(PL_rsfp, PL_linestart + skip,             \
                         PL_bufend - PL_linestart - skip);   \
     PerlIO_apply_layers(aTHX_ PL_rsfp, NULL,                \
