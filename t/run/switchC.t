@@ -114,7 +114,7 @@ SKIP: {
     # perl -e 'print qq($stdin)', so we hijack that to print
     # the contents of $scriptfile
     my $stdin = <<"EOS";
-); binmode STDOUT; open S, q{<}, q{$scriptfile} or die "open $scriptfile: \$!"; print STDOUT <S>; close S; (
+); binmode STDOUT; open S, q{<}, q{$scriptfile} or die qq{open $scriptfile: \$!}; print STDOUT <S>; close S; (
 EOS
     
     my $script_body = <<"EOS";
@@ -122,14 +122,14 @@ EOS
         binmode STDERR, q{:utf8};
         warn q{\x{30cd}};
         warn q{\x{1F42A}};
-        warn q{line 4};
+        warn q{line 5};
 EOS
 
     my $expect = <<"EOF";
 line 1 at - line 1.
 \x{30cd} at - line 3.
 \x{1F42A} at - line 4.
-line 4 at - line 5.
+line 5 at - line 5.
 EOF
     
     my $bom = "\x{FEFF}";
