@@ -24,7 +24,7 @@ unless (defined $Config{usedl}) {
 }
 
 if ( $Config{usecrosscompile} ) {
-  skip_all( "Not all files might be available during cross-compilation" );
+  skip_all( "Not all files are available during cross-compilation" );
 }
 
 plan tests => 10;
