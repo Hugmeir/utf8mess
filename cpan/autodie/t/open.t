@@ -53,7 +53,9 @@ unlike($@, qr/at \S+ line \d+\s+at \S+ line \d+/, "...but not too mentions");
 # Sniff to see if we can run 'true' on this system.  Changes we can't
 # on non-Unix systems.
 
-my @true = $^O eq 'linux-androideabi'
+use Config;
+my @true = ($^O eq 'linux-androideabi'
+            || ($Config{usecrosscompile} && $^O eq 'nto' ))
         ? ('sh', '-c', 'true $@', '--')
         : 'true';
 
