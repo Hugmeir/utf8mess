@@ -17,7 +17,7 @@ if ($^O eq "MSWin32" && !defined $ENV{PERL_STATIC_EXT}) {
 }
 
 if ( $Config{usecrosscompile} ) {
-  skip_all( "Not all files might be available during cross-compilation" );
+  skip_all( "Not all files are available during cross-compilation" );
 }
 
 require FindExt;
