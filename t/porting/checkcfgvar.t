@@ -29,7 +29,7 @@ BEGIN {
 use TestInit qw(T A); # T is chdir to the top level, A makes paths absolute
 
 if ( $Config{usecrosscompile} ) {
-  skip_all( "Not all files might be available during cross-compilation" );
+  skip_all( "Not all files are available during cross-compilation" );
 }
 
 system "$^X Porting/checkcfgvar.pl --tap";
