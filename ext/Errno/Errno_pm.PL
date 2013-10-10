@@ -65,6 +65,9 @@ sub process_file {
              # OpenSTEP has gcc 2.7.2.1 which recognizes but
 	     # doesn't implement the -dM flag.
 	     && $^O ne 'openstep' && $^O ne 'next' && $^O ne 'darwin'
+	     # qcc, which can be used to cross-compile for the QNX NTO,
+	     # doesn't understand -dM.
+	     && !($^O eq 'nto' && "$Config{cc} $Config{ccflags}" =~ /qcc/)
 	     ) { 
 	# With the -dM option, gcc outputs every #define it finds
 	unless(open(FH,"$Config{cc} -E -dM $Config{cppflags} $file |")) {
