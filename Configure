@@ -3540,7 +3540,17 @@ EOM
         case "$targetarch" in
         '') ;;
         *)  hostarch=$osname
-            osname=`echo $targetarch|sed 's,^[^-]*-,,'`
+            case "$targetarch" in
+                nto*|*-nto-*)
+                    osname=nto
+                    ;;
+                *linux-android*)
+                    osname=linux-androideabi
+                    ;;
+                *)
+                    osname=`echo $targetarch|sed 's,^[^-]*-,,'`
+                ;;
+            esac
             osvers=''
             ;;
         esac
