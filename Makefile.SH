@@ -1510,6 +1510,7 @@ test_prep test-prep: test_prep_pre $(MINIPERL_EXE) $(unidatafiles) $(PERL_EXE) \
 test_prep test-prep: test_prep_pre \$(MINIPERL_EXE) \$(unidatafiles) \$(PERL_EXE) \
 	\$(dynamic_ext) \$(TEST_PERL_DLL) runtests x2p/s2p x2p/find2perl \
 	\$(generated_pods)
+	$to libperl.*
 	$to t
 	$to lib
 	$to TestInit.pm
