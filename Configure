@@ -1968,23 +1968,27 @@ esac
 : This is primarily meant for cross-compile environments, and may fail to be useful in other cases
 
 if test "X$sysroot" != X; then
-  echo "Using $sysroot to find your headers and libraries, adding to ccflags"
-  case "$ccflags" in
-  *sysroot*) ;;
-  'undef'|*)
-       ccflags="$ccflags --sysroot=$sysroot"
+  case "$cc" in
+    *-gcc|*-g++)
+        $echo "Using $sysroot to find your headers and libraries, adding to ccflags"
+        case "$ccflags" in
+            *sysroot*) ;;
+            'undef'|*)
+                ccflags="$ccflags --sysroot=$sysroot"
+        esac
+        case "$ldflags" in
+            *sysroot*) ;;
+            'undef'|*)
+                ldflags="$ldflags --sysroot=$sysroot"
+        esac
+        case "$cccdlflags" in
+            *sysroot*) ;;
+            'undef'|*)
+                cccdlflags="$cccdlflags --sysroot=$sysroot"
+        esac
+        # lddlflags updated below in lddlflags section
+  ;;
   esac
-  case "$ldflags" in
-  *sysroot*) ;;
-  'undef'|*)
-       ldflags="$ldflags --sysroot=$sysroot"
-  esac
-  case "$cccdlflags" in
-  *sysroot*) ;;
-  'undef'|*)
-       cccdlflags="$cccdlflags --sysroot=$sysroot"
-  esac
-  # lddlflags updated below in lddlflags section
 fi
 
 : Eunice requires " " instead of "", can you believe it
@@ -2909,6 +2913,8 @@ esac
 case "$targethost" in
     '') echo "Checking for cross-compile" >&4
     case "$usecrosscompile$multiarch" in
+       '') echo "Not cross-compiling" >&4
+           ;;
        *$define*) echo "Skipping the try tests in the rest of Configure as no targethost was defined when cross-compiling" >&4
          if [ -f Makefile ]; then
            echo " "
@@ -8110,9 +8116,14 @@ EOM
     *) dflt="$lddlflags" ;;
     esac
 
-    : Should we only do this if its gcc/linux? 
+    : Only do this for gcc, since, for example, qcc has no concept
+    : of --sysroot.
     if $test "X$sysroot" != X; then
-        dflt="$dflt --sysroot $sysroot"
+        case "$cc" in
+        *-gcc|*-g++)
+               dflt="$dflt --sysroot $sysroot"
+        ;;
+        esac
     fi
 
 	: Try to guess additional flags to pick up local libraries.
