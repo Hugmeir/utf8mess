@@ -2832,9 +2832,9 @@ $define|true|[yY]*)
 	$echo "Cross-compiling..."
     croak=''
     case "$cc" in
-	*-*-gcc|*-*-g++) # A cross-compiling gcc, probably. Only supporting gcc at the moment.
+	*-gcc|*-g++) # A cross-compiling gcc, probably.
 	    targetarch=`$echo $cc|$sed 's/-g..$//'`
-        $echo "Your targetarch is now set to: $targetarch"
+        $echo "Your targetarch is now set to: $targetarch" >&4
 	    ar=$targetarch-ar
 	    # leave out ld, choosing it is more complex
 	    nm=$targetarch-nm
