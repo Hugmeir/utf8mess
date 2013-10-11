@@ -1548,27 +1548,6 @@ test_prep test-prep: test_prep_pre \$(MINIPERL_EXE) \$(unidatafiles) \$(PERL_EXE
 # --- For Module::Build
 	$to cpan/Module-Build/lib
 	$to *.h
-# --- For t/porting/perlfunc.t
-	$to ext/Pod-Functions
-# --- For t/porting/pod_rules.t
-	$to Makefile.SH
-	$to cpan/perlfaq
-	$to cpan/Pod-Perldoc/lib/perldoc.pod
-	$to dist/ExtUtils-ParseXS/lib/perlxs.pod
-	$to dist/ExtUtils-ParseXS/lib/perlxstut.pod
-	$to dist/ExtUtils-ParseXS/lib/perlxstypemap.pod
-	$to win32/Makefile
-	$to win32/makefile.mk
-	$to win32/pod.mak
-	$to vms/descrip_mms.template
-# --- For t/porting/regen.t
-	$to keywords.c
-	$to regen.pl
-	$to regen_perly.pl
-	$to perly.tab
-	$to perly.act
-	$to perly.y
-	$to uconfig.sh
 # --- For t/x2p/s2p.t
 	$to x2p
 	cd t && (rm -f \$(PERL_EXE); \$(LNS) ../\$(PERL_EXE) \$(PERL_EXE)) && cd ..
