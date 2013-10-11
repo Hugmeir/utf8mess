@@ -1541,7 +1541,7 @@ test_prep test-prep: test_prep_pre \$(MINIPERL_EXE) \$(unidatafiles) \$(PERL_EXE
 	$to ext/POSIX/POSIX.xs
 	$to ext/POSIX/Makefile.PL
 	$to dist/IO/Makefile.PL
-# --- These two are needed by ExtUtils::MM_Unix to verify PERL_CORE
+# --- These three are needed by ExtUtils::MM_Unix to verify PERL_CORE
 	$to config_h.SH
 	$to perl.h
 	$to cflags
