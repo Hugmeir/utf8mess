@@ -245,6 +245,6 @@ $chmod a+rx $from
 fi # Cross-compiling with adb
 
 hostosname=`$hostperl -le 'print $^O'`
-if $test "X$hostosname" == "Xdarwin"; then
+if $test "X$hostosname" = "Xdarwin"; then
   firstmakefile=GNUmakefile;
 fi
