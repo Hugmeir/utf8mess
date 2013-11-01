@@ -129,6 +129,8 @@ EOCBU
 
 if $test "X$targetrun" = "Xadb"; then
 
+$rm $run $to $from $targetmkdir
+
 case "$src" in
     /*) run=$src/Cross/run
             targetmkdir=$src/Cross/mkdir
@@ -248,3 +250,14 @@ hostosname=`$hostperl -le 'print $^O'`
 if $test "X$hostosname" = "Xdarwin"; then
   firstmakefile=GNUmakefile;
 fi
+
+case "$cc" in
+*gcc*)
+    if $test "X$gcc" = X; then
+        gcc="$cc"
+    fi
+    ;;
+esac
+
+# Android is a linux variant, so run those hints.
+. ./hints/linux.sh
