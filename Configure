@@ -7884,10 +7884,11 @@ yes)
 			echo "$extern_C void *$1$tdc; void *(*(p()))$tdc { return &$1; } int main() { if(p()) return(0); else return(1); }"> try.c;
 			$cc -o try $optimize $ccflags $ldflags try.c >/dev/null 2>&1 $libs && tval=true;
 			$test "$mistrustnm" = run -a -x try && { $run ./try$_exe >/dev/null 2>&1 || tval=false; };
+			$rm_try;
 		fi;
 	else
 		echo "$extern_C void *$1$tdc; void *(*(p()))$tdc { return &$1; } int main() { if(p()) return(0); else return(1); }"> try.c;
-		$cc -o try $optimize $ccflags $ldflags try.c $libs && tval=true;
+		$cc -o try $optimize $ccflags $ldflags try.c $libs >/dev/null 2>&1 && tval=true;
 		$rm_try;
 	fi;
 	;;
