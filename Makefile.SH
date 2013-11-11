@@ -899,7 +899,7 @@ $(MINIPERL_EXE): lib/buildcustomize.pl
 	case "${osname}${osvers}" in
 	aix*)
 		$spitshell >>$Makefile <<'!NO!SUBS!'
-lib/buildcustomize.pl: $& $(mini_obj) $(CONFIGPM)
+lib/buildcustomize.pl: $& $(mini_obj)
 	$(CC) -o $(MINIPERL_EXE) $(CLDFLAGS) $(mini_obj) $(libs)
 	$(LDLIBPTH) ./miniperl$(HOST_EXE_EXT) -w -Ilib -Idist/Exporter/lib -MExporter -e '<?>' || sh -c 'echo >&2 Failed to build miniperl.  Please run make minitest; exit 1'
 	$(MINIPERL) -f write_buildcustomize.pl
@@ -907,7 +907,7 @@ lib/buildcustomize.pl: $& $(mini_obj) $(CONFIGPM)
 		;;
 	next4*)
 		$spitshell >>$Makefile <<'!NO!SUBS!'
-lib/buildcustomize.pl: $& $(mini_obj) write    ldcustomize.pl $(CONFIGPM)
+lib/buildcustomize.pl: $& $(mini_obj) write    ldcustomize.pl
 	$(CC) -o $(MINIPERL_EXE) $(mini_obj    libs)
 	$(LDLIBPTH) ./miniperl$(HOST    _EXT) -w -Ilib -Idist/Exporter/lib -MExporter -e '<?>' || sh -c 'echo >&2 Failed to build miniperl.  Please run make minitest; exit 1'
 	$(MINIPERL) -f write_buildcustomize.pl    
@@ -927,7 +927,7 @@ NAMESPACEFLAGS = -force_flat_namespace
 		    ;;
 		esac
 		$spitshell >>$Makefile <<'!NO!SUBS!'
-lib/buildcustomize.pl: $& $(mini_obj) write_buildcustomize.pl $(CONFIGPM)
+lib/buildcustomize.pl: $& $(mini_obj) write_buildcustomize.pl
 	-@rm -f miniperl.xok
 	$(CC) $(CLDFLAGS) $(NAMESPACEFLAGS) -o $(MINIPERL_EXE) \
 	    $(mini_obj) $(libs)
@@ -938,7 +938,7 @@ lib/buildcustomize.pl: $& $(mini_obj) write_buildcustomize.pl $(CONFIGPM)
 	*)
 		if test "X$hostperl" != X; then
 			$spitshell >>$Makefile <<'!NO!SUBS!'
-lib/buildcustomize.pl: $& $(mini_obj) write_buildcustomize.pl $(CONFIGPM)
+lib/buildcustomize.pl: $& $(mini_obj) write_buildcustomize.pl
 	-@rm -f miniperl.xok
 	-@rm $(MINIPERL_EXE)
 	$(LNS) $(HOST_PERL) $(MINIPERL_EXE)
@@ -946,12 +946,12 @@ lib/buildcustomize.pl: $& $(mini_obj) write_buildcustomize.pl $(CONFIGPM)
 !NO!SUBS!
 		else
 			$spitshell >>$Makefile <<'!NO!SUBS!'
-lib/buildcustomize.pl: $& $(mini_obj) write_buildcustomize.pl $(CONFIGPM)
+lib/buildcustomize.pl: $& $(mini_obj) write_buildcustomize.pl
 	-@rm -f miniperl.xok
 	$(CC) $(CLDFLAGS) -o $(MINIPERL_EXE) \
 	    $(mini_obj) $(libs)
 	$(LDLIBPTH) ./miniperl$(HOST_EXE_EXT) -w -Ilib -Idist/Exporter/lib -MExporter -e '<?>' || sh -c 'echo >&2 Failed to build miniperl.  Please run make minitest; exit 1'
-	$(MINIPERL) -f write_buildcustomize.pl
+	$(MINIPERL) -f write_buildcustomize.pl ${osname}
 !NO!SUBS!
 		fi
 		;;
