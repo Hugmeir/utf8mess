@@ -1970,7 +1970,7 @@ esac
 if test "X$sysroot" != X; then
   case "$cc" in
     *-gcc|*-g++)
-        $echo "Using $sysroot to find your headers and libraries, adding to ccflags"
+        echo "Using $sysroot to find your headers and libraries, adding to ccflags"
         case "$ccflags" in
             *sysroot*) ;;
             'undef'|*)
