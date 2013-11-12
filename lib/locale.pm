@@ -72,7 +72,7 @@ sub import {
 
     if(!$Config{d_setlocale}) {
         ## No locale support found on this Perl, giving up:
-        die('Your vendor does not support locales, you cannot use the locale module.');
+        return;
     }
 
     my $found_not_chars = 0;
