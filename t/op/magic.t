@@ -83,8 +83,12 @@ sub env_is {
         $eqv = "\n" if length($eqv) == 2 and $eqv eq "\000\n";
         is $eqv, "$val\n", $desc;
     } else {
-        chomp (my @env = grep { s/^$key=// } `env`);
-        is "@env", $val, $desc;
+        my @env = `env`;
+        SKIP: {
+            skip("env doesn't work on this android", 1) if !@env && $Is_Android;
+            chomp (my @env = grep { s/^$key=// } @env);
+            is "@env", $val, $desc;
+        }
     }
 }
 
