@@ -2,12 +2,17 @@
 
 # Test the well-formed-ness of the MANIFEST file.
 
+use Config;
 BEGIN {
     @INC = '..' if -f '../TestInit.pm';
 }
 use TestInit qw(T); # T is chdir to the top level
 
 require 't/test.pl';
+
+skip_all("Cross-compiling, the entire source might not be available")
+    if $Config{usecrosscompile};
+
 
 plan('no_plan');
 
