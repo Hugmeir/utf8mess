@@ -3535,7 +3535,14 @@ EOM
                     osname=nto
                     ;;
                 *linux-android*)
+                    # Catch arm-linux-androideabi, mipsel-linux-android,
+                    # and i686-linux-android
                     osname=linux-androideabi
+                    ;;
+                *linux*)
+                    # Something like arm-linux-gnueabihf is really just
+                    # plain linux.
+                    osname=linux
                     ;;
                 *)
                     osname=`echo $targetarch|sed 's,^[^-]*-,,'`
