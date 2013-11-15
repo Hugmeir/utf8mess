@@ -3540,7 +3540,8 @@ EOM
         *)  hostarch=$osname
             case "$targetarch" in
                 nto*|*-nto-*)
-                    osname=nto
+                    # Will load qnx.sh, which should change osname to nto
+                    osname=qnx
                     ;;
                 *linux-android*)
                     # Catch arm-linux-androideabi, mipsel-linux-android,

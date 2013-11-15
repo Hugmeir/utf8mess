@@ -106,7 +106,7 @@ echo ""
 # making an unnecessary distinction between AT-qnx and PCI-qnx,
 # for example. I will use uname's architecture for Neutrino.
 #----------------------------------------------------------------
-set X `uname -a`
+set X `$run uname -a`
 shift
 [ "$1" != "QNX" ] && echo "uname doesn't look like QNX!"
 case $4 in
@@ -248,10 +248,14 @@ else
   lddlflags='-shared'
   ccdlflags='-Wl,-E'
 
-  # Somewhere in the build, something tries to throw a gcc
-  # option to $cc if it knows it invokes gcc. Our cc doesn't
-  # recognize that option, so we're better off setting cc=gcc.
-  cc='gcc'
+  if "X$usecrosscompile" = X; then
+    # Somewhere in the build, something tries to throw a gcc
+    # option to $cc if it knows it invokes gcc. Our cc doesn't
+    # recognize that option, so we're better off setting cc=gcc.
+    # Of course, only do this when not cross-compiling, for
+    # obvious reasons.
+    cc='gcc'
+  fi
 
   # gcc uses $QNX_TARGET/usr/include as the include directory.
   usrinc="$QNX_TARGET/usr/include"
