@@ -19,7 +19,8 @@ elsif ($^O eq 'VMS') {
 elsif ($ENV{PWD}) {
     $wd = $ENV{PWD};
 }
-elsif ( $^O eq 'linux-androideabi' && !$Config{d_useshellcmds} ) {
+elsif ( !$Config{d_useshellcmds}
+        && ($^O eq 'linux-androideabi' || $^O eq 'nto' ) ) {
     # On Android, pwd is a shell builtin, so unless perl was built
     # with -DUSE_SHELL_ALWAYS, `pwd` won't cut it
     $wd = `sh -c pwd`;
