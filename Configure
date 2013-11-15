@@ -3001,7 +3001,7 @@ esac
 exe=\$1
 shift
 $to \$exe
-$targetrun -p $targetport -l $targetuser $targethost "cd \$cwd && \$env ./\$exe \$@"
+$targetrun -p $targetport -l $targetuser $targethost "cd \$cwd && \$env \$exe \$@"
 EOF
 	    ;;
 	       adb)
