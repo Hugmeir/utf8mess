@@ -179,6 +179,24 @@ hang; this is because it doesn't output anything until it finishes
 running all tests.  You can check its progress by logging into the
 device, moving to $TARGETDIR, and looking at the file output.stdout.
 
+=head3 Notes
+
+=over
+
+=item *
+
+If you are targetting x86 Android, you will have to change $TARGETARCH-gcc
+and $TARGETARCH-nm to i686-linux-android-gcc and i686-linux-android-nm,
+respectively.
+
+=item *
+
+On some older low-end devices -- think early 2.2 era -- some tests,
+particularly t/re/uniprops, may crash the phone, causing it to turn
+itself off and then back on again.
+
+=back
+
 =head1 AUTHOR
 
 Brian Fraser <fraserbn@gmail.com>
