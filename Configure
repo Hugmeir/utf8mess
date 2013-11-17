@@ -1969,7 +1969,7 @@ esac
 
 if test "X$sysroot" != X; then
   case "$cc" in
-    *-gcc|*-g++)
+    *-gcc*|*-g++*)
         echo "Using $sysroot to find your headers and libraries, adding to ccflags"
         case "$ccflags" in
             *sysroot*) ;;
@@ -2825,17 +2825,25 @@ $define|true|[yY]*)
 	$echo "Cross-compiling..."
     croak=''
     case "$cc" in
-	*-gcc|*-g++) # A cross-compiling gcc, probably.
-	    targetarch=`$echo $cc|$sed 's/-gcc$//'`
+	*-gcc*|*-g++*) # A cross-compiling gcc, probably.
+            # arm-linux-androideabi-gcc  -> arm-linux-androideabi
+            # x86_64-w64-mingw32-gcc.exe -> x86_64-w64-mingw32
+	    targetarch=`$echo $cc|$sed 's/-g\(\+\+\|cc\).*$//'`
         $echo "Your targetarch is now set to: $targetarch" >&4
-	    ar=$targetarch-ar
+            case $ar in
+            '') ar=$targetarch-ar ;;
+            esac
 	    # leave out ld, choosing it is more complex
-	    nm=$targetarch-nm
-	    ranlib=$targetarch-ranlib
+            case $nm in
+            '') nm=$targetarch-nm ;;
+            esac
+            case $ranlib in
+            '') ranlib=$targetarch-ranlib ;;
+            esac
         # if sysroot is set we already have our incpath and libpath discovered, else try to get gcc to tell us
 	    if test "X$sysroot" = X; then
 	        $echo 'extern int foo;' > try.c
-	        set X `$cc -v -E try.c 2>&1 | $awk '/^#include </,/^End of search /'|$grep '/include'`
+	        set X `$cc -v -E try.c 2>&1 | $awk '/^#include </,/^End of search /'|$grep '/include'|$tr -d '\r'| $sed 's,.:,,g' | $tr '\\\\' '/'`
 	        shift
             if $test $# -gt 0; then
 	            incpth="$incpth $*"
@@ -5541,6 +5549,9 @@ $cppstdin $cppflags $cppminus <foo.c 2>/dev/null | \
 $grep '^[ 	]*#.*stdio\.h' | \
 while read cline; do
 	pos=1
+	if $test -n "$dos_to_unix"; then
+	    cline=\`$dos_to_unix "\$cline"\`
+	fi
 	set \$cline
 	while $test \$# -gt 0; do
 		if $test $testaccess \`echo \$1 | $tr -d '"'\`; then
@@ -5586,6 +5597,9 @@ echo "#include <\$wanted>" > foo\$\$.c
 $cppstdin $cppminus $cppflags < foo\$\$.c 2>/dev/null | \
 $cppfilter $grep "^[ 	]*#.*\$wanted" | \
 while read cline; do
+        if $test -n "$dos_to_unix"; then
+            cline=\`$dos_to_unix "\$cline"\`
+        fi
 	name=\`echo \$cline | $awk "\$awkprg" | $tr -d '"'\`
 	case "\$name" in
 	*[/\\\\]\$wanted) echo "\$name"; exit 1;;
@@ -8142,7 +8156,7 @@ EOM
     : of --sysroot.
     if $test "X$sysroot" != X; then
         case "$cc" in
-        *-gcc|*-g++)
+        *-gcc*|*-g++*)
                dflt="$dflt --sysroot $sysroot"
         ;;
         esac

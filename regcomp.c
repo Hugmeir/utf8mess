@@ -83,7 +83,9 @@
 #  include "re_comp.h"
 extern const struct regexp_engine my_reg_engine;
 #else
+#  include "EXTERN.h"
 #  include "regcomp.h"
+#  include "INTERN.h"
 #endif
 
 #include "dquote_static.c"
