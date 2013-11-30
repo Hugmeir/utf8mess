@@ -11,6 +11,7 @@
 #define SPU_ENABLESUPPRESSION           1
 #include <os2.h>
 #include "dlfcn.h"
+#include <sys/emx.h>
 #include <emx/syscalls.h>
 #include <sys/emxload.h>
 
@@ -2274,6 +2275,9 @@ dir_subst(char *s, unsigned int l, char *b, unsigned int bl, enum dir_subst_e fl
 	    switch (s[1]) {
 	      case 'i': case 'I':
 		strip = 0;
+#ifndef INSTALL_PREFIX
+#  define INSTALL_PREFIX "/usr/local"
+#endif
 		tol = strlen(INSTALL_PREFIX);
 		if (tol >= bl) {
 		    if (flags & dir_subst_fatal)
@@ -2439,6 +2443,13 @@ Perl_hab_GET()			/* Needed if perl.h cannot be included */
     return perl_hab_GET();
 }
 
+#ifndef MCW_EM
+#ifndef _MCW_EM /* for OS2/eCS */
+#define _MCW_EM 0x0008001F
+#endif
+#define MCW_EM _MCW_EM
+#endif
+
 static void
 Create_HMQ(int serve, char *message)	/* Assumes morphing */
 {
@@ -2573,11 +2584,26 @@ Perl_Deregister_MQ(int serve)
 				&& ((path)[2] == '/' || (path)[2] == '\\'))
 #define sys_is_rooted _fnisabs
 #define sys_is_relative _fnisrel
-#define current_drive _getdrive
+
+/* for getcwd2, fnisabs, fnisrel, abspath */
+#include <stdlib.h>
+
+#ifdef _getdrive
+#  define current_drive _getdrive
+#else
+#  define current_drive __getdrive
+#endif
 
 #undef chdir				/* Was _chdir2. */
 #define sys_chdir(p) (chdir(p) == 0)
-#define change_drive(d) (_chdrive(d), (current_drive() == toupper(d)))
+#ifndef chdrive
+#  ifdef _chdrive
+#    define chdrive _chdrive
+#  else
+#    define chdrive __chdrive
+#  endif
+#endif
+#define change_drive(d) (chdrive(d), (current_drive() == toupper(d)))
 
 XS(XS_OS2_Error)
 {
@@ -4549,14 +4575,14 @@ Xs_OS2_init(pTHX)
 	gv = gv_fetchpv("OS2::can_fork", TRUE, SVt_PV);
 	GvMULTI_on(gv);
 	sv_setiv(GvSV(gv), exe_is_aout());
-	gv = gv_fetchpv("OS2::emx_rev", TRUE, SVt_PV);
+	/*gv = gv_fetchpv("OS2::emx_rev", TRUE, SVt_PV);
 	GvMULTI_on(gv);
 	sv_setiv(GvSV(gv), _emx_rev);
 	sv_setpv(GvSV(gv), _emx_vprt);
 	SvIOK_on(GvSV(gv));
 	gv = gv_fetchpv("OS2::emx_env", TRUE, SVt_PV);
 	GvMULTI_on(gv);
-	sv_setiv(GvSV(gv), _emx_env);
+	sv_setiv(GvSV(gv), _emx_env);*/
 	gv = gv_fetchpv("OS2::os_ver", TRUE, SVt_PV);
 	GvMULTI_on(gv);
 	sv_setnv(GvSV(gv), _osmajor + 0.001 * _osminor);
@@ -5260,12 +5286,6 @@ my_getpwent (void)
   if (pwent_cnt++)
     return 0;				/* Return one entry only */
   return getpwuid(0);
-}
-
-void
-setgrent(void)
-{
-  grent_cnt = 0;
 }
 
 void

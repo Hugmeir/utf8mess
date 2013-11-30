@@ -2820,10 +2820,10 @@ Perl_wait4pid(pTHX_ Pid_t pid, int *statusp, int flags)
     result = wait4(pid,statusp,flags,NULL);
     goto finish;
 #endif
-#ifdef PERL_USES_PL_PIDSTATUS
 #if defined(HAS_WAITPID) && defined(HAS_WAITPID_RUNTIME)
   hard_way:
 #endif
+#ifdef PERL_USES_PL_PIDSTATUS
     {
 	if (flags)
 	    Perl_croak(aTHX_ "Can't do waitpid with flags");

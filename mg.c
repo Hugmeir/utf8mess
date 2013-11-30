@@ -837,12 +837,9 @@ Perl_magic_get(pTHX_ SV *sv, MAGIC *mg)
                 sv_setpvs(sv,"");
         }
 #elif defined(OS2)
-        if (!(_emx_env & 0x200)) {	/* Under DOS */
-            sv_setnv(sv, (NV)errno);
-            sv_setpv(sv, errno ? Strerror(errno) : "");
-        } else {
+        {
             if (errno != errno_isOS2) {
-                const int tmp = _syserrno();
+                const int tmp = errno_isOS2;
                 if (tmp)	/* 2nd call to _syserrno() makes it 0 */
                     Perl_rc = tmp;
             }

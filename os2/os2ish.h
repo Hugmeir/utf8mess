@@ -38,7 +38,6 @@
  */
 #define HAS_GROUP
 #define HAS_GETGRENT			/* fake */
-#define HAS_SETGRENT			/* fake */
 #define HAS_ENDGRENT			/* fake */
 
 /* USEMYBINMODE
@@ -114,6 +113,7 @@
 #define OS2_ERROR_ALREADY_POSTED 299	/* Avoid os2.h */
 
 extern int rc;
+extern char** environ;
 
 #define MUTEX_INIT(m) \
     STMT_START {						\
@@ -229,14 +229,10 @@ EXTERN_C void *xreg[2];
 
 #  define PERL_SYS_INIT3_BODY(argcp, argvp, envp)	\
     MALLOC_CHECK_TAINT(*argcp, *argvp, *envp)	\
-    _response(argcp, argvp);			\
-    _wildcard(argcp, argvp);			\
     Perl_OS2_init3(*envp, xreg, 0);		\
     PERLIO_INIT
 
 #  define PERL_SYS_INIT_BODY(argcp, argvp)  \
-    _response(argcp, argvp);			\
-    _wildcard(argcp, argvp);			\
     Perl_OS2_init3(NULL, xreg, 0);		\
     PERLIO_INIT
 
@@ -353,7 +349,6 @@ unsigned long DosAllocThreadLocalMemory (unsigned long cb, unsigned long **p);
 #endif
 
 struct group *getgrent (void);
-void setgrent (void);
 void endgrent (void);
 
 struct passwd *my_getpwuid (uid_t);
@@ -403,7 +398,6 @@ void *emx_realloc (void *, size_t);
 #include <fcntl.h>
 #include <sys/stat.h>
 
-#define chdir	_chdir2
 #define getcwd	_getcwd2
 
 /* This guy is needed for quick stdstd  */
@@ -528,12 +522,7 @@ void init_PMWIN_entries(void);
 
 #define OS2_XS_init() (*OS2_Perl_data.xs_init)(aTHX)
 
-#if _EMX_CRT_REV_ >= 60
-# define os2_setsyserrno(rc)	(Perl_rc = rc, errno = errno_isOS2_set, \
-				_setsyserrno(rc))
-#else
-# define os2_setsyserrno(rc)	(Perl_rc = rc, errno = errno_isOS2)
-#endif
+#define os2_setsyserrno(rc)	(Perl_rc = rc, errno = errno_isOS2)
 
 /* The expressions below return true on error. */
 /* INCL_DOSERRORS needed. rc should be declared outside. */
@@ -792,8 +781,6 @@ extern const Perl_PFN * const pExtFCN;
 char *os2error(int rc);
 int os2_stat(const char *name, struct stat *st);
 int fork_with_resources();
-int setpriority(int which, int pid, int val);
-int getpriority(int which /* ignored */, int pid);
 
 void croak_with_os2error(char *s) __attribute__((noreturn));
 
