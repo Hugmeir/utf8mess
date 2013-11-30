@@ -484,3 +484,9 @@ esac
 # Now go back
 cd ../..
 cp os2/*.t t/lib
+
+# Hugmeir WIP
+obj_ext='.o'
+# os2.c uses a lot of underscore-functions
+ccflags="$ccflags -D__USE_EMX -D_WITH_UNDERSCORE"
+usenm="$undef"

@@ -51,7 +51,7 @@ enum module_name_how { mod_name_handle, mod_name_shortname, mod_name_full,
 static SV* module_name_at(void *pp, enum module_name_how how);
 
 void
-croak_with_os2error(char *s)
+croak_with_os2error(const char *s)
 {
     Perl_croak_nocontext("%s: %s", s, os2error(Perl_rc));
 }
@@ -4166,7 +4166,7 @@ XS(XS_OS2_pipe)
 	    }
 	    if (items >= 5) {
 		STRLEN lll = SvUV(ST(4));
-		SV *sv = NEWSV(914, lll);
+		SV *sv = newSV(lll);
 
 		sv_2mortal(sv);
 		ll = lll;
