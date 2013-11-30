@@ -26,7 +26,7 @@ cc='gcc'
 # Make denser object files and DLL
 case "X$optimize" in
   X)
-	optimize="-O2 -fomit-frame-pointer -malign-loops=2 -malign-jumps=2 -malign-functions=2 -s"
+	optimize="-O2 -fomit-frame-pointer -s"
 	ld_dll_optimize="-s"
 	;;
 esac
@@ -217,8 +217,15 @@ fi
 # [Maybe we should just remove c from $libswanted ?]
 
 # Test would pick up wrong rand, so we hardwire the value for random()
-libs='-lsocket -lm -lbsd'
-randbits=31
+libs='-lsocket -lm'
+
+# Hugmeir WIP
+obj_ext='.o'
+# os2.c uses a lot of underscore-functions
+ccflags="$ccflags -D__USE_EMX -D_WITH_UNDERSCORE"
+usenm="$undef"
+#end wip
+
 archobjs="os2$obj_ext dl_os2$obj_ext"
 
 # Run files without extension with sh:
