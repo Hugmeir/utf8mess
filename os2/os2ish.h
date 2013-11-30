@@ -218,21 +218,22 @@ void Perl_OS2_init(char **);
 void Perl_OS2_init3(char **envp, void **excH, int flags);
 void Perl_OS2_term(void **excH, int exitstatus, int flags);
 
+#endif /* USE_ITHREADS */
+
 /* The code without INIT3 hideously puts env inside: */
+
+void *xreg[2];
 
 /* These ones should be in the same block as PERL_SYS_TERM() */
 #ifdef PERL_CORE
-
 #  define PERL_SYS_INIT3_BODY(argcp, argvp, envp)	\
-  { void *xreg[2];				\
     MALLOC_CHECK_TAINT(*argcp, *argvp, *envp)	\
     _response(argcp, argvp);			\
     _wildcard(argcp, argvp);			\
     Perl_OS2_init3(*envp, xreg, 0);		\
     PERLIO_INIT
 
-#  define PERL_SYS_INIT_BODY(argcp, argvp)  {	\
-  { void *xreg[2];				\
+#  define PERL_SYS_INIT_BODY(argcp, argvp)      \
     _response(argcp, argvp);			\
     _wildcard(argcp, argvp);			\
     Perl_OS2_init3(NULL, xreg, 0);		\
@@ -241,11 +242,10 @@ void Perl_OS2_term(void **excH, int exitstatus, int flags);
 #else  /* Compiling embedded Perl or Perl extension */
 
 #  define PERL_SYS_INIT3_BODY(argcp, argvp, envp)	\
-  { void *xreg[2];				\
     Perl_OS2_init3(*envp, xreg, 0);		\
     PERLIO_INIT
-#  define PERL_SYS_INIT_BODY(argcp, argvp)	{	\
-  { void *xreg[2];				\
+#  define PERL_SYS_INIT_BODY(argcp, argvp)	\
+    void *xreg[2];				\
     Perl_OS2_init3(NULL, xreg, 0);		\
     PERLIO_INIT
 #endif
@@ -264,8 +264,7 @@ void Perl_OS2_term(void **excH, int exitstatus, int flags);
 
 /* This one should come in pair with PERL_SYS_INIT_BODY() and in the same block */
 #define PERL_SYS_TERM_BODY()							\
-     PERL_SYS_TERM1(xreg);						\
-  }
+     PERL_SYS_TERM1(xreg);
 
 #ifndef __EMX__
 #  define PERL_CALLCONV _System
