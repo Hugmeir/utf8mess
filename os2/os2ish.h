@@ -113,7 +113,6 @@
 #define OS2_ERROR_ALREADY_POSTED 299	/* Avoid os2.h */
 
 extern int rc;
-extern char** environ;
 
 #define MUTEX_INIT(m) \
     STMT_START {						\
@@ -397,6 +396,8 @@ void *emx_realloc (void *, size_t);
 #include <unistd.h>	/* before the following definitions */
 #include <fcntl.h>
 #include <sys/stat.h>
+
+extern char** environ;
 
 #define getcwd	_getcwd2
 

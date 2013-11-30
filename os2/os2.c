@@ -27,6 +27,8 @@ Probably not. http://unix.os2site.com/pub/list/unixos2/2004/11/2004Nov02000421.t
  * Various Unix compatibility functions for OS/2
  */
 
+#include <float.h>
+#include <string.h>
 #include <stdio.h>
 #include <errno.h>
 #include <limits.h>
@@ -2166,11 +2168,15 @@ dllname2buffer(pTHX_ char *buf, STRLEN l)
     return (ll >= l ? "???" : buf);
 }
 
+#include <stdlib.h>
 static char *
 execname2buffer(char *buf, STRLEN l, char *oname)
 {
   char *p, *orig = oname, ok = oname != NULL;
-
+  
+#ifndef _execname
+# define _execname(a,b) __execname(a,b)
+#endif
   if (_execname(buf, l) != 0) {
     if (!oname || strlen(oname) >= l)
       return oname;
@@ -2450,6 +2456,7 @@ Perl_hab_GET()			/* Needed if perl.h cannot be included */
 #define MCW_EM _MCW_EM
 #endif
 
+#include <float.h>
 static void
 Create_HMQ(int serve, char *message)	/* Assumes morphing */
 {
@@ -2580,13 +2587,12 @@ Perl_Deregister_MQ(int serve)
     }
 }
 
+/* for getcwd2, fnisabs, fnisrel, abspath */
+#include <stdlib.h>
 #define sys_is_absolute(path) ( isALPHA((path)[0]) && (path)[1] == ':' \
 				&& ((path)[2] == '/' || (path)[2] == '\\'))
 #define sys_is_rooted _fnisabs
 #define sys_is_relative _fnisrel
-
-/* for getcwd2, fnisabs, fnisrel, abspath */
-#include <stdlib.h>
 
 #ifdef _getdrive
 #  define current_drive _getdrive
@@ -4509,6 +4515,10 @@ XS(XS_OS2_open)
     }
     XSRETURN(2);
 }
+
+extern const unsigned char _osminor;
+extern const unsigned char _osmajor;
+extern char** _environ;
 
 int
 Xs_OS2_init(pTHX)
