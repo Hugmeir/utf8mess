@@ -17,6 +17,12 @@
 #include <sys/uflags.h>
 
 /*
+ *> Should I expect to find 'emx_env' in this new environment?
+
+Probably not. http://unix.os2site.com/pub/list/unixos2/2004/11/2004Nov02000421.txt
+*/
+
+/*
  * Various Unix compatibility functions for OS/2
  */
 
@@ -660,7 +666,6 @@ my_type()
     TIB *tib;
     PIB *pib;
     
-    if (!(_emx_env & 0x200)) return 1; /* not OS/2. */
     if (CheckOSError(DosGetInfoBlocks(&tib, &pib))) 
 	return -1; 
     
@@ -674,8 +679,6 @@ my_type_set(int type)
     TIB *tib;
     PIB *pib;
     
-    if (!(_emx_env & 0x200))
-	Perl_croak_nocontext("Can't set type on DOS"); /* not OS/2. */
     if (CheckOSError(DosGetInfoBlocks(&tib, &pib))) 
 	croak_with_os2error("Error getting info blocks");
     pib->pib_ultype = type;
@@ -832,7 +835,6 @@ setpriority(int which, int pid, int val)
 {
   ULONG rc, prio = sys_prio(pid);
 
-  if (!(_emx_env & 0x200)) return 0; /* Nop if not OS/2. */
   if (priors[(32 - val) >> 5] + 1 == (prio >> 8)) {
       /* Do not change class. */
       return CheckOSError(DosSetPriority((pid < 0) 
@@ -866,7 +868,6 @@ getpriority(int which /* ignored */, int pid)
 {
   ULONG ret;
 
-  if (!(_emx_env & 0x200)) return 0; /* Nop if not OS/2. */
   ret = sys_prio(pid);
   if (ret == PRIO_ERR) {
       return -1;
@@ -951,8 +952,6 @@ file_type(char *path)
     int rc;
     ULONG apptype;
     
-    if (!(_emx_env & 0x200)) 
-	Perl_croak_nocontext("file_type not implemented on DOS"); /* not OS/2. */
     if (CheckOSError(DosQueryAppType(path, &apptype))) {
 	switch (rc) {
 	case ERROR_FILE_NOT_FOUND:
@@ -1015,7 +1014,7 @@ do_spawn_ve(pTHX_ SV *really, U32 flag, U32 execf, char *inicmd, U32 addflag)
 
       reread:
 	force_shell = 0;
-	if (_emx_env & 0x200) { /* OS/2. */ 
+	{ /* OS/2. */ 
 	    int type = file_type(real_name);
 	  type_again:
 	    if (type == -1) {		/* Not found */
@@ -1253,9 +1252,7 @@ do_spawn_ve(pTHX_ SV *really, U32 flag, U32 execf, char *inicmd, U32 addflag)
 			    /* If EXECSHELL is set, we do not set */
 			    
 			    if (!shell)
-				shell = ((_emx_env & 0x200)
-					 ? "c:/os2/cmd.exe"
-					 : "c:/command.com");
+				shell = "c:/os2/cmd.exe";
 			    nargs = shell_opt ? 2 : 1;	/* shell file args */
 			    exec_args[0] = shell;
 			    exec_args[1] = shell_opt;
@@ -2074,7 +2071,6 @@ os2error(int rc)
 	char *s;
 	int number = SvTRUE(get_sv("OS2::nsyserror", GV_ADD));
 
-        if (!(_emx_env & 0x200)) return ""; /* Nop if not OS/2. */
 	if (rc == 0)
 		return "";
 	if (number) {
@@ -2650,9 +2646,6 @@ async_mssleep(ULONG ms, int switch_priority) {
   PTIB tib;
   char *e = NULL;
   APIRET badrc;
-
-  if (!(_emx_env & 0x200))	/* DOS */
-    return !_sleep2(ms);
 
   os2cp_croak(DosCreateEventSem(NULL,	     /* Unnamed */
 				&hevEvent1,  /* Handle of semaphore returned */
@@ -4498,13 +4491,11 @@ Xs_OS2_init(pTHX)
     {
 	GV *gv;
 
-	if (_emx_env & 0x200) {	/* OS/2 */
             newXS("File::Copy::syscopy", XS_File__Copy_syscopy, file);
             newXS("Cwd::extLibpath", XS_Cwd_extLibpath, file);
             newXS("Cwd::extLibpath_set", XS_Cwd_extLibpath_set, file);
             newXS("OS2::extLibpath", XS_Cwd_extLibpath, file);
             newXS("OS2::extLibpath_set", XS_Cwd_extLibpath_set, file);
-	}
         newXS("OS2::Error", XS_OS2_Error, file);
         newXS("OS2::Errors2Drive", XS_OS2_Errors2Drive, file);
         newXS("OS2::SysInfo", XS_OS2_SysInfo, file);
@@ -4853,7 +4844,7 @@ check_emx_runtime(char **env, EXCEPTIONREGISTRATIONRECORD *preg)
 	__os_version().  */
     v_crt = (_osmajor | _osminor);
 
-    if ((_emx_env & 0x200) && !(v_emx & 0xFFFF)) {	/* OS/2, EMX uninit. */ 
+    if (!(v_emx & 0xFFFF)) {	/* OS/2, EMX uninit. */ 
 	force_init_emx_runtime( preg,
 				FORCE_EMX_INIT_CONTRACT_ARGV 
 				| FORCE_EMX_INIT_INSTALL_ATEXIT );
@@ -4997,7 +4988,6 @@ fd_ok(int fd)
 {
     static ULONG max_fh = 0;
 
-    if (!(_emx_env & 0x200)) return 1;		/* not OS/2. */
     if (fd >= max_fh) {				/* Renew */
 	LONG delta = 0;
 
@@ -5132,7 +5122,7 @@ my_flock(int handle, int o)
    }
    MUTEX_UNLOCK(&perlos2_state_mutex);
   }
-  if (!(_emx_env & 0x200) || !use_my_flock) 
+  if (!use_my_flock) 
     return flock(handle, o);	/* Delegate to EMX. */
   
                                         /* is this a file? */

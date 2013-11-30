@@ -22,7 +22,7 @@
 #define HAS_KILL
 #define HAS_WAIT
 #define HAS_DLERROR
-#define HAS_WAITPID_RUNTIME (_emx_env & 0x200)
+#define HAS_WAITPID_RUNTIME 1
 
 /* HAS_PASSWD
  *	This symbol, if defined, indicates that the getpwnam() and
@@ -234,7 +234,7 @@ EXTERN_C void *xreg[2];
     Perl_OS2_init3(*envp, xreg, 0);		\
     PERLIO_INIT
 
-#  define PERL_SYS_INIT_BODY(argcp, argvp)  {	\
+#  define PERL_SYS_INIT_BODY(argcp, argvp)  \
     _response(argcp, argvp);			\
     _wildcard(argcp, argvp);			\
     Perl_OS2_init3(NULL, xreg, 0);		\
@@ -245,7 +245,7 @@ EXTERN_C void *xreg[2];
 #  define PERL_SYS_INIT3_BODY(argcp, argvp, envp)	\
     Perl_OS2_init3(*envp, xreg, 0);		\
     PERLIO_INIT
-#  define PERL_SYS_INIT_BODY(argcp, argvp)	{	\
+#  define PERL_SYS_INIT_BODY(argcp, argvp)	\
     Perl_OS2_init3(NULL, xreg, 0);		\
     PERLIO_INIT
 #endif
