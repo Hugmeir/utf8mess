@@ -222,7 +222,8 @@ libs='-lsocket -lm'
 # Hugmeir WIP
 obj_ext='.o'
 # os2.c uses a lot of underscore-functions
-ccflags="$ccflags -D__USE_EMX -D_WITH_UNDERSCORE"
+ccflags="$ccflags -D__USE_EMX -D_WITH_UNDERSCORE -I/EMX/include"
+cppflags="$cppflags -I/EMX/include"
 usenm="$undef"
 #end wip
 

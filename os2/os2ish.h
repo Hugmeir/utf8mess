@@ -332,7 +332,7 @@ extern unsigned long find_myself(void);
 
 #define MAX_SLEEP	(((1<30) / (1000/4))-1)	/* 1<32 msec */
 
-static __inline__ unsigned
+PERL_STATIC_INLINE unsigned
 my_sleep(unsigned sec)
 {
   int remain;
@@ -415,8 +415,6 @@ void *emx_realloc (void *, size_t);
 	 ? (--FILE_ptr(fp), ++FILE_cnt(fp), (int)c) : ungetc(c,fp))
 #endif
 
-#define PERLIO_IS_BINMODE_FD(fd) _PERLIO_IS_BINMODE_FD(fd)
-
 #ifdef __GNUG__
 # define HAS_BOOL 
 #endif
@@ -426,14 +424,6 @@ void *emx_realloc (void *, size_t);
 #endif
 
 #include <emx/io.h> /* for _fd_flags() prototype */
-
-static inline bool
-_PERLIO_IS_BINMODE_FD(int fd)
-{
-    int *pflags = _fd_flags(fd);
-
-    return pflags && (*pflags) & O_BINARY;
-}
 
 /* ctermid is missing from emx0.9d */
 char *ctermid(char *s);
@@ -782,7 +772,7 @@ char *perllib_mangle(char *, unsigned int);
 #define fork	fork_with_resources
 
 #ifdef EINTR				/* x2p do not include perl.h!!! */
-static __inline__ int
+PERL_STATIC_INLINE int
 my_select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout)
 {
   if (nfds == 0 && timeout && (_emx_env & 0x200)) {
@@ -1244,6 +1234,9 @@ typedef struct {
 /* ************************************************************ */
 
 PQTOPLEVEL get_sysinfo(ULONG pid, ULONG flags);
+
+/* WIP hackery */
+#define _SYS_IOCTL_H    1
 
 #endif /* _OS2_H */
 
