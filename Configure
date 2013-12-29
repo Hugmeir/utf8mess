@@ -216,6 +216,7 @@ sysroot=''
 usecrosscompile=''
 hostperl=''
 hostgenerate=''
+hostosname=''
 targetsh=''
 extern_C=''
 mistrustnm=''
@@ -2882,6 +2883,7 @@ $define|true|[yY]*)
       cd ..
       cd UU
     fi
+    hostosname=`$hostperl -le 'print $^O'`
     ;;
 *)
     usecrosscompile='undef'
@@ -23431,6 +23433,7 @@ html3dir='$html3dir'
 html3direxp='$html3direxp'
 hostgenerate='$hostgenerate'
 hostperl='$hostperl'
+hostosname='$hostosname'
 i16size='$i16size'
 i16type='$i16type'
 i32size='$i32size'
