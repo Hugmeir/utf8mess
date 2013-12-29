@@ -1310,6 +1310,57 @@ my_kill(int pid, int sig)
     return retval;
 }
 
+
+DllExport int
+win32_async_check(pTHX)
+{
+    MSG msg;
+    HWND hwnd = w32_message_hwnd;
+
+    /* Reset w32_poll_count before doing anything else, incase we dispatch
+     * messages that end up calling back into perl */
+    w32_poll_count = 0;
+
+    if (hwnd != INVALID_HANDLE_VALUE) {
+        /* Passing PeekMessage -1 as HWND (2nd arg) only gets PostThreadMessage() messages
+        * and ignores window messages - should co-exist better with windows apps e.g. Tk
+        */
+        if (hwnd == NULL)
+            hwnd = (HWND)-1;
+
+        while (PeekMessage(&msg, hwnd, WM_TIMER,    WM_TIMER,    PM_REMOVE|PM_NOYIELD) ||
+               PeekMessage(&msg, hwnd, WM_USER_MIN, WM_USER_MAX, PM_REMOVE|PM_NOYIELD))
+        {
+            /* re-post a WM_QUIT message (we'll mark it as read later) */
+            if(msg.message == WM_QUIT) {
+                PostQuitMessage((int)msg.wParam);
+                break;
+            }
+
+            if(!CallMsgFilter(&msg, MSGF_USER))
+            {
+                TranslateMessage(&msg);
+                DispatchMessage(&msg);
+            }
+        }
+    }
+
+    /* Call PeekMessage() to mark all pending messages in the queue as "old".
+     * This is necessary when we are being called by win32_msgwait() to
+     * make sure MsgWaitForMultipleObjects() stops reporting the same waiting
+     * message over and over.  An example how this can happen is when
+     * Perl is calling win32_waitpid() inside a GUI application and the GUI
+     * is generating messages before the process terminated.
+     */
+    PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE|PM_NOYIELD);
+
+    /* Above or other stuff may have set a signal flag */
+    if (PL_sig_pending)
+        despatch_signals();
+    
+    return 1;
+}
+
 #ifdef USE_ITHREADS
 /* Get a child pseudo-process HWND, with retrying and delaying/yielding.
  * The "tries" parameter is the number of retries to make, with a Sleep(1)
@@ -2159,56 +2210,6 @@ sig_terminate(pTHX_ int sig)
     exit(sig);
 }
 
-DllExport int
-win32_async_check(pTHX)
-{
-    MSG msg;
-    HWND hwnd = w32_message_hwnd;
-
-    /* Reset w32_poll_count before doing anything else, incase we dispatch
-     * messages that end up calling back into perl */
-    w32_poll_count = 0;
-
-    if (hwnd != INVALID_HANDLE_VALUE) {
-        /* Passing PeekMessage -1 as HWND (2nd arg) only gets PostThreadMessage() messages
-        * and ignores window messages - should co-exist better with windows apps e.g. Tk
-        */
-        if (hwnd == NULL)
-            hwnd = (HWND)-1;
-
-        while (PeekMessage(&msg, hwnd, WM_TIMER,    WM_TIMER,    PM_REMOVE|PM_NOYIELD) ||
-               PeekMessage(&msg, hwnd, WM_USER_MIN, WM_USER_MAX, PM_REMOVE|PM_NOYIELD))
-        {
-            /* re-post a WM_QUIT message (we'll mark it as read later) */
-            if(msg.message == WM_QUIT) {
-                PostQuitMessage((int)msg.wParam);
-                break;
-            }
-
-            if(!CallMsgFilter(&msg, MSGF_USER))
-            {
-                TranslateMessage(&msg);
-                DispatchMessage(&msg);
-            }
-        }
-    }
-
-    /* Call PeekMessage() to mark all pending messages in the queue as "old".
-     * This is necessary when we are being called by win32_msgwait() to
-     * make sure MsgWaitForMultipleObjects() stops reporting the same waiting
-     * message over and over.  An example how this can happen is when
-     * Perl is calling win32_waitpid() inside a GUI application and the GUI
-     * is generating messages before the process terminated.
-     */
-    PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE|PM_NOYIELD);
-
-    /* Above or other stuff may have set a signal flag */
-    if (PL_sig_pending)
-        despatch_signals();
-    
-    return 1;
-}
-
 /* This function will not return until the timeout has elapsed, or until
  * one of the handles is ready. */
 DllExport DWORD
@@ -2846,7 +2847,7 @@ win32_fseek(FILE *pf, Off_t offset,int origin)
 	errno = EINVAL;
 	return -1;
     }
-    return fsetpos(pf, &offset);
+    return fsetpos(pf, (fpos_t)&offset);
 #else
     return fseek(pf, (long)offset, origin);
 #endif

@@ -235,6 +235,9 @@ if ($ARGS{PLATFORM} ne 'vms') {
     }
 }
 
+# XXX TODO
+++$skip{$_} for qw( Perl_sv_copypv );
+
 unless ($define{UNLINK_ALL_VERSIONS}) {
     ++$skip{Perl_unlnk};
 }

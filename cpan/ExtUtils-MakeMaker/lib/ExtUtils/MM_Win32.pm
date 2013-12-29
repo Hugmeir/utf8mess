@@ -37,7 +37,7 @@ sub _identify_compiler_environment {
 	my ( $config ) = @_;
 
 	my $BORLAND = $config->{cc} =~ /^bcc/i ? 1 : 0;
-	my $GCC     = $config->{cc} =~ /\bgcc\b/i ? 1 : 0;
+	my $GCC     = $config->{cc} =~ /\bg(?:cc\b|\+\+)/i ? 1 : 0;
 	my $DLLTOOL = $config->{dlltool} || 'dlltool';
 
 	return ( $BORLAND, $GCC, $DLLTOOL );
@@ -107,6 +107,9 @@ used by default.
 
 sub maybe_command {
     my($self,$file) = @_;
+    if ($Config{usecrosscompile}) {
+        return $file if -x $file;
+    }
     my @e = exists($ENV{'PATHEXT'})
           ? split(/;/, $ENV{PATHEXT})
 	  : qw(.com .exe .bat .cmd);
@@ -135,6 +138,10 @@ Using \ for Windows.
 sub init_DIRFILESEP {
     my($self) = shift;
 
+    if ( $Config{usecrosscompile} ) {
+        return $self->{DIRFILESEP} = '/';
+    }
+    
     # The ^ makes sure its not interpreted as an escape in nmake
     $self->{DIRFILESEP} = $self->is_make_type('nmake') ? '^\\' :
                           $self->is_make_type('dmake') ? '\\\\'
@@ -150,9 +157,11 @@ Override some of the slower, portable commands with Windows specific ones.
 sub init_tools {
     my ($self) = @_;
 
-    $self->{NOOP}     ||= 'rem';
-    $self->{DEV_NULL} ||= '> NUL';
-
+    if ( !$Config{usecrosscompile} ) {
+        $self->{NOOP}     ||= 'rem';
+        $self->{DEV_NULL} ||= '> NUL';
+    }
+    
     $self->{FIXIN}    ||= $self->{PERL_CORE} ?
       "\$(PERLRUN) $self->{PERL_SRC}/win32/bin/pl2bat.pl" :
       'pl2bat.bat';
@@ -311,12 +320,12 @@ q{	$(AR) }.($BORLAND ? '$@ $(OBJECT:^"+")'
 			  : ($GCC ? '-ru $@ $(OBJECT)'
 			          : '-out:$@ $(OBJECT)')).q{
 	$(CHMOD) $(PERM_RWX) $@
-	$(NOECHO) $(ECHO) "$(EXTRALIBS)" > $(INST_ARCHAUTODIR)\extralibs.ld
+	$(NOECHO) $(ECHO) "$(EXTRALIBS)" > $(INST_ARCHAUTODIR)/extralibs.ld
 };
 
     # Old mechanism - still available:
     push @m, <<'MAKE_FRAG' if $self->{PERL_SRC} && $self->{EXTRALIBS};
-	$(NOECHO) $(ECHO) "$(EXTRALIBS)" >> $(PERL_SRC)\ext.libs
+	$(NOECHO) $(ECHO) "$(EXTRALIBS)" >> $(PERL_SRC)/ext.libs
 MAKE_FRAG
 
     join('', @m);
@@ -358,10 +367,10 @@ $(INST_DYNAMIC): $(OBJECT) $(MYEXTLIB) $(BOOTSTRAP) $(INST_ARCHAUTODIR)$(DFSEP).
       push(@m,
        q{	$(LD) $(LDDLFLAGS) $(OTHERLDFLAGS) }.$ldfrom.q{,$@,,}
        .($self->is_make_type('dmake')
-                ? q{$(PERL_ARCHIVE:s,/,\,) $(LDLOADLIBS:s,/,\,) }
-		 .q{$(MYEXTLIB:s,/,\,),$(EXPORT_LIST:s,/,\,)}
-		: q{$(subst /,\,$(PERL_ARCHIVE)) $(subst /,\,$(LDLOADLIBS)) }
-		 .q{$(subst /,\,$(MYEXTLIB)),$(subst /,\,$(EXPORT_LIST))})
+                ? q{$(PERL_ARCHIVE:s,/,/,) $(LDLOADLIBS:s,/,/,) }
+		 .q{$(MYEXTLIB:s,/,/,),$(EXPORT_LIST:s,/,/,)}
+		: q{$(subst /,/,$(PERL_ARCHIVE)) $(subst /,/,$(LDLOADLIBS)) }
+		 .q{$(subst /,/,$(MYEXTLIB)),$(subst /,/,$(EXPORT_LIST))})
        .q{,$(RESFILES)});
     } else {	# VC
       push(@m,
@@ -400,7 +409,7 @@ sub extra_clean_files {
 sub init_linker {
     my $self = shift;
 
-    $self->{PERL_ARCHIVE}       = "\$(PERL_INC)\\$Config{libperl}";
+    $self->{PERL_ARCHIVE}       = "\$(PERL_INC)/$Config{libperl}";
     $self->{PERL_ARCHIVE_AFTER} = '';
     $self->{EXPORT_LIST}        = '$(BASEEXT).def';
 }
@@ -465,8 +474,8 @@ sub _normalize_path_name {
     my $self = shift;
     my $file = shift;
 
-    require Win32;
-    my $short = Win32::GetShortPathName($file);
+    eval { require Win32 };
+    my $short = eval { Win32::GetShortPathName($file) };
     return defined $short ? lc $short : lc $file;
 }
 

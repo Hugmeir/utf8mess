@@ -338,6 +338,7 @@ extern  int	mkstemp(const char *path);
 #undef   init_os_extras
 #define  init_os_extras Perl_init_os_extras
 
+DllExport int		win32_async_check(pTHX);
 DllExport void		Perl_win32_init(int *argcp, char ***argvp);
 DllExport void		Perl_win32_term(void);
 DllExport void		Perl_init_os_extras(void);
@@ -472,8 +473,6 @@ struct interp_intern {
     unsigned 	poll_count;
     Sighandler_t sigtable[SIG_SIZE];
 };
-
-DllExport int win32_async_check(pTHX);
 
 #define WIN32_POLL_INTERVAL 32768
 #define PERL_ASYNC_CHECK() if (w32_do_async || PL_sig_pending) win32_async_check(aTHX)

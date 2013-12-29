@@ -3126,7 +3126,7 @@
  *	/bin/pdksh, /bin/ash, /bin/bash, or even something such as
  *	D:/bin/sh.exe.
  */
-#define SH_PATH "/bin/sh"  /**/
+#define SH_PATH ""  /**/
 
 /* SIG_NAME:
  *	This symbol contains a list of signal names in order of

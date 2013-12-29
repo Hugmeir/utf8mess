@@ -119,6 +119,8 @@ sub which_perl {
     my $perl = $^X;
     $perl ||= 'perl';
 
+    return $Config{hostperl} if $Config{hostperl};
+    
     # VMS should have 'perl' aliased properly
     return $perl if $Is_VMS;
 
@@ -134,8 +136,11 @@ sub which_perl {
           if $ENV{PERL_CORE};
 
         foreach my $path (File::Spec->path) {
-            $perlpath = File::Spec->catfile($path, $perl);
-            last if -x $perlpath;
+            my $maybe_perl = File::Spec->catfile($path, $perl);
+            if (-x $maybe_perl) {
+                $perlpath = $maybe_perl;
+                last;
+            }
         }
     }
 

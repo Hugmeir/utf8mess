@@ -139,27 +139,26 @@ my %extra_passthrough;
 if ($is_Win32) {
     require Cwd;
     require FindExt;
-    my $build = Cwd::getcwd();
+    my $build = Cwd::getcwd() || Cwd::_backtick_pwd();
     $perl = $^X;
     if ($perl =~ m#^\.\.#) {
 	my $here = $build;
-	$here =~ s{/}{\\}g;
-	$perl = "$here\\$perl";
+	$perl = "$here/$perl";
     }
     (my $topdir = $perl) =~ s/\\[^\\]+$//;
     # miniperl needs to find perlglob and pl2bat
-    $ENV{PATH} = "$topdir;$topdir\\win32\\bin;$ENV{PATH}";
-    my $pl2bat = "$topdir\\win32\\bin\\pl2bat";
+    $ENV{PATH} = "$topdir$Config{path_sep}$topdir\\win32\\bin$Config{path_sep}$ENV{PATH}";
+    my $pl2bat = "$topdir/win32/bin/pl2bat";
     unless (-f "$pl2bat.bat") {
-	my @args = ($perl, "-I$topdir\\lib", ("$pl2bat.pl") x 2);
+	my @args = ($perl, "-I$topdir/lib", ("$pl2bat.pl") x 2);
 	print "@args\n";
 	system(@args) unless IS_CROSS;
     }
 
-    print "In $build";
+    print "In $build\n";
     foreach my $dir (@dirs) {
 	chdir($dir) or die "Cannot cd to $dir: $!\n";
-	(my $ext = Cwd::getcwd()) =~ s{/}{\\}g;
+	my $ext = Cwd::getcwd() || Cwd::_backtick_pwd();
 	FindExt::scan_ext($ext);
 	FindExt::set_static_extensions(split ' ', $Config{static_ext});
 	chdir $build
@@ -190,8 +189,8 @@ if ($is_Win32) {
 	}
     }
 
-    chdir '..'
-	or die "Couldn't chdir to build directory: $!"; # now in the Perl build
+    #chdir '..'
+	#or die "Couldn't chdir to build directory: $!"; # now in the Perl build
 }
 elsif ($is_VMS) {
     $perl = $^X;
