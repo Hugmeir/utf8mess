@@ -259,5 +259,7 @@ case "$cc" in
     ;;
 esac
 
+osvers="`$run getprop ro.build.version.release`"
+
 # Android is a linux variant, so run those hints.
 . ./hints/linux.sh
