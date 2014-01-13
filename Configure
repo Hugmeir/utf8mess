@@ -5147,7 +5147,7 @@ checkccflag='check=$1; flag=$2; callback=$3;
 echo " ";
 echo "Checking if your compiler accepts $flag" 2>&1;
 echo "int main(void) { return 0; }" > gcctest.c;
-if $cc -O2 $flag -o gcctest gcctest.c 2>gcctest.out && ./gcctest; then
+if $cc $ccflags -O2 $flag -o gcctest gcctest.c 2>gcctest.out && $run ./gcctest; then
     echo "Yes, it does." 2>&1;
     if $test -s gcctest.out ; then
         echo "But your platform does not like it:";
