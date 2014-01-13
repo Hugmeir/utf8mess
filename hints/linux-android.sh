@@ -266,3 +266,16 @@ osvers="`$run getprop ro.build.version.release`"
 
 # Android is a linux variant, so run those hints.
 . ./hints/linux.sh
+
+# Hackery. We want osname to be linux-android during Configure,
+# but plain 'android' afterwards.
+case "$src" in
+    /*) pwd="$src";;
+    *)  pwd=`test -f ../Configure && cd ..; pwd`
+        ;;
+esac
+
+$cat <<EOO >> $pwd/config.arch
+
+osname='android'
+EOO
