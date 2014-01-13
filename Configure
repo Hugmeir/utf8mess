@@ -3539,7 +3539,7 @@ EOM
                 *linux-android*)
                     # Catch arm-linux-androideabi, mipsel-linux-android,
                     # and i686-linux-android
-                    osname=linux-androideabi
+                    osname=linux-android
                     osvers=''
                     ;;
                 *linux*)
