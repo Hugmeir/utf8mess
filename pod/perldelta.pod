@@ -344,6 +344,15 @@ for all headers and libraries under this new sysroot, instead of /.
 This is a huge time saver if cross-compiling, but can also help
 on native builds if your toolchain's files have non-standard locations.
 
+=item *
+
+By default, Perl will only create a shell subprocess for system(), backticks
+etc, if you use shell metacharacters in your shell command. Some operating
+systems (e.g. Android) do not install the separate echo or pwd binaries,
+which breaks the assumptions of not only the core tests, but also large
+parts of CPAN; In these cases, we can force perl to always spawn a
+shell by building it with the -Duseshellcmds.
+
 =back
 
 =head1 Testing
