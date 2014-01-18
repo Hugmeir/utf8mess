@@ -898,6 +898,12 @@
 #define	PERL_TARGETARCH	""	/**/
 #endif
 
+/* USE_SHELL_ALWAYS:
+ * This symbol, if defined, indicates that only shell commands should be used
+ * when using system() or backticks.
+ */
+/*#define USE_SHELL_ALWAYS    / **/
+
 /* MULTIARCH:
  *	This symbol, if defined, signifies that the build
  *	process will produce some binary files that are going to be
@@ -4718,6 +4724,6 @@
 #endif
 
 /* Generated from:
- * 4ce7b989417303946dd7101ed52557e157c57900e9dbff6b5799a7b6af48dbd3 config_h.SH
- * 71b0dcf437b30c409fc23b5c4c6ec2c988fc419295a650fe80f93a6d5fb0ff94 uconfig.sh
+ * dffe86369a8c770e7cb199fab2c30ab37098833c57b250c77f5e5de23fb2fa89 config_h.SH
+ * 6541a1f7bfc634abda781151b709493de488cd55dd312f8c6ff7db1fd9a161be uconfig.sh
  * ex: set ro: */
