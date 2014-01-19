@@ -63,6 +63,10 @@ $PERL =
     $Is_MSWin32 ? '.\perl' :
                   './perl');
 
+if ( $Config{d_useshellcmds} ) {
+    $PERL = "exec $PERL";
+}
+
 sub env_is {
     my ($key, $val, $desc) = @_;
 

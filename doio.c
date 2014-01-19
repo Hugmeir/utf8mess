@@ -1464,8 +1464,10 @@ bool
 Perl_do_exec3(pTHX_ const char *incmd, int fd, int do_report)
 {
     dVAR;
+#ifndef USE_SHELL_ALWAYS
     const char **a;
     char *s;
+#endif
     char *buf;
     char *cmd;
     /* Make a copy so we can change it */
@@ -1480,6 +1482,7 @@ Perl_do_exec3(pTHX_ const char *incmd, int fd, int do_report)
     while (*cmd && isSPACE(*cmd))
 	cmd++;
 
+#ifndef USE_SHELL_ALWAYS
     /* save an extra exec if possible */
 
 #ifdef CSH
@@ -1553,12 +1556,14 @@ Perl_do_exec3(pTHX_ const char *incmd, int fd, int do_report)
 		}
 	    }
 	  doshell:
+#endif /* USE_SHELL_ALWAYS */
 	    PERL_FPU_PRE_EXEC
 	    PerlProc_execl(PL_sh_path, "sh", "-c", cmd, (char *)NULL);
 	    PERL_FPU_POST_EXEC
  	    S_exec_failed(aTHX_ PL_sh_path, fd, do_report);
 	    Safefree(buf);
 	    return FALSE;
+#ifndef USE_SHELL_ALWAYS
 	}
     }
 
@@ -1589,6 +1594,7 @@ Perl_do_exec3(pTHX_ const char *incmd, int fd, int do_report)
     do_execfree();
     Safefree(buf);
     return FALSE;
+#endif /* USE_SHELL_ALWAYS */
 }
 
 #endif /* OS2 || WIN32 */
